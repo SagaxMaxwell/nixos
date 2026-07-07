@@ -1,0 +1,71 @@
+theme = "onedark"
+
+[editor]
+true-color = true
+line-number = "relative"
+mouse = true
+cursorline = true
+cursorcolumn = false
+auto-format = true
+bufferline = "never"
+auto-pairs = true
+
+[editor.statusline]
+left = ["mode", "spinner", "file-name", "read-only-indicator", "file-modification-indicator"]
+center = []
+right = ["diagnostics", "selections", "register", "position", "file-encoding", "file-line-ending", "file-type"]
+separator = "💤"
+mode.normal = "🥳"
+mode.insert = "🤯"
+mode.select = "🤔"
+
+[editor.lsp]
+enable = true
+display-messages = true
+auto-signature-help = true
+display-inlay-hints = true
+display-signature-help-docs = true
+snippets = true
+goto-reference-include-declaration = true
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+hidden = false
+follow-symlinks = true
+deduplicate-links = true
+parents = true
+ignore = true
+git-ignore = true
+git-global = true
+git-exclude = true
+
+[editor.search]
+smart-case = true
+wrap-around = true
+
+[editor.whitespace]
+render = "none"
+
+[editor.indent-guides]
+render = false
+
+[editor.gutters]
+layout = ["diff", "diagnostics", "line-numbers", "spacer"]
+
+[editor.gutters.line-numbers]
+min-width = 3
+
+[editor.soft-wrap]
+enable = true
+max-wrap = 20
+max-indent-retain = 40
+wrap-indicator = ""
+wrap-at-text-width = false
+
+[editor.smart-tab]
+enable = true
+supersede-menu = false
