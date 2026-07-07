@@ -114,5 +114,9 @@
     wezterm = {
       enable = true;
     };
+    
+    helix = {
+      enable = true;
+    };
   };
 }

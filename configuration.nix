@@ -47,6 +47,17 @@
     };
   };
 
+  networking = {
+    networkmanager.enable = true;
+  };
+
+  users.users.maxwell = {
+    isNormalUser = true;
+    description = "Maxwell";
+    group = "users";
+    extraGroups = [ "networkmanager" "wheel" ];
+  };
+
   services = {
     fstrim = {
       enable = true;
@@ -64,6 +75,10 @@
   zramSwap = {
     enable = true;
     memoryPercent = 50;
+  };
+
+  system = {
+    stateVersion = "26.05";
   };
 
   programs = {

@@ -21,7 +21,7 @@
     let
       system = "x86_64-linux";
       hostname = "nixos";
-      username = "maxwellsagax";
+      username = "maxwell";
     in
     {
       nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {

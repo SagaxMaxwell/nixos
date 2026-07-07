@@ -2,9 +2,8 @@
   services = {
     mihomo = {
       enable = true;
-      configFile = "/var/lib/mihomo/config.yaml";
+      configFile = "/home/maxwell/Downloads/clash-verge.yaml";
       tunMode = true;
-      processesInfo = true;
     };
   };
 }
