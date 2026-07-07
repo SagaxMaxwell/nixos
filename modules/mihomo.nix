@@ -1,10 +1,8 @@
-{ config, ... }:
-
 {
   services = {
     mihomo = {
       enable = true;
-      configFile = config.local.paths.mihomoConfig;
+      configFile = "/home/maxwell/Downloads/clash-verge.yaml";
       tunMode = true;
     };
   };

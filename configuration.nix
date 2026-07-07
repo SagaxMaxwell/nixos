@@ -1,8 +1,5 @@
-{ config, ... }:
-
 {
   imports = [
-    ./modules/local-options.nix
     ./hardware-configuration.nix
     ./modules/desktop.nix
     ./modules/fonts.nix
@@ -12,51 +9,6 @@
     ./modules/nvidia.nix
     ./modules/asus.nix
   ];
-
-  local = rec {
-    stateVersion = "26.05";
-
-    user = {
-      name = "maxwell";
-      fullName = "Maxwell";
-      primaryGroup = "users";
-      extraGroups = [ "networkmanager" "wheel" ];
-
-      git = {
-        name = "Maxwell";
-        email = "sagax.maxwell@gmail.com";
-      };
-    };
-
-    paths = rec {
-      home = "/home/" + user.name;
-      mihomoConfig = home + "/Downloads/clash-verge.yaml";
-    };
-
-    nix = {
-      gc = {
-        dates = "weekly";
-        options = "--delete-older-than 30d";
-        randomizedDelaySec = "45min";
-      };
-
-      optimise = {
-        dates = [ "weekly" ];
-      };
-    };
-
-    desktop = {
-      portalBackend = "gtk";
-    };
-
-    inputMethod = {
-      type = "fcitx5";
-    };
-
-    graphics = {
-      videoDrivers = [ "nvidia" ];
-    };
-  };
 
   nixpkgs = {
     config = {
@@ -71,15 +23,15 @@
 
     gc = {
       automatic = true;
-      dates = config.local.nix.gc.dates;
-      options = config.local.nix.gc.options;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
       persistent = true;
-      randomizedDelaySec = config.local.nix.gc.randomizedDelaySec;
+      randomizedDelaySec = "45min";
     };
 
     optimise = {
       automatic = true;
-      dates = config.local.nix.optimise.dates;
+      dates = [ "weekly" ];
     };
   };
 
@@ -104,11 +56,11 @@
     networkmanager.enable = true;
   };
 
-  users.users.${config.local.user.name} = {
+  users.users.maxwell = {
     isNormalUser = true;
-    description = config.local.user.fullName;
-    group = config.local.user.primaryGroup;
-    extraGroups = config.local.user.extraGroups;
+    description = "Maxwell";
+    group = "users";
+    extraGroups = [ "networkmanager" "wheel" ];
   };
 
   services = {
@@ -131,7 +83,7 @@
   };
 
   system = {
-    stateVersion = config.local.stateVersion;
+    stateVersion = "26.05";
   };
 
   programs = {

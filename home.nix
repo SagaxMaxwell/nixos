@@ -1,21 +1,19 @@
-{ osConfig, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   home = {
-    stateVersion = osConfig.local.stateVersion;
+    stateVersion = "26.05";
 
     packages = with pkgs; [
-      duf
       google-chrome
-      ncdu
       rsync
-      unzip
       which
-      wl-clipboard
       xh
-      zip
-      _7zz
-      poppler-utils
+      rustup
+      nixd
+      nixfmt
+      nix-tree
+      nix-output-monitor
     ];
   };
 
@@ -59,8 +57,8 @@
 
       settings = {
         user = {
-          name = osConfig.local.user.git.name;
-          email = osConfig.local.user.git.email;
+          name = "Maxwell";
+          email = "sagax.maxwell@gmail.com";
         };
       };
     };

@@ -1,9 +1,7 @@
-{ config, ... }:
-
 {
   services = {
     xserver = {
-      videoDrivers = config.local.graphics.videoDrivers;
+      videoDrivers = [ "nvidia" ];
     };
   };
 

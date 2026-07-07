@@ -22,18 +22,13 @@
     };
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, nix-index-database, ... }:
+  outputs = { nixpkgs, home-manager, nix-index-database, ... }:
     let
       system = "x86_64-linux";
-      hostname = "nixos";
     in
     {
-      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = {
-          inherit inputs hostname;
-        };
-
         modules = [
           ./configuration.nix
 
@@ -42,11 +37,6 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-
-              extraSpecialArgs = {
-                inherit inputs;
-              };
-
               users.maxwell = {
                 imports = [
                   nix-index-database.homeModules.default
