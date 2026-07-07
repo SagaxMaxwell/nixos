@@ -1,9 +1,9 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   i18n.inputMethod = {
     enable = true;
-    type = "fcitx5";
+    type = config.local.inputMethod.type;
 
     fcitx5 = {
       waylandFrontend = true;

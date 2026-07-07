@@ -1,15 +1,68 @@
-{ ... }:
+{ config, ... }:
 
 {
   imports = [
+    ./modules/local-options.nix
     ./hardware-configuration.nix
     ./modules/desktop.nix
+    ./modules/fonts.nix
     ./modules/gaming.nix
     ./modules/input.nix
     ./modules/mihomo.nix
     ./modules/nvidia.nix
     ./modules/asus.nix
   ];
+
+  local = rec {
+    stateVersion = "26.05";
+
+    user = {
+      name = "maxwell";
+      fullName = "Maxwell";
+      primaryGroup = "users";
+      extraGroups = [ "networkmanager" "wheel" ];
+
+      git = {
+        name = "Maxwell";
+        email = "sagax.maxwell@gmail.com";
+      };
+    };
+
+    paths = rec {
+      home = "/home/" + user.name;
+      mihomoConfig = home + "/Downloads/clash-verge.yaml";
+    };
+
+    nix = {
+      gc = {
+        dates = "weekly";
+        options = "--delete-older-than 30d";
+        randomizedDelaySec = "45min";
+      };
+
+      optimise = {
+        dates = [ "weekly" ];
+      };
+    };
+
+    desktop = {
+      portalBackend = "gtk";
+    };
+
+    inputMethod = {
+      type = "fcitx5";
+    };
+
+    graphics = {
+      videoDrivers = [ "nvidia" ];
+    };
+  };
+
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+    };
+  };
 
   nix = {
     settings = {
@@ -18,15 +71,15 @@
 
     gc = {
       automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 30d";
+      dates = config.local.nix.gc.dates;
+      options = config.local.nix.gc.options;
       persistent = true;
-      randomizedDelaySec = "45min";
+      randomizedDelaySec = config.local.nix.gc.randomizedDelaySec;
     };
 
     optimise = {
       automatic = true;
-      dates = [ "weekly" ];
+      dates = config.local.nix.optimise.dates;
     };
   };
 
@@ -51,11 +104,11 @@
     networkmanager.enable = true;
   };
 
-  users.users.maxwell = {
+  users.users.${config.local.user.name} = {
     isNormalUser = true;
-    description = "Maxwell";
-    group = "users";
-    extraGroups = [ "networkmanager" "wheel" ];
+    description = config.local.user.fullName;
+    group = config.local.user.primaryGroup;
+    extraGroups = config.local.user.extraGroups;
   };
 
   services = {
@@ -78,7 +131,7 @@
   };
 
   system = {
-    stateVersion = "26.05";
+    stateVersion = config.local.stateVersion;
   };
 
   programs = {

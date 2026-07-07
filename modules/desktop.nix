@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   hardware = {
@@ -70,7 +70,7 @@
 
       config = {
         common = {
-          default = [ "gtk" ];
+          default = [ config.local.desktop.portalBackend ];
         };
       };
     };

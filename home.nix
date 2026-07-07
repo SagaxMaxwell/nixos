@@ -1,11 +1,12 @@
-{ pkgs, ... }:
+{ osConfig, pkgs, ... }:
 
 {
   home = {
-    stateVersion = "26.05";
+    stateVersion = osConfig.local.stateVersion;
 
     packages = with pkgs; [
       duf
+      google-chrome
       ncdu
       rsync
       unzip
@@ -18,9 +19,23 @@
     ];
   };
 
+  xdg = {
+    enable = true;
+  };
+
   programs = {
     home-manager = {
       enable = true;
+    };
+
+    nix-index = {
+      enable = true;
+    };
+
+    nix-index-database = {
+      comma = {
+        enable = true;
+      };
     };
 
     direnv = {
@@ -41,6 +56,13 @@
 
     git = {
       enable = true;
+
+      settings = {
+        user = {
+          name = osConfig.local.user.git.name;
+          email = osConfig.local.user.git.email;
+        };
+      };
     };
 
     mangohud = {
@@ -114,7 +136,7 @@
     wezterm = {
       enable = true;
     };
-    
+
     helix = {
       enable = true;
     };

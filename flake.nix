@@ -6,6 +6,11 @@
       url = "github:nixos/nixpkgs?ref=nixos-unstable";
     };
 
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
 
@@ -17,17 +22,16 @@
     };
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, ... }:
+  outputs = inputs@{ nixpkgs, home-manager, nix-index-database, ... }:
     let
       system = "x86_64-linux";
       hostname = "nixos";
-      username = "maxwell";
     in
     {
       nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
-          inherit inputs hostname username;
+          inherit inputs hostname;
         };
 
         modules = [
@@ -40,10 +44,15 @@
               useUserPackages = true;
 
               extraSpecialArgs = {
-                inherit inputs username;
+                inherit inputs;
               };
 
-              users.${username} = import ./home.nix;
+              users.maxwell = {
+                imports = [
+                  nix-index-database.homeModules.default
+                  ./home.nix
+                ];
+              };
             };
           }
         ];

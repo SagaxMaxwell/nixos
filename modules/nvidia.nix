@@ -1,13 +1,9 @@
-{
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
-  };
+{ config, ... }:
 
+{
   services = {
     xserver = {
-      videoDrivers = [ "nvidia" ];
+      videoDrivers = config.local.graphics.videoDrivers;
     };
   };
 
