@@ -6,6 +6,7 @@
 
     packages = with pkgs; [
       google-chrome
+      gnome-tweaks
       rsync
       which
       xh
