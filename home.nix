@@ -57,6 +57,10 @@
       };
     };
 
+    bash = {
+      enable = true;
+    };
+
     fish = {
       enable = true;
     };
@@ -141,6 +145,13 @@
 
     nushell = {
       enable = true;
+    };
+
+    starship = {
+      enable = true;
+      enableBashIntegration = true;
+      enableZshIntegration = true;
+      enableNushellIntegration = true;
     };
 
     wezterm = {

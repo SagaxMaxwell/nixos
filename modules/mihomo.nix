@@ -4,7 +4,7 @@
   services = {
     mihomo = {
       enable = true;
-      configFile = "/home/maxwell/Downloads/decky/clash-verge.yaml";
+      configFile = "/home/maxwell/Downloads/nixos/clash-verge.yaml";
       tunMode = true;
     };
   };
