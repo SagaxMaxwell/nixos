@@ -20,6 +20,18 @@
 
   xdg = {
     enable = true;
+
+    configFile = {
+      "helix/config.toml" = {
+        source = ./helix/config.toml;
+        force = true;
+      };
+
+      "wezterm/wezterm.lua" = {
+        source = ./wezterm/wezterm.lua;
+        force = true;
+      };
+    };
   };
 
   programs = {
@@ -114,10 +126,9 @@
 
     zoxide = {
       enable = true;
-    };
-
-    starship = {
-      enable = true;
+      enableZshIntegration = true;
+      enableBashIntegration = true;
+      enableNushellIntegration = true;
     };
 
     obsidian = {

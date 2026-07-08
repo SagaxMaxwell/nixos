@@ -11,6 +11,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    jovian = {
+      url = "github:Jovian-Experiments/Jovian-NixOS";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
 
@@ -22,7 +27,7 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, nix-index-database, ... }:
+  outputs = { nixpkgs, home-manager, nix-index-database, jovian, ... }:
     let
       system = "x86_64-linux";
     in
@@ -32,6 +37,7 @@
         modules = [
           ./configuration.nix
 
+          jovian.nixosModules.default
           home-manager.nixosModules.home-manager
           {
             home-manager = {

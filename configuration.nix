@@ -52,10 +52,6 @@
     };
   };
 
-  networking = {
-    networkmanager.enable = true;
-  };
-
   users.users.maxwell = {
     isNormalUser = true;
     description = "Maxwell";
