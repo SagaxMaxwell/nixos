@@ -10,7 +10,7 @@ secret: Maxwell.721120
 unified-delay: true
 external-controller-unix: /run/user/1000/clash-verge-rev/verge-mihomo.sock
 tun:
-  enable: true
+  enable: false
   stack: gvisor
   auto-route: true
   strict-route: false
