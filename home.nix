@@ -68,16 +68,18 @@
 
     starship = {
       enable = true;
-      enableBashIntegration = true;
-      enableNushellIntegration = true;
       enableZshIntegration = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
     };
 
     zoxide = {
       enable = true;
-      enableBashIntegration = true;
-      enableNushellIntegration = true;
       enableZshIntegration = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
     };
 
     # Command-line tools
@@ -111,6 +113,10 @@
 
     yazi = {
       enable = true;
+      enableZshIntegration = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      enableNushellIntegration = true;
     };
 
     # Nix integration
@@ -171,8 +177,8 @@
 
     wezterm = {
       enable = true;
-      enableBashIntegration = true;
       enableZshIntegration = true;
+      enableBashIntegration = true;
     };
   };
 }
