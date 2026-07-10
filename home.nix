@@ -5,11 +5,16 @@
     stateVersion = "26.05";
 
     packages = with pkgs; [
-      google-chrome
+      # Desktop applications
       gnome-tweaks
+      google-chrome
+
+      # Command-line tools
       rsync
       which
       xh
+
+      # Development and Nix tools
       rustup
       nixd
       nixfmt
@@ -35,28 +40,7 @@
   };
 
   programs = {
-    home-manager = {
-      enable = true;
-    };
-
-    nix-index = {
-      enable = true;
-    };
-
-    nix-index-database = {
-      comma = {
-        enable = true;
-      };
-    };
-
-    direnv = {
-      enable = true;
-
-      nix-direnv = {
-        enable = true;
-      };
-    };
-
+    # Shells
     bash = {
       enable = true;
     };
@@ -65,25 +49,38 @@
       enable = true;
     };
 
+    nushell = {
+      enable = true;
+    };
+
     zsh = {
       enable = true;
     };
 
-    git = {
+    # Shell environment
+    direnv = {
       enable = true;
 
-      settings = {
-        user = {
-          name = "Maxwell";
-          email = "sagax.maxwell@gmail.com";
-        };
+      nix-direnv = {
+        enable = true;
       };
     };
 
-    mangohud = {
+    starship = {
       enable = true;
+      enableBashIntegration = true;
+      enableNushellIntegration = true;
+      enableZshIntegration = true;
     };
 
+    zoxide = {
+      enable = true;
+      enableBashIntegration = true;
+      enableNushellIntegration = true;
+      enableZshIntegration = true;
+    };
+
+    # Command-line tools
     bat = {
       enable = true;
     };
@@ -112,7 +109,27 @@
       enable = true;
     };
 
-    vscode = {
+    yazi = {
+      enable = true;
+    };
+
+    # Nix integration
+    home-manager = {
+      enable = true;
+    };
+
+    nix-index = {
+      enable = true;
+    };
+
+    nix-index-database = {
+      comma = {
+        enable = true;
+      };
+    };
+
+    # Development tools
+    bun = {
       enable = true;
     };
 
@@ -120,22 +137,18 @@
       enable = true;
     };
 
-    bun = {
+    git = {
       enable = true;
+
+      settings = {
+        user = {
+          name = "Maxwell";
+          email = "sagax.maxwell@gmail.com";
+        };
+      };
     };
 
-    yazi = {
-      enable = true;
-    };
-
-    zoxide = {
-      enable = true;
-      enableZshIntegration = true;
-      enableBashIntegration = true;
-      enableNushellIntegration = true;
-    };
-
-    obsidian = {
+    helix = {
       enable = true;
     };
 
@@ -143,23 +156,23 @@
       enable = true;
     };
 
-    nushell = {
+    vscode = {
       enable = true;
     };
 
-    starship = {
+    # Interface applications
+    mangohud = {
       enable = true;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableNushellIntegration = true;
+    };
+
+    obsidian = {
+      enable = true;
     };
 
     wezterm = {
       enable = true;
-    };
-
-    helix = {
-      enable = true;
+      enableBashIntegration = true;
+      enableZshIntegration = true;
     };
   };
 }

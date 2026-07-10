@@ -34,13 +34,13 @@
     pipewire = {
       enable = true;
 
-      pulse = {
-        enable = true;
-      };
-
       alsa = {
         enable = true;
         support32Bit = pkgs.stdenv.hostPlatform.isx86_64;
+      };
+
+      pulse = {
+        enable = true;
       };
     };
 

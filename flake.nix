@@ -6,16 +6,6 @@
       url = "github:nixos/nixpkgs?ref=nixos-unstable";
     };
 
-    nix-index-database = {
-      url = "github:nix-community/nix-index-database";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    jovian = {
-      url = "github:Jovian-Experiments/Jovian-NixOS";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     home-manager = {
       url = "github:nix-community/home-manager";
 
@@ -25,9 +15,26 @@
         };
       };
     };
+
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    jovian = {
+      url = "github:Jovian-Experiments/Jovian-NixOS";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, nix-index-database, jovian, ... }:
+  outputs =
+    {
+      nixpkgs,
+      home-manager,
+      nix-index-database,
+      jovian,
+      ...
+    }:
     let
       system = "x86_64-linux";
     in
@@ -37,8 +44,8 @@
         modules = [
           ./configuration.nix
 
-          jovian.nixosModules.default
           home-manager.nixosModules.home-manager
+          jovian.nixosModules.default
           {
             home-manager = {
               useGlobalPkgs = true;

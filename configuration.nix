@@ -3,13 +3,16 @@
 {
   imports = [
     ./hardware-configuration.nix
+
+    ./modules/asus.nix
+    ./modules/nvidia.nix
+
     ./modules/desktop.nix
     ./modules/fonts.nix
-    ./modules/gaming.nix
     ./modules/input.nix
+
+    ./modules/gaming.nix
     ./modules/mihomo.nix
-    ./modules/nvidia.nix
-    ./modules/asus.nix
   ];
 
   nixpkgs = {
@@ -19,8 +22,13 @@
   };
 
   nix = {
+    package = pkgs.nixVersions.latest;
+    
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
 
     gc = {
@@ -60,7 +68,10 @@
     isNormalUser = true;
     description = "Maxwell";
     group = "users";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
   };
 
   services = {
@@ -87,11 +98,11 @@
   };
 
   programs = {
-    nix-ld = {
+    fish = {
       enable = true;
     };
 
-    fish = {
+    nix-ld = {
       enable = true;
     };
 

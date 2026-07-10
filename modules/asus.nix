@@ -1,4 +1,4 @@
-{ 
+{
   programs = {
     rog-control-center = {
       enable = true;
@@ -6,11 +6,11 @@
   };
 
   services = {
-    supergfxd = {
+    power-profiles-daemon = {
       enable = true;
     };
 
-    power-profiles-daemon = {
+    supergfxd = {
       enable = true;
     };
 
