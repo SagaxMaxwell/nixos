@@ -1,3 +1,5 @@
+{ pkgs, ... }:
+
 {
   imports = [
     ./hardware-configuration.nix
@@ -50,6 +52,8 @@
     tmp = {
       cleanOnBoot = true;
     };
+
+    kernelPackages = pkgs.linuxPackages_latest;
   };
 
   users.users.maxwell = {

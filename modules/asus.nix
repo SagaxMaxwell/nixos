@@ -1,10 +1,4 @@
-{ pkgs, ... }:
-
-{
-  boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
-  };
-  
+{ 
   programs = {
     rog-control-center = {
       enable = true;
