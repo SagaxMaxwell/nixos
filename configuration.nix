@@ -6,6 +6,7 @@
 
     ./modules/asus.nix
     ./modules/nvidia.nix
+    ./modules/openrgb.nix
 
     ./modules/desktop.nix
     ./modules/fonts.nix
