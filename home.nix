@@ -31,11 +31,6 @@
         source = ./helix/config.toml;
         force = true;
       };
-
-      "wezterm/wezterm.lua" = {
-        source = ./wezterm/wezterm.lua;
-        force = true;
-      };
     };
   };
 
@@ -175,10 +170,14 @@
       enable = true;
     };
 
-    wezterm = {
+    ghostty = {
       enable = true;
+      systemd.enable = true;
+      installBatSyntax = true;
+      installVimSyntax = true;
       enableZshIntegration = true;
       enableBashIntegration = true;
+      enableFishIntegration = true;
     };
   };
 }
