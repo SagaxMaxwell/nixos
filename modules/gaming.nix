@@ -42,7 +42,6 @@
       heroic
       protonplus
       wineWow64Packages.stagingFull
-      winetricks
     ];
   };
 }
