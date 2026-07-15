@@ -8,6 +8,7 @@
     ./modules/nvidia.nix
     ./modules/openrgb.nix
 
+    ./modules/graphics.nix
     ./modules/desktop.nix
     ./modules/fonts.nix
     ./modules/input.nix

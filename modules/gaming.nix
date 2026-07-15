@@ -39,13 +39,10 @@
 
   environment = {
     systemPackages = with pkgs; [
-      clinfo
-      libva-utils
-      mesa-demos
+      heroic
       protonplus
-      vdpauinfo
-      vulkan-tools
-      vulkan-validation-layers
+      wineWow64Packages.stagingFull
+      winetricks
     ];
   };
 }
