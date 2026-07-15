@@ -28,6 +28,7 @@
 
     gamescope = {
       enable = true;
+      enableWsi = true;
       capSysNice = true;
     };
 

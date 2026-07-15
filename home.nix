@@ -8,6 +8,7 @@
       # Desktop applications
       gnome-tweaks
       google-chrome
+      heroic
 
       # Command-line tools
       rsync
