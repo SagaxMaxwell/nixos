@@ -9,10 +9,7 @@
     };
   };
 
-  networking.networkmanager = {
-    enable = true;
-    insertNameservers = [ "127.0.0.1" ];
-  };
+  networking.networkmanager.insertNameservers = [ "127.0.0.1" ];
 
   systemd.services.mihomo.serviceConfig = {
     AmbientCapabilities = lib.mkAfter [ "CAP_NET_BIND_SERVICE" ];

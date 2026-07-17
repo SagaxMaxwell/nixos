@@ -7,7 +7,6 @@
     packages = with pkgs; [
       # Desktop applications
       gnome-tweaks
-      google-chrome
 
       # Command-line tools
       rsync
@@ -25,13 +24,6 @@
 
   xdg = {
     enable = true;
-
-    configFile = {
-      "helix/config.toml" = {
-        source = ./helix/config.toml;
-        force = true;
-      };
-    };
   };
 
   services = {
@@ -41,6 +33,20 @@
   };
 
   programs = {
+    gnome-shell = {
+      enable = true;
+
+      extensions = with pkgs.gnomeExtensions; [
+        {
+          package = appindicator;
+        }
+      ];
+    };
+
+    google-chrome = {
+      enable = true;
+    };
+
     # Shells
     bash = {
       enable = true;
@@ -157,6 +163,114 @@
 
     helix = {
       enable = true;
+
+      settings = {
+        theme = "onedark";
+
+        editor = {
+          "true-color" = true;
+          "line-number" = "relative";
+          mouse = true;
+          cursorline = true;
+          cursorcolumn = false;
+          "auto-format" = true;
+          bufferline = "never";
+          "auto-pairs" = true;
+
+          statusline = {
+            left = [
+              "mode"
+              "spinner"
+              "file-name"
+              "read-only-indicator"
+              "file-modification-indicator"
+            ];
+            center = [ ];
+            right = [
+              "diagnostics"
+              "selections"
+              "register"
+              "position"
+              "file-encoding"
+              "file-line-ending"
+              "file-type"
+            ];
+            separator = "💤";
+
+            mode = {
+              normal = "🥳";
+              insert = "🤯";
+              select = "🤔";
+            };
+          };
+
+          lsp = {
+            enable = true;
+            "display-messages" = true;
+            "auto-signature-help" = true;
+            "display-inlay-hints" = true;
+            "display-signature-help-docs" = true;
+            snippets = true;
+            "goto-reference-include-declaration" = true;
+          };
+
+          "cursor-shape" = {
+            insert = "bar";
+            normal = "block";
+            select = "underline";
+          };
+
+          "file-picker" = {
+            hidden = false;
+            "follow-symlinks" = true;
+            "deduplicate-links" = true;
+            parents = true;
+            ignore = true;
+            "git-ignore" = true;
+            "git-global" = true;
+            "git-exclude" = true;
+          };
+
+          search = {
+            "smart-case" = true;
+            "wrap-around" = true;
+          };
+
+          whitespace = {
+            render = "none";
+          };
+
+          "indent-guides" = {
+            render = false;
+          };
+
+          gutters = {
+            layout = [
+              "diff"
+              "diagnostics"
+              "line-numbers"
+              "spacer"
+            ];
+
+            "line-numbers" = {
+              "min-width" = 3;
+            };
+          };
+
+          "soft-wrap" = {
+            enable = true;
+            "max-wrap" = 20;
+            "max-indent-retain" = 40;
+            "wrap-indicator" = "";
+            "wrap-at-text-width" = false;
+          };
+
+          "smart-tab" = {
+            enable = true;
+            "supersede-menu" = false;
+          };
+        };
+      };
     };
 
     uv = {

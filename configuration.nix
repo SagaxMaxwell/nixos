@@ -25,7 +25,7 @@
 
   nix = {
     package = pkgs.nixVersions.latest;
-    
+
     settings = {
       experimental-features = [
         "nix-command"
@@ -77,10 +77,6 @@
   };
 
   services = {
-    fstrim = {
-      enable = true;
-    };
-
     fwupd = {
       enable = true;
     };

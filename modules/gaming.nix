@@ -27,13 +27,16 @@
     };
 
     gamescope = {
-      enable = true;
       enableWsi = true;
       capSysNice = true;
     };
 
     steam = {
       enable = true;
+
+      gamescopeSession = {
+        enable = true;
+      };
     };
   };
 
