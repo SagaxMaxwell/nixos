@@ -34,6 +34,12 @@
     };
   };
 
+  services = {
+    flameshot = {
+      enable = true;
+    };
+  };
+
   programs = {
     # Shells
     bash = {
