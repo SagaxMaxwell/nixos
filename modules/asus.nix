@@ -6,6 +6,10 @@
   };
 
   services = {
+    hardware.openrgb = {
+      enable = true;
+    };
+
     power-profiles-daemon = {
       enable = true;
     };

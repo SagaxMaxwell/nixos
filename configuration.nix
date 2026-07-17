@@ -6,7 +6,6 @@
 
     ./modules/asus.nix
     ./modules/nvidia.nix
-    ./modules/openrgb.nix
 
     ./modules/graphics.nix
     ./modules/desktop.nix
