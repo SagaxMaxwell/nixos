@@ -281,6 +281,10 @@
       enable = true;
     };
 
+    zed-editor = {
+      enable = true;
+    };
+
     # Interface applications
     mangohud = {
       enable = true;
