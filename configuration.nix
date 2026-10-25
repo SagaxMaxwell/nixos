@@ -22,8 +22,19 @@
     };
   };
 
+  # Chrome does not expose Home Manager's extension option on Linux;
+  # install the shared extension through Chrome's managed policy.
+  environment.etc."opt/chrome/policies/managed/extensions.json".text = builtins.toJSON {
+    ExtensionSettings = {
+      "bgnkhhnnamicmpeenaelnjfhikgbkllg" = {
+        installation_mode = "force_installed";
+        update_url = "https://clients2.google.com/service/update2/crx";
+      };
+    };
+  };
+
   nix = {
-    package = pkgs.nixVersions.latest;
+    package = pkgs.lix;
 
     settings = {
       experimental-features = [

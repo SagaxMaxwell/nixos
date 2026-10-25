@@ -21,6 +21,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    obsidian-extensions = {
+      url = "git+https://github.com/karaolidis/nix-obsidian-extensions?shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    vscode-extensions = {
+      url = "git+https://github.com/nix-community/nix-vscode-extensions?shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     jovian = {
       url = "github:Jovian-Experiments/Jovian-NixOS";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,6 +42,8 @@
       nixpkgs,
       home-manager,
       nix-index-database,
+      obsidian-extensions,
+      vscode-extensions,
       jovian,
       ...
     }:
@@ -47,6 +59,11 @@
           home-manager.nixosModules.home-manager
           jovian.nixosModules.default
           {
+            nixpkgs.overlays = [
+              obsidian-extensions.overlays.default
+              vscode-extensions.overlays.default
+            ];
+
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;

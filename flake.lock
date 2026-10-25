@@ -99,12 +99,78 @@
         "type": "github"
       }
     },
+    "obsidian-extensions": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "treefmt-nix": "treefmt-nix"
+      },
+      "locked": {
+        "lastModified": 1790853896,
+        "narHash": "sha256-nfZSUrQpPeCa6MAA6A9PzGeBTfcW83MMnXycydSK2TY=",
+        "ref": "refs/heads/main",
+        "rev": "ce991897a2195d22d38de82007dbd1273b11aac0",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/karaolidis/nix-obsidian-extensions"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/karaolidis/nix-obsidian-extensions"
+      }
+    },
     "root": {
       "inputs": {
         "home-manager": "home-manager",
         "jovian": "jovian",
         "nix-index-database": "nix-index-database",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "obsidian-extensions": "obsidian-extensions",
+        "vscode-extensions": "vscode-extensions"
+      }
+    },
+    "treefmt-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "obsidian-extensions",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785360170,
+        "narHash": "sha256-XE1lKgQ3eIO3E7zWryqcRsax+mYXod/5RHBn4YaR9YE=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "d1187f8bc71fb8aab02395869ec3f5c1920f75c0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "vscode-extensions": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790831594,
+        "narHash": "sha256-X+uowytIH8SVW1m3GVZKJrZ0A+rAJb8gkMSToExik0s=",
+        "ref": "refs/heads/master",
+        "rev": "9cfe29321e0ba1d2b5d53a76332669ae72c421f6",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/nix-vscode-extensions"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/nix-vscode-extensions"
       }
     }
   },
