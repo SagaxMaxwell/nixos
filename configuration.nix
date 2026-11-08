@@ -1,29 +1,21 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
-
-    ./modules/asus.nix
-    ./modules/nvidia.nix
-
-    ./modules/graphics.nix
-    ./modules/desktop.nix
-    ./modules/fonts.nix
-    ./modules/input.nix
-
-    ./modules/gaming.nix
-    ./modules/mihomo.nix
+    ./system/desktop.nix
+    ./system/gaming.nix
+    ./system/hardware.nix
+    ./system/input.nix
+    ./system/virtualisation.nix
   ];
 
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
-  };
+  nixpkgs.config.allowUnfree = true;
 
-  # Chrome does not expose Home Manager's extension option on Linux;
-  # install the shared extension through Chrome's managed policy.
+  time.timeZone = "Asia/Shanghai";
+  i18n.defaultLocale = "zh_CN.UTF-8";
+
+  # Chrome extensions use system policy on Linux.
   environment.etc."opt/chrome/policies/managed/extensions.json".text = builtins.toJSON {
     ExtensionSettings = {
       "bgnkhhnnamicmpeenaelnjfhikgbkllg" = {
@@ -40,6 +32,10 @@
       experimental-features = [
         "nix-command"
         "flakes"
+      ];
+      substituters = lib.mkAfter [ "https://cache.lantian.pub/lantian" ];
+      trusted-public-keys = lib.mkAfter [
+        "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
       ];
     };
 
@@ -73,49 +69,22 @@
       cleanOnBoot = true;
     };
 
-    kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
   };
 
   users.users.maxwell = {
     isNormalUser = true;
     description = "Maxwell";
-    group = "users";
     extraGroups = [
       "networkmanager"
       "wheel"
     ];
   };
 
-  services = {
-    fwupd = {
-      enable = true;
-    };
+  system.stateVersion = "26.05";
 
-    openssh = {
-      enable = true;
-    };
-  };
-
-  zramSwap = {
-    enable = true;
-    memoryPercent = 50;
-  };
-
-  system = {
-    stateVersion = "26.05";
-  };
-
-  programs = {
-    fish = {
-      enable = true;
-    };
-
-    nix-ld = {
-      enable = true;
-    };
-
-    zsh = {
-      enable = true;
-    };
-  };
+  programs.nix-ld.enable = true;
+  programs.nushell.enable = true;
+  users.defaultUserShell = pkgs.nushell;
+  systemd.oomd.enableUserSlices = true;
 }
