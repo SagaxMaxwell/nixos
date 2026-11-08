@@ -17,7 +17,7 @@ sudo nixos-enter --root /mnt -c 'passwd maxwell'
 首次登录前设置密码。后续在仓库内更新：
 
 ```sh
-nix flake update path:.
+nix flake update
 nix flake check path:. --show-trace
 sudo nixos-rebuild switch --flake path:.#nixos
 ```
@@ -36,7 +36,7 @@ Hyprland 按最高分辨率选择最高刷新率，全屏按需启用 VRR；保�
 
 | 桌面 | 默认键位 | 当前调用 |
 | --- | --- | --- |
-| Hyprland | `Super+Q` / `Super+R` / `Super+E` | Ghostty / Noctalia 启动器 / Ghostty 中运行 Yazi |
+| Hyprland | `Super+Q` / `Super+R` / `Super+E` | Ghostty / Noctalia 启动器 / Strata |
 | Hyprland | `Super+M` | `uwsm stop` 退出会话 |
 | niri | `Super+T` / `Super+D` / `Super+Alt+L` | Ghostty / Noctalia 启动器 / Noctalia 锁屏 |
 | 两者 | 音量、媒体、亮度键 | Noctalia |
@@ -56,6 +56,7 @@ Hyprland 默认没有锁屏键，可通过 Noctalia 锁屏。niri 保留的 Orca
 
 ## 备注
 
+- 文件管理：Strata 通过上游 flake 安装，负责打开目录和显示文件位置；终端保留 Yazi。文件选择器继续使用 GTK。
 - 游戏：Steam、Gamescope、GameMode、MangoHud。GameMode 不会自动作用于所有 Steam 游戏；启动选项使用 `gamemoderun %command%`，性能显示使用 `gamemoderun mangohud %command%`。
 - AMD OpenCL 已启用；Blender 内选择 HIP 设备。ReBAR/SAM 需在 UEFI 开启 Above 4G Decoding 和 Re-Size BAR。
 - zram-generator 是唯一 swap；使用 systemd-oomd，MetaOOM 目前没有 Nix 包。

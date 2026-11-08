@@ -34,6 +34,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    strata = {
+      url = "github:lgse/strata";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     sfd-nix = {
       url = "github:asaineko/sfd-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -50,6 +55,7 @@
       nix-index-database,
       obsidian-extensions,
       sheprd,
+      strata,
       sfd-nix,
       ...
     }:
@@ -82,6 +88,7 @@
 
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
+        specialArgs.strata = strata.packages.${system}.default;
         modules = [
           ./configuration.nix
 

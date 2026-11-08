@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  strata,
   ...
 }:
 
@@ -14,6 +15,8 @@
   services = {
     displayManager.noctalia-greeter.enable = true;
     gnome.gnome-keyring.enable = true;
+    gvfs.enable = true;
+    dbus.packages = [ strata.fileManagerService ];
   };
 
   fonts.packages = with pkgs; [
@@ -26,6 +29,15 @@
   ];
 
   home-manager.users.maxwell = {
+    home.packages = [ strata ];
+    xdg.mimeApps = {
+      enable = true;
+      defaultApplications = {
+        "inode/directory" = [ "io.github.lgse.Strata.desktop" ];
+        "x-scheme-handler/trash" = [ "io.github.lgse.Strata.desktop" ];
+      };
+    };
+
     systemd.user.services.noctalia.Unit.X-Restart-Triggers = lib.optional (
       config.time.timeZone != null
     ) config.time.timeZone;

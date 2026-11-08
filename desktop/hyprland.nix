@@ -82,7 +82,7 @@ in
           "SUPER + Q" = ''exec_cmd("ghostty")'';
           "SUPER + C" = "window.close()";
           "SUPER + M" = ''exec_cmd("uwsm stop")'';
-          "SUPER + E" = ''exec_cmd("ghostty -e yazi")'';
+          "SUPER + E" = ''exec_cmd("strata")'';
           "SUPER + V" = ''window.float({ action = "toggle" })'';
           "SUPER + R" = ''exec_cmd("noctalia msg panel-toggle launcher")'';
           "SUPER + P" = "window.pseudo()";

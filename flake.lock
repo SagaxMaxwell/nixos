@@ -172,7 +172,8 @@
         "nixpkgs": "nixpkgs_2",
         "obsidian-extensions": "obsidian-extensions",
         "sfd-nix": "sfd-nix",
-        "sheprd": "sheprd"
+        "sheprd": "sheprd",
+        "strata": "strata"
       }
     },
     "rust-overlay": {
@@ -237,6 +238,26 @@
       "original": {
         "owner": "sheprd-labs",
         "repo": "sheprd",
+        "type": "github"
+      }
+    },
+    "strata": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794164014,
+        "narHash": "sha256-X5BDZXpt462w/D1WADy3wG9qqWO/rAYqnjleUZe/48g=",
+        "owner": "lgse",
+        "repo": "strata",
+        "rev": "afa70b348326803868c335156de2abbc9be5b93f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lgse",
+        "repo": "strata",
         "type": "github"
       }
     },
