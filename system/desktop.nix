@@ -28,7 +28,6 @@
     displayManager.noctalia-greeter.enable = true;
     fwupd.enable = true;
     openssh.enable = true;
-    firewalld.enable = true;
     knot-resolver.enable = true;
     chrony.enable = true;
 

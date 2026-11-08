@@ -67,8 +67,8 @@ way-displays 自动选择显示器刷新率并处理 VRR。Noctalia 使用系统
 - Blender：使用 ROCm/HIP 构建；在 Blender 中选择 HIP 渲染设备。
 - 游戏：Steam、Gamescope、GameMode、MangoHud、Wine。GameMode 不会自动作用于所有 Steam 游戏，按需在启动选项填写 `gamemoderun %command%`；MangoHud 可用 `gamemoderun mangohud %command%` 启动。
 - 显卡性能：ReBAR/SAM 需在 UEFI 中开启 Above 4G Decoding 和 Re-Size BAR。
-- 系统服务：greetd、NetworkManager、Knot Resolver、firewalld（nftables）、Chrony、BlueZ、PipeWire/WirePlumber、fwupd、OpenSSH、zram-generator（唯一 swap）和 systemd-oomd。
-- 容器与虚拟化：Podman 使用 Netavark；containerd CRI 使用 CNI 插件并注册可选的 gVisor `runsc` 运行时；安装 BuildKit 和 Cloud Hypervisor。WireGuard 可通过 NetworkManager 配置；Kea DHCP 服务暂未启用。
+- 系统服务：Noctalia Greeter、NetworkManager、Knot Resolver、NixOS 原生 nftables 防火墙、Chrony、BlueZ、PipeWire/WirePlumber、fwupd、OpenSSH、zram-generator（唯一 swap）和 systemd-oomd。MetaOOM 目前没有 Nix 包。
+- 容器与虚拟化：Podman 使用 Netavark；containerd 注册可选的 gVisor `runsc` 运行时，CNI 网络尚未配置；安装 BuildKit 和 Cloud Hypervisor。WireGuard 可通过 NetworkManager 配置；Kea DHCP 服务暂未启用。
 - 输入与桌面语言：`Asia/Shanghai`、`zh_CN.UTF-8`。
 - Shell：Nushell 为默认登录 shell。
 - AI：Codex CLI、Herdr；TUI 工作台暂用 Sheprd，Vibex 目前没有 Nix 包。
