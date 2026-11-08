@@ -3,7 +3,8 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./system/desktop.nix
+    ./desktop/hyprland.nix
+    ./system/services.nix
     ./system/gaming.nix
     ./system/hardware.nix
     ./system/input.nix

@@ -1,20 +1,10 @@
-{ lib, pkgs, ... }:
+{ lib, ... }:
 
 {
   security.rtkit.enable = true;
   swapDevices = lib.mkForce [ ];
 
   programs = {
-    niri = {
-      enable = true;
-      useNautilus = false;
-    };
-
-    noctalia = {
-      enable = true;
-      recommendedServices.enable = true;
-    };
-
     sing-box-for-desktop = {
       enable = true;
       settings = {
@@ -25,7 +15,6 @@
   };
 
   services = {
-    displayManager.noctalia-greeter.enable = true;
     fwupd.enable = true;
     openssh.enable = true;
     knot-resolver.enable = true;
@@ -52,13 +41,4 @@
   };
 
   networking.nftables.enable = true;
-
-  fonts.packages = with pkgs; [
-    ibm-plex
-    lxgw-wenkai
-    nerd-fonts.jetbrains-mono
-    source-han-mono
-    source-han-sans
-    source-han-serif
-  ];
 }

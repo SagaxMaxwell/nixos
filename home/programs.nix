@@ -5,8 +5,6 @@
 }:
 
 {
-  imports = [ ./session.nix ];
-
   home = {
     stateVersion = "26.05";
 

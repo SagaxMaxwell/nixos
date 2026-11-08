@@ -65,11 +65,25 @@
     {
       checks.${system} =
         let
-          home = self.nixosConfigurations.nixos.config.home-manager.users.maxwell;
+          config = self.nixosConfigurations.nixos.config;
+          pkgs = self.nixosConfigurations.nixos.pkgs;
+          home = config.home-manager.users.maxwell;
         in
         {
-          niri-config = home.xdg.configFile."niri/config.kdl".source;
           noctalia-config = home.xdg.configFile."noctalia/config.toml".source;
+        }
+        // nixpkgs.lib.optionalAttrs config.programs.niri.enable {
+          niri-config = home.xdg.configFile."niri/config.kdl".source;
+        }
+        // nixpkgs.lib.optionalAttrs config.programs.hyprland.enable {
+          hyprland-config = pkgs.runCommand "hyprland-config" { } ''
+            export HOME="$TMPDIR/home" XDG_RUNTIME_DIR="$TMPDIR/runtime"
+            mkdir -p "$HOME" "$XDG_RUNTIME_DIR"
+            chmod 700 "$XDG_RUNTIME_DIR"
+            ${config.programs.hyprland.package}/bin/Hyprland --verify-config \
+              -c ${home.xdg.configFile."hypr/hyprland.lua".source}
+            touch "$out"
+          '';
         };
 
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
@@ -92,7 +106,7 @@
               users.maxwell = {
                 imports = [
                   nix-index-database.homeModules.default
-                  ./home/maxwell.nix
+                  ./home/programs.nix
                 ];
               };
             };
