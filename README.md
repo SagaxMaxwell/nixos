@@ -72,6 +72,7 @@ way-displays 自动选择显示器刷新率并处理 VRR。Noctalia 使用系统
 - 输入与桌面语言：`Asia/Shanghai`、`zh_CN.UTF-8`。
 - Shell：Nushell 为默认登录 shell。
 - AI：Codex CLI、Herdr；TUI 工作台暂用 Sheprd，Vibex 目前没有 Nix 包。
+- 办公：ONLYOFFICE Desktop Editors。
 - 其他应用：Ghostty、Helix、Zed、Obsidian、Chrome、Tabularis、sing-box for Desktop。
 
 sing-box for Desktop 通过社区 `sfd-nix` 模块安装 GUI、配套核心和 root systemd 后台服务，并配置 PolicyKit action/`pkexec` 集成；TUN 操作由后台特权服务执行。GUI 会自动启动，但需在界面导入订阅并手动连接；订阅和密钥不存入仓库。

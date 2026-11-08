@@ -259,6 +259,8 @@
     };
 
     # GUI apps.
+    onlyoffice.enable = true;
+
     obsidian = {
       enable = true;
       cli.enable = true;
