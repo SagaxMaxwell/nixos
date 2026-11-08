@@ -45,7 +45,7 @@ Hyprland 按最高分辨率选择最高刷新率，全屏按需启用 VRR；保�
 
 | 快捷键 | 重叠功能 |
 | --- | --- |
-| `Ctrl+Space` | Fcitx 输入法 / Zed 补全 |
+| `Ctrl+Space` | Fcitx 输入法 / Zed 补全 / Strata 切换选择 |
 | `Ctrl+;` | Fcitx 剪贴板 / Zed 行号或上下文菜单 |
 | `Ctrl+Shift+U` | Fcitx Unicode / Zed 重做选择 |
 | `Ctrl+Alt+P`、`Ctrl+Alt+H/J` | Fcitx 预编辑、拼写提示 / Zed Agent、子词删除或侧栏 |
