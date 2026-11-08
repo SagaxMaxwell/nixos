@@ -55,8 +55,6 @@
 
     eza.enable = true;
 
-    man.generateCaches = false;
-
     fd.enable = true;
 
     ripgrep.enable = true;
@@ -65,10 +63,7 @@
 
     atuin.enable = true;
 
-    yazi = {
-      enable = true;
-      shellWrapperName = "y";
-    };
+    yazi.enable = true;
 
     zoxide.enable = true;
 
@@ -225,13 +220,26 @@
         arguments = [ "--lsp" ];
       };
       userSettings.lsp.oxlint.initialization_options.settings.fixKind = "safe_fix";
-      userSettings.lsp.oxlint.binary.path = "${pkgs.oxlint}/bin/oxlint";
-      userSettings.lsp.ruff.binary.path = "${pkgs.ruff}/bin/ruff";
-      userSettings.lsp.ty.binary.path = "${pkgs.ty}/bin/ty";
-      userSettings.lsp.tombi.binary.path = "${pkgs.tombi}/bin/tombi";
+      userSettings.lsp.oxlint.binary = {
+        path = "${pkgs.oxlint}/bin/oxlint";
+        arguments = [ "--lsp" ];
+      };
+      userSettings.lsp.ruff.binary = {
+        path = "${pkgs.ruff}/bin/ruff";
+        arguments = [ "server" ];
+      };
+      userSettings.lsp.ty.binary = {
+        path = "${pkgs.ty}/bin/ty";
+        arguments = [ "server" ];
+      };
+      userSettings.lsp.tombi.binary = {
+        path = "${pkgs.tombi}/bin/tombi";
+        arguments = [ "lsp" ];
+      };
       userSettings.lsp.rust-analyzer.binary.path = "${pkgs.rust-analyzer}/bin/rust-analyzer";
       userSettings.languages =
         lib.genAttrs [ "JavaScript" "JSX" "TypeScript" "TSX" ] (_: {
+          formatter.language_server.name = "oxfmt";
           code_actions_on_format = {
             "source.organizeImports" = true;
             "source.fixAll.oxc" = true;
@@ -263,10 +271,7 @@
       enable = true;
       cli.enable = true;
 
-      vaults.Documents = {
-        target = "Documents";
-        settings.app.restrictedMode = false;
-      };
+      vaults.Documents.settings.app.restrictedMode = false;
 
       defaultSettings.communityPlugins = with pkgs.obsidianPlugins; [
         obsidian-linter

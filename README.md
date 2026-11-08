@@ -59,7 +59,7 @@ Hyprland 默认没有锁屏键，可通过 Noctalia 锁屏。niri 保留的 Orca
 - 游戏：Steam、Gamescope、GameMode、MangoHud。GameMode 不会自动作用于所有 Steam 游戏；启动选项使用 `gamemoderun %command%`，性能显示使用 `gamemoderun mangohud %command%`。
 - AMD OpenCL 已启用；Blender 内选择 HIP 设备。ReBAR/SAM 需在 UEFI 开启 Above 4G Decoding 和 Re-Size BAR。
 - zram-generator 是唯一 swap；使用 systemd-oomd，MetaOOM 目前没有 Nix 包。
-- Podman 使用 Netavark；containerd 提供可选 gVisor，CNI 网络尚未配置。包含 BuildKit、Cloud Hypervisor；WireGuard 通过 NetworkManager 配置，Kea 未启用。
+- Podman 使用 Netavark；containerd 的 gVisor 需显式选择 `runsc`，CNI 网络尚未配置。BuildKit、Cloud Hypervisor 仅安装工具；WireGuard 通过 NetworkManager 配置，Kea 未启用。
 - AI 工作台暂用 Sheprd，Vibex 目前没有 Nix 包；办公使用 ONLYOFFICE。
 - sing-box for Desktop 已配置特权后台与授权集成；首次在 GUI 导入订阅并连接，密钥不进入仓库。
 

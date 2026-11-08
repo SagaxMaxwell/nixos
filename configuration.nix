@@ -16,13 +16,11 @@
   time.timeZone = "Asia/Shanghai";
   i18n.defaultLocale = "zh_CN.UTF-8";
 
-  # Chrome extensions use system policy on Linux.
-  environment.etc."opt/chrome/policies/managed/extensions.json".text = builtins.toJSON {
-    ExtensionSettings = {
-      "bgnkhhnnamicmpeenaelnjfhikgbkllg" = {
-        installation_mode = "force_installed";
-        update_url = "https://clients2.google.com/service/update2/crx";
-      };
+  programs.chromium = {
+    enable = true;
+    extraOpts.ExtensionSettings."bgnkhhnnamicmpeenaelnjfhikgbkllg" = {
+      installation_mode = "force_installed";
+      update_url = "https://clients2.google.com/service/update2/crx";
     };
   };
 
@@ -44,7 +42,6 @@
       automatic = true;
       dates = "weekly";
       options = "--delete-older-than 30d";
-      persistent = true;
       randomizedDelaySec = "45min";
     };
 
@@ -61,14 +58,10 @@
         configurationLimit = 10;
       };
 
-      efi = {
-        canTouchEfiVariables = true;
-      };
+      efi.canTouchEfiVariables = true;
     };
 
-    tmp = {
-      cleanOnBoot = true;
-    };
+    tmp.cleanOnBoot = true;
 
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
   };
