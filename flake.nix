@@ -34,11 +34,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    strata = {
-      url = "github:lgse/strata";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     sfd-nix = {
       url = "github:asaineko/sfd-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -55,7 +50,6 @@
       nix-index-database,
       obsidian-extensions,
       sheprd,
-      strata,
       sfd-nix,
       ...
     }:
@@ -88,15 +82,6 @@
 
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs.strata = strata.packages.${system}.default.overrideAttrs (previous: {
-          # Expose NixOS media drivers inside the preview sandbox.
-          postPatch = (previous.postPatch or "") + ''
-            substituteInPlace src/sandbox/command.rs \
-              --replace-fail 'command.args(["--ro-bind", "/sys", "/sys"]);' \
-                'bind_try(command, "/run/opengl-driver");
-                    command.args(["--ro-bind", "/sys", "/sys"]);'
-          '';
-        });
         modules = [
           ./configuration.nix
 

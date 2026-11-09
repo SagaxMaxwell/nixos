@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  strata,
   ...
 }:
 
@@ -16,7 +15,6 @@
     displayManager.noctalia-greeter.enable = true;
     gnome.gnome-keyring.enable = true;
     gvfs.enable = true;
-    dbus.packages = [ strata.fileManagerService ];
   };
 
   fonts.packages = with pkgs; [
@@ -29,13 +27,10 @@
   ];
 
   home-manager.users.maxwell = {
-    home.packages = [ strata ];
+    home.packages = [ pkgs.cosmic-files ];
     xdg.mimeApps = {
       enable = true;
-      defaultApplications = {
-        "inode/directory" = [ "io.github.lgse.Strata.desktop" ];
-        "x-scheme-handler/trash" = [ "io.github.lgse.Strata.desktop" ];
-      };
+      defaultApplications."inode/directory" = [ "com.system76.CosmicFiles.desktop" ];
     };
 
     systemd.user.services.noctalia.Unit.X-Restart-Triggers = lib.optional (
