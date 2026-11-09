@@ -19,7 +19,7 @@ sudo nixos-enter --root /mnt -c 'passwd maxwell'
 ```sh
 nix flake update
 nix flake check path:. --show-trace
-sudo nixos-rebuild switch --flake path:.#nixos
+run0 nixos-rebuild switch --flake path:.#nixos
 ```
 
 软件版本由 `flake.lock` 固定；`stateVersion` 是数据兼容基线。硬件配置由目标机器生成。
@@ -56,6 +56,10 @@ Hyprland 默认没有锁屏键，可通过 Noctalia 锁屏。niri 保留的 Orca
 
 ## 备注
 
+- 提权使用 run0，`sudo` 命令由兼容入口转交 run0，常用调用可继续使用；授权仍需密码，不完全兼容 sudo 的所有选项。
+- Wi-Fi 使用 NetworkManager + iwd，IP 与 DNS 继续由现有配置管理；当前 NixOS 模块仍将 iwd 后端标为实验性。
+- 保留 glibc。mimalloc v3 通过 NixOS 原生字段替换宿主 Nix/glibc 动态程序的分配器，不覆盖所有程序或 Steam 隔离运行时；直接运行的 32 位程序可能出现忽略 64 位预加载库的提示，兼容性需 Linux 实测。
+- Linux 下运行 `nix develop` 使用 mold 链接的 C/C++ 开发环境；已有系统软件和项目自带工具链不受此设置覆盖。
 - 文件管理：COSMIC Files 使用浅色主题、默认青绿强调色和 Adwaita 蓝色文件夹；终端保留 Yazi，文件选择器使用 GTK。未启用提供 FileManager1 的桌面图标进程，部分应用的“显示所在文件夹”可能不可用；视频、PDF 缩略图取决于额外 thumbnailer。
 - 游戏：Steam、Gamescope、GameMode、MangoHud。GameMode 不会自动作用于所有 Steam 游戏；启动选项使用 `gamemoderun %command%`，性能显示使用 `gamemoderun mangohud %command%`。
 - AMD OpenCL 已启用；Blender 内选择 HIP 设备。ReBAR/SAM 需在 UEFI 开启 Above 4G Decoding 和 Re-Size BAR。

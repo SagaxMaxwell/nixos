@@ -57,6 +57,15 @@
       system = "x86_64-linux";
     in
     {
+      devShells.${system}.default =
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        (pkgs.mkShell.override {
+          stdenv = pkgs.stdenvAdapters.useMoldLinker pkgs.stdenv;
+        })
+          { };
+
       checks.${system} =
         let
           config = self.nixosConfigurations.nixos.config;

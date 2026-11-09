@@ -1,7 +1,16 @@
 { lib, ... }:
 
 {
-  security.rtkit.enable = true;
+  security = {
+    rtkit.enable = true;
+    sudo.enable = false;
+    run0 = {
+      enable = true;
+      sudo-shim.enable = true;
+    };
+  };
+
+  environment.memoryAllocator.provider = "mimalloc";
   swapDevices = lib.mkForce [ ];
 
   programs = {
@@ -38,6 +47,7 @@
   networking.networkmanager = {
     enable = true;
     dns = "none";
+    wifi.backend = "iwd";
   };
 
   networking.nftables.enable = true;
