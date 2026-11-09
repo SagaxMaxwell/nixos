@@ -56,7 +56,7 @@ Hyprland 默认没有锁屏键，可通过 Noctalia 锁屏。niri 保留的 Orca
 
 ## 备注
 
-- 文件管理：COSMIC Files 打开目录，终端保留 Yazi，文件选择器使用 GTK。未启用提供 FileManager1 的桌面图标进程，部分应用的“显示所在文件夹”可能不可用；视频、PDF 缩略图取决于额外 thumbnailer。
+- 文件管理：COSMIC Files 使用浅色主题、默认青绿强调色和 Adwaita 蓝色文件夹；终端保留 Yazi，文件选择器使用 GTK。未启用提供 FileManager1 的桌面图标进程，部分应用的“显示所在文件夹”可能不可用；视频、PDF 缩略图取决于额外 thumbnailer。
 - 游戏：Steam、Gamescope、GameMode、MangoHud。GameMode 不会自动作用于所有 Steam 游戏；启动选项使用 `gamemoderun %command%`，性能显示使用 `gamemoderun mangohud %command%`。
 - AMD OpenCL 已启用；Blender 内选择 HIP 设备。ReBAR/SAM 需在 UEFI 开启 Above 4G Decoding 和 Re-Size BAR。
 - zram-generator 是唯一 swap；使用 systemd-oomd，MetaOOM 目前没有 Nix 包。

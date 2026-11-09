@@ -27,7 +27,14 @@
   ];
 
   home-manager.users.maxwell = {
-    home.packages = [ pkgs.cosmic-files ];
+    home.packages = with pkgs; [
+      cosmic-files
+      adwaita-icon-theme
+    ];
+    xdg.configFile = {
+      "cosmic/com.system76.CosmicFiles/v1/app_theme".text = "Light";
+      "cosmic/com.system76.CosmicTk/v1/icon_theme".text = ''"Adwaita"'';
+    };
     xdg.mimeApps = {
       enable = true;
       defaultApplications."inode/directory" = [ "com.system76.CosmicFiles.desktop" ];
