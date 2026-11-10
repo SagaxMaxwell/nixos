@@ -45,7 +45,11 @@ in
         general = {
           gaps_in = 6;
           gaps_out = 12;
-          col.active_border = "rgba(16fff9ff)";
+          border_size = 2;
+          col = {
+            active_border = "rgba(629ee8ff)";
+            inactive_border = "rgba(dce4edff)";
+          };
         };
         misc.vrr = 2;
       };

@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   ...
@@ -7,6 +8,22 @@
 {
   home = {
     stateVersion = "26.05";
+
+    activation.sheprdAppearance = lib.hm.dag.entryAfter [ "linkGeneration" ] (
+      lib.hm.generators.mkImpureConfigMerger {
+        inherit pkgs;
+        format = "toml";
+        empty = "{}";
+        jqOperation = "$dynamic * $static";
+        path = "${config.xdg.configHome}/herdr/config-gpui.local.toml";
+        staticSettings = (pkgs.formats.toml { }).generate "sheprd.toml" {
+          backdrop = {
+            opacity = 0.8;
+            blur = true;
+          };
+        };
+      }
+    );
 
     packages = with pkgs; [
       # Nix tooling.
@@ -96,7 +113,10 @@
     ghostty = {
       enable = true;
       settings = {
-        theme = "Atom One Dark";
+        theme = "light:GitHub Light Default,dark:Atom One Dark";
+        background-opacity = 0.8;
+        background-opacity-cells = true;
+        background-blur = true;
       };
     };
 
@@ -107,6 +127,7 @@
     # Editors.
     helix = {
       enable = true;
+      extraPackages = [ pkgs.wl-clipboard ];
 
       settings = {
         theme = "onedark";
@@ -204,6 +225,33 @@
 
     zed-editor = {
       enable = true;
+      # Paint opacity once; nested surfaces must not accumulate alpha.
+      userSettings.theme_overrides =
+        lib.mapAttrs
+          (
+            _: background:
+            {
+              "background.appearance" = "blurred";
+              inherit background;
+              "title_bar.background" = background;
+              "title_bar.inactive_background" = background;
+              "status_bar.background" = background;
+            }
+            // lib.genAttrs [
+              "editor.background"
+              "editor.gutter.background"
+              "panel.background"
+              "terminal.background"
+              "toolbar.background"
+              "tab_bar.background"
+              "tab.active_background"
+              "tab.inactive_background"
+            ] (_: "#00000000")
+          )
+          {
+            "One Light" = "#fafafacc";
+            "One Dark" = "#282c33cc";
+          };
       userSettings.auto_install_extensions = {
         nix = true;
         oxc = true;
@@ -269,7 +317,10 @@
 
     mpv = {
       enable = true;
-      config.hwdec = "auto";
+      config = {
+        hwdec = "auto";
+        background-color = "#CC000000";
+      };
       scripts = [ pkgs.mpvScripts.mpris ];
     };
 

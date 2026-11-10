@@ -28,7 +28,20 @@ run0 nixos-rebuild switch --flake path:.#nixos
 
 当前引用 `desktop/hyprland.nix`，通过 UWSM 管理会话，Nix 字段生成 Lua。切回保留的 niri 时，只需将 `configuration.nix` 中这一行换成 `./desktop/niri.nix`。两者共用 `desktop/common.nix`，登录会话、Portal 和显示管理分别随桌面切换。
 
-Noctalia 提供自动隐藏的状态栏、启动器、通知、控制中心、锁屏和授权界面。上下外边距均为 12 个逻辑像素；10 分钟闲置锁屏，11 分钟熄屏。Fcitx 5 提供美式键盘与 Rime-Ice 拼音，Shift 切换中英文。
+Noctalia 平时隐藏；鼠标在屏幕右上角停留 0.5 秒展开悬浮控制中心，点击外部或按 Esc 收起。日期、时间、网络、蓝牙、音量、通知和剪贴板集中在面板里。无常驻状态栏与托盘，应用从启动器打开；全屏可能遮住热角，可从启动器搜索控制中心。
+
+两套桌面以白色为主，浅蓝（`#629EE8`）仅点缀焦点边框、按钮和选中状态；统一直角与毛玻璃。Noctalia 使用原生调色板，不添加 CSS 或主题守护进程。支持的应用背景统一为 80% 不透明，文字不做整窗淡化：
+
+| 范围 | 效果与限制 |
+| --- | --- |
+| Noctalia | 面板、通知、音量／亮度提示为 80%；内层卡片由原生预设固定为 88% |
+| Ghostty、COSMIC Files、Sheprd、Zed | 背景 80%＋模糊；控件、菜单及叠加区域由应用自身绘制 |
+| mpv | 视频外空白区域为 80%；视频、字幕保持不透明 |
+| 其余应用 | 未提供合适的 Linux 背景透明度接口，保留原状 |
+
+Ghostty 原生跟随系统外观，07:00–22:00 为浅色，其余时间为原有深色；Noctalia 外壳始终浅色。Helix 暂无原生自动浅深主题，保留原配色，终端背景随 Ghostty；Obsidian 主题不变，Zed 保留默认主题和语法配色。Sheprd 在激活时合并外观设置，保留 GUI 的其他设置。
+
+窗口上下外边距均为 12 个逻辑像素；10 分钟闲置锁屏，11 分钟熄屏。Fcitx 5 提供美式键盘与 Rime-Ice 拼音，Shift 切换中英文。
 
 Hyprland 按最高分辨率选择最高刷新率，全屏按需启用 VRR；保留其默认全屏自动 HDR。niri 使用 way-displays。外接显示器需自行开启 DDC/CI。夜灯跟随本地时间，22:00–07:00 为 5500K，切换前后渐变；HDR 与夜灯同时使用的色彩表现需实机检查。
 
@@ -61,7 +74,7 @@ Hyprland 默认没有锁屏键，可通过 Noctalia 锁屏。niri 保留的 Orca
 - Wi-Fi 使用 NetworkManager + iwd，IP 与 DNS 继续由现有配置管理；当前 NixOS 模块仍将 iwd 后端标为实验性。
 - 保留 glibc。mimalloc v3 通过 NixOS 原生字段替换宿主 Nix/glibc 动态程序的分配器，不覆盖所有程序或 Steam 隔离运行时；直接运行的 32 位程序可能出现忽略 64 位预加载库的提示，兼容性需 Linux 实测。
 - Linux 下运行 `nix develop` 使用 mold 链接的 C/C++ 开发环境；已有系统软件和项目自带工具链不受此设置覆盖。
-- 文件管理：COSMIC Files 使用浅色主题、默认青绿强调色和 Adwaita 蓝色文件夹；终端保留 Yazi，文件选择器使用 GTK。未启用提供 FileManager1 的桌面图标进程，部分应用的“显示所在文件夹”可能不可用；视频、PDF 缩略图取决于额外 thumbnailer。
+- 文件管理：COSMIC Files 使用白色背景、直角、Adwaita 蓝色文件夹，保留默认青绿强调色。终端保留 Yazi，文件选择器使用 GTK。未启用 FileManager1 桌面进程，部分“显示所在文件夹”功能可能不可用；视频、PDF 缩略图取决于额外 thumbnailer。
 - 游戏：Steam、Gamescope、GameMode、MangoHud。GameMode 不会自动作用于所有 Steam 游戏；启动选项使用 `gamemoderun %command%`，性能显示使用 `gamemoderun mangohud %command%`。
 - AMD OpenCL 已启用；Blender 内选择 HIP 设备。ReBAR/SAM 需在 UEFI 开启 Above 4G Decoding 和 Re-Size BAR。
 - zram-generator 是唯一 swap；使用 systemd-oomd，MetaOOM 目前没有 Nix 包。

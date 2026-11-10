@@ -21,6 +21,9 @@ in
 
   services.displayManager.noctalia-greeter.settings.session.default = "niri";
 
+  # GNOME's accent-color would regenerate COSMIC's custom theme.
+  xdg.portal.config.niri."org.freedesktop.impl.portal.Settings" = "gtk";
+
   home-manager.users.maxwell = {
     services.way-displays = {
       enable = true;
@@ -39,13 +42,33 @@ in
 
         layout = {
           gaps = 12;
+          background-color = "#ffffff";
           default-column-width.proportion = 0.7;
           preset-column-widths._children = [
             { proportion = 0.5; }
             { proportion = 0.7; }
             { proportion = 1.0; }
           ];
-          focus-ring.active-color = "#16fff9";
+          focus-ring = {
+            width = 2;
+            active-color = "#629ee8";
+            inactive-color = "#dce4ed";
+          };
+        };
+
+        overview.backdrop-color = "#f8fafc";
+        blur.passes = 2;
+        layer-rule = {
+          match._props.namespace = "^noctalia-";
+          background-effect.xray = false;
+        };
+        # Clients without native ext-background-effect requests.
+        window-rule = {
+          match._props.app-id = "^(dev\\.zed\\.Zed|org\\.sheprd\\.Sheprd|mpv)$";
+          background-effect = {
+            blur = true;
+            xray = false;
+          };
         };
 
         prefer-no-csd = { };
