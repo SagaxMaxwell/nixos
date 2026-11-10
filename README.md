@@ -56,6 +56,7 @@ Hyprland 默认没有锁屏键，可通过 Noctalia 锁屏。niri 保留的 Orca
 
 ## 备注
 
+- 剪贴板历史目前使用 Noctalia 内置功能，暂不配置 Ringboard。
 - 提权使用 run0，`sudo` 命令由兼容入口转交 run0，常用调用可继续使用；授权仍需密码，不完全兼容 sudo 的所有选项。
 - Wi-Fi 使用 NetworkManager + iwd，IP 与 DNS 继续由现有配置管理；当前 NixOS 模块仍将 iwd 后端标为实验性。
 - 保留 glibc。mimalloc v3 通过 NixOS 原生字段替换宿主 Nix/glibc 动态程序的分配器，不覆盖所有程序或 Steam 隔离运行时；直接运行的 32 位程序可能出现忽略 64 位预加载库的提示，兼容性需 Linux 实测。
@@ -66,6 +67,7 @@ Hyprland 默认没有锁屏键，可通过 Noctalia 锁屏。niri 保留的 Orca
 - zram-generator 是唯一 swap；使用 systemd-oomd，MetaOOM 目前没有 Nix 包。
 - Podman 使用 Netavark；containerd 的 gVisor 需显式选择 `runsc`，CNI 网络尚未配置。BuildKit、Cloud Hypervisor 仅安装工具；WireGuard 通过 NetworkManager 配置，Kea 未启用。
 - AI 工作台暂用 Sheprd，Vibex 目前没有 Nix 包；办公使用 ONLYOFFICE。
+- 视频使用 mpv，自动选择硬件解码，常见视频格式默认用它打开；Noctalia 通过 MPRIS 控制播放，保留 mpv 默认快捷键。
 - sing-box for Desktop 已配置特权后台与授权集成；首次在 GUI 导入订阅并连接，密钥不进入仓库。
 
 `nix flake check` 检查当前桌面和 Noctalia 配置。macOS 使用 `nix flake check path:. --all-systems --no-build --show-trace` 仅做求值；登录、HDR、休眠唤醒和硬件功能需在 Linux 实测。

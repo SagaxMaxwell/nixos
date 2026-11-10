@@ -267,6 +267,12 @@
     # GUI apps.
     onlyoffice.enable = true;
 
+    mpv = {
+      enable = true;
+      config.hwdec = "auto";
+      scripts = [ pkgs.mpvScripts.mpris ];
+    };
+
     obsidian = {
       enable = true;
       cli.enable = true;
@@ -299,5 +305,19 @@
     };
   };
 
-  xdg.enable = true;
+  xdg = {
+    enable = true;
+    mimeApps.defaultApplications = lib.genAttrs [
+      "video/mp4"
+      "video/x-matroska"
+      "video/webm"
+      "video/quicktime"
+      "video/x-msvideo"
+      "video/mpeg"
+      "video/ogg"
+      "video/mp2t"
+      "video/x-flv"
+      "video/x-ms-wmv"
+    ] (_: [ "mpv.desktop" ]);
+  };
 }
