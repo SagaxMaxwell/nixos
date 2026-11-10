@@ -42,21 +42,15 @@ in
 
         layout = {
           gaps = 12;
-          background-color = "#ffffff";
           default-column-width.proportion = 0.7;
           preset-column-widths._children = [
             { proportion = 0.5; }
             { proportion = 0.7; }
             { proportion = 1.0; }
           ];
-          focus-ring = {
-            width = 2;
-            active-color = "#629ee8";
-            inactive-color = "#dce4ed";
-          };
+          focus-ring.width = 2;
         };
 
-        overview.backdrop-color = "#f8fafc";
         blur.passes = 2;
         layer-rule = {
           match._props.namespace = "^noctalia-";
