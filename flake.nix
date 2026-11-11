@@ -80,11 +80,6 @@
         in
         {
           noctalia-config = home.xdg.configFile."noctalia/config.toml".source;
-        }
-        // nixpkgs.lib.optionalAttrs config.programs.niri.enable {
-          niri-config = home.xdg.configFile."niri/config.kdl".source;
-        }
-        // nixpkgs.lib.optionalAttrs config.programs.umbriel.enable {
           umbriel-config = pkgs.runCommand "umbriel-config" { } ''
             ${config.programs.umbriel.package}/bin/umbriel config validate \
               -c ${home.xdg.configFile."umbriel/config.toml".source}

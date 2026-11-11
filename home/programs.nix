@@ -209,16 +209,8 @@
         }
       ];
 
-      languages.language-server.ty = {
-        command = "${pkgs.ty}/bin/ty";
-        args = [ "server" ];
-      };
-
-      languages.language-server.ruff = {
-        command = "${pkgs.ruff}/bin/ruff";
-        args = [ "server" ];
-      };
-
+      languages.language-server.ty.command = "${pkgs.ty}/bin/ty";
+      languages.language-server.ruff.command = "${pkgs.ruff}/bin/ruff";
       languages.language-server.rust-analyzer.command = "${pkgs.rust-analyzer}/bin/rust-analyzer";
       languages.language-server.tombi.command = "${pkgs.tombi}/bin/tombi";
     };
@@ -328,7 +320,10 @@
       enable = true;
       cli.enable = true;
 
-      vaults.Documents.settings.app.restrictedMode = false;
+      vaults.notes = {
+        target = "Documents/notes";
+        settings.app.restrictedMode = false;
+      };
 
       defaultSettings.communityPlugins = with pkgs.obsidianPlugins; [
         obsidian-linter
