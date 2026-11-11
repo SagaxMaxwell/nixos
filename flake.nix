@@ -11,7 +11,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/master";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -34,6 +34,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    strata = {
+      url = "github:lgse/strata";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     sfd-nix = {
       url = "github:asaineko/sfd-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -50,6 +55,7 @@
       nix-index-database,
       obsidian-extensions,
       sheprd,
+      strata,
       sfd-nix,
       ...
     }:
@@ -78,19 +84,25 @@
         // nixpkgs.lib.optionalAttrs config.programs.niri.enable {
           niri-config = home.xdg.configFile."niri/config.kdl".source;
         }
-        // nixpkgs.lib.optionalAttrs config.programs.hyprland.enable {
-          hyprland-config = pkgs.runCommand "hyprland-config" { } ''
-            export HOME="$TMPDIR/home" XDG_RUNTIME_DIR="$TMPDIR/runtime"
-            mkdir -p "$HOME" "$XDG_RUNTIME_DIR"
-            chmod 700 "$XDG_RUNTIME_DIR"
-            ${config.programs.hyprland.package}/bin/Hyprland --verify-config \
-              -c ${home.xdg.configFile."hypr/hyprland.lua".source}
+        // nixpkgs.lib.optionalAttrs config.programs.umbriel.enable {
+          umbriel-config = pkgs.runCommand "umbriel-config" { } ''
+            ${config.programs.umbriel.package}/bin/umbriel config validate \
+              -c ${home.xdg.configFile."umbriel/config.toml".source}
             touch "$out"
           '';
         };
 
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
+        specialArgs.strata = strata.packages.${system}.default.overrideAttrs (previous: {
+          # Expose NixOS media drivers inside the preview sandbox.
+          postPatch = (previous.postPatch or "") + ''
+            substituteInPlace src/sandbox/command.rs \
+              --replace-fail 'command.args(["--ro-bind", "/sys", "/sys"]);' \
+                'bind_try(command, "/run/opengl-driver");
+                    command.args(["--ro-bind", "/sys", "/sys"]);'
+          '';
+        });
         modules = [
           ./configuration.nix
 

@@ -2,11 +2,11 @@
   config,
   lib,
   pkgs,
+  strata,
   ...
 }:
 
 let
-  cosmicTheme = "com.system76.CosmicTheme.Light/v2";
   palette = rec {
     primary = "#629EE8";
     onPrimary = "#182B45";
@@ -55,6 +55,7 @@ in
     displayManager.noctalia-greeter.enable = true;
     gnome.gnome-keyring.enable = true;
     gvfs.enable = true;
+    dbus.packages = [ strata.fileManagerService ];
   };
 
   fonts.packages = with pkgs; [
@@ -67,46 +68,13 @@ in
   ];
 
   home-manager.users.maxwell = {
-    home.packages = with pkgs; [
-      cosmic-files
-      adwaita-icon-theme
-    ];
-    xdg.configFile = {
-      "cosmic/com.system76.CosmicFiles/v1/app_theme".text = "Light";
-      "cosmic/com.system76.CosmicTk/v1/icon_theme".text = ''"Adwaita"'';
-      "cosmic/${cosmicTheme}/frosted_windows".text = "true";
-      "cosmic/${cosmicTheme}/frosted_maximized_apps".text = "true";
-      "cosmic/${cosmicTheme}/corner_radii".text = ''
-        (
-          radius_0: (0.0, 0.0, 0.0, 0.0),
-          radius_xs: (0.0, 0.0, 0.0, 0.0),
-          radius_s: (0.0, 0.0, 0.0, 0.0),
-          radius_m: (0.0, 0.0, 0.0, 0.0),
-          radius_l: (0.0, 0.0, 0.0, 0.0),
-          radius_xl: (0.0, 0.0, 0.0, 0.0),
-        )
-      '';
-    }
-    //
-      lib.mapAttrs'
-        (
-          layer: color:
-          lib.nameValuePair "cosmic/${cosmicTheme}/transparent_${layer}" {
-            # Reuse native theme data; change only the surface, not text or controls.
-            source = pkgs.runCommand "cosmic-${layer}.ron" { } ''
-              sed -E 's/^(    base: )"#[[:xdigit:]]{8}"/\1"${color}CC"/' \
-                ${pkgs.cosmic-settings.src}/resources/default_schema/${cosmicTheme}/${layer} > "$out"
-            '';
-          }
-        )
-        {
-          background = "#FFFFFF";
-          primary = "#F8FAFC";
-          secondary = "#FFFFFF";
-        };
+    home.packages = [ strata ];
     xdg.mimeApps = {
       enable = true;
-      defaultApplications."inode/directory" = [ "com.system76.CosmicFiles.desktop" ];
+      defaultApplications = {
+        "inode/directory" = [ "io.github.lgse.Strata.desktop" ];
+        "x-scheme-handler/trash" = [ "io.github.lgse.Strata.desktop" ];
+      };
     };
 
     systemd.user.services.noctalia.Unit.X-Restart-Triggers = lib.optional (
@@ -146,7 +114,6 @@ in
 
         shell = {
           polkit_agent = true;
-          corner_radius_scale = 0;
           font_family = "IBM Plex Sans";
           panel = {
             transparency_mode = "soft";
@@ -164,7 +131,6 @@ in
         };
 
         control_center = {
-          circular_avatar = false;
           media.show_visualizer = false;
           shortcuts = map (type: { inherit type; }) [
             "wifi"

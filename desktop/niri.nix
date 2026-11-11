@@ -21,14 +21,14 @@ in
 
   services.displayManager.noctalia-greeter.settings.session.default = "niri";
 
-  # GNOME's accent-color would regenerate COSMIC's custom theme.
-  xdg.portal.config.niri."org.freedesktop.impl.portal.Settings" = "gtk";
-
   home-manager.users.maxwell = {
     services.way-displays = {
       enable = true;
       systemdTarget = "niri.service";
-      settings.MAX_PREFERRED_REFRESH = [ "!.*" ];
+      settings = {
+        MAX_PREFERRED_REFRESH = [ "!.*" ];
+        VRR_OFF = [ "!.*" ];
+      };
     };
 
     wayland.windowManager.niri = {
