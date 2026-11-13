@@ -87,6 +87,8 @@
     # Development tools.
     bun.enable = true;
 
+    claude-code.enable = true;
+
     codex.enable = true;
 
     herdr.enable = true;
@@ -107,8 +109,6 @@
         email = "sagax.maxwell@gmail.com";
       };
     };
-
-    home-manager.enable = true;
 
     ghostty = {
       enable = true;
@@ -353,6 +353,8 @@
 
   xdg = {
     enable = true;
+    # Apps rewrite this file; Home Manager owns MIME defaults.
+    configFile."mimeapps.list".force = true;
     mimeApps.defaultApplications = lib.genAttrs [
       "video/mp4"
       "video/x-matroska"

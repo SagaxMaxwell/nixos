@@ -23,7 +23,8 @@
   };
 
   users.users.maxwell.extraGroups = [ "gamemode" ];
-  home-manager.users.maxwell.programs.mangohud.enable = true;
-
-  environment.systemPackages = with pkgs; [ wineWow64Packages.stagingFull ];
+  home-manager.users.maxwell = {
+    programs.mangohud.enable = true;
+    home.packages = with pkgs; [ wineWow64Packages.stagingFull ];
+  };
 }

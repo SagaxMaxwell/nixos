@@ -1,8 +1,6 @@
 { pkgs, ... }:
 
 {
-  hardware.cpu.amd.updateMicrocode = true;
-
   hardware = {
     amdgpu = {
       initrd.enable = true;
@@ -11,7 +9,7 @@
     i2c.enable = true;
   };
 
-  environment.systemPackages = with pkgs; [
+  home-manager.users.maxwell.home.packages = with pkgs; [
     ddcutil
     libva-utils
     mesa-demos

@@ -47,18 +47,7 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nix-cachyos-kernel,
-      home-manager,
-      nix-index-database,
-      obsidian-extensions,
-      sheprd,
-      strata,
-      sfd-nix,
-      ...
-    }:
+    inputs@{ self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
     in
@@ -89,34 +78,28 @@
 
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs.strata = strata.packages.${system}.default.overrideAttrs (previous: {
-          # Expose NixOS media drivers inside the preview sandbox.
-          postPatch = (previous.postPatch or "") + ''
-            substituteInPlace src/sandbox/command.rs \
-              --replace-fail 'command.args(["--ro-bind", "/sys", "/sys"]);' \
-                'bind_try(command, "/run/opengl-driver");
-                    command.args(["--ro-bind", "/sys", "/sys"]);'
-          '';
-        });
+        specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
 
-          home-manager.nixosModules.home-manager
-          sfd-nix.nixosModules.default
+          inputs.home-manager.nixosModules.home-manager
+          inputs.sfd-nix.nixosModules.default
           {
             nixpkgs.overlays = [
-              nix-cachyos-kernel.overlays.pinned
-              obsidian-extensions.overlays.default
-              sheprd.overlays.default
+              inputs.nix-cachyos-kernel.overlays.pinned
+              inputs.obsidian-extensions.overlays.default
+              inputs.sheprd.overlays.default
             ];
 
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+              backupFileExtension = "hm-backup";
+              overwriteBackup = true;
               users.maxwell = {
                 imports = [
-                  nix-index-database.homeModules.default
-                  ./home/programs.nix
+                  inputs.nix-index-database.homeModules.default
+                  ./home
                 ];
               };
             };

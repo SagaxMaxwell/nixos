@@ -1,4 +1,4 @@
-{ lib, ... }:
+_:
 
 {
   security = {
@@ -9,9 +9,6 @@
       sudo-shim.enable = true;
     };
   };
-
-  environment.memoryAllocator.provider = "mimalloc";
-  swapDevices = lib.mkForce [ ];
 
   programs = {
     sing-box-for-desktop = {
@@ -33,14 +30,6 @@
       enable = true;
       alsa.enable = true;
       pulse.enable = true;
-    };
-
-    zram-generator = {
-      enable = true;
-      settings.zram0 = {
-        zram-size = "ram / 2";
-        compression-algorithm = "zstd";
-      };
     };
   };
 

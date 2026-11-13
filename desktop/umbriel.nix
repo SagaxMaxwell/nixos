@@ -2,11 +2,22 @@
   config,
   lib,
   pkgs,
-  strata,
+  inputs,
   ...
 }:
 
 let
+  # Bind NixOS GPU drivers into the preview sandbox; drop after lgse/strata#2261.
+  strata =
+    inputs.strata.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
+      (previous: {
+        postPatch = (previous.postPatch or "") + ''
+          substituteInPlace src/sandbox/command.rs \
+            --replace-fail 'command.args(["--ro-bind", "/sys", "/sys"]);' \
+              'bind_try(command, "/run/opengl-driver");
+                  command.args(["--ro-bind", "/sys", "/sys"]);'
+        '';
+      });
   defaults = builtins.fromTOML (builtins.readFile "${pkgs.umbriel.src}/examples/config.toml");
   palette = rec {
     primary = "#629EE8";

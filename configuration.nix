@@ -7,6 +7,7 @@
     ./system/services.nix
     ./system/gaming.nix
     ./system/hardware.nix
+    ./system/memory.nix
     ./system/input.nix
     ./system/virtualisation.nix
   ];
@@ -74,11 +75,9 @@
       "wheel"
     ];
   };
+  users.defaultUserShell = pkgs.nushell;
+  programs.nushell.enable = true;
+  programs.nix-ld.enable = true;
 
   system.stateVersion = "26.05";
-
-  programs.nix-ld.enable = true;
-  programs.nushell.enable = true;
-  users.defaultUserShell = pkgs.nushell;
-  systemd.oomd.enableUserSlices = true;
 }

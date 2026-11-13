@@ -1,12 +1,18 @@
 # NixOS 配置
 
-Ryzen 7 9800X3D + Radeon RX 9070 XT；NixOS unstable、CachyOS master/latest、Umbriel + Noctalia。
+Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Noctalia。
 
-入口为 `configuration.nix`；`desktop/umbriel.nix` 配置桌面，`system/` 配置系统，`home/programs.nix` 配置应用。
+入口 `configuration.nix`；`desktop/` 桌面，`system/` 系统（`memory.nix` 管分配器、zram 与 OOM），`home/` 用户应用。
+
+## 管理约定
+
+用户级应用、工具和 dotfiles 一律由 Home Manager（`home-manager.users.maxwell`）管理，优先 `programs.<name>.enable`，其次 `home.packages`。仅以下留在系统层：服务、驱动、内核与硬件；需要系统权限、udev、PAM 的程序；必须在 `/etc` 的配置与登录 shell；非本用户进程用的资源（如登录界面字体）。
+
+Home Manager 仅作为 NixOS 模块随 `nixos-rebuild` 生效，不启用 `programs.home-manager`、不用 `home-manager switch`；冲突文件备份为 `*.hm-backup`。
 
 ## 安装
 
-分区并挂载到 `/mnt`，将仓库放到 `/mnt/etc/nixos`，生成本机硬件配置：
+分区挂载到 `/mnt`，仓库放到 `/mnt/etc/nixos`：
 
 ```sh
 sudo nixos-generate-config --root /mnt --show-hardware-config | sudo tee /mnt/etc/nixos/hardware-configuration.nix >/dev/null
@@ -14,31 +20,23 @@ sudo nixos-install --flake path:/mnt/etc/nixos#nixos
 sudo nixos-enter --root /mnt -c 'passwd maxwell'
 ```
 
-## 检查、构建与更新
-
-在 Linux 的仓库目录中执行：
+## 构建与更新
 
 ```sh
+nix flake update                                       # 可选：更新依赖
 nix flake check path:. --show-trace
-nixos-rebuild build --flake path:.#nixos
 run0 nixos-rebuild switch --flake path:.#nixos
 ```
 
-更新依赖用 `nix flake update`，再执行上述检查与构建。版本由 `flake.lock` 固定；内核无缓存时会本地编译。
+macOS 上只能检查求值：`nix flake check path:. --all-systems --no-build`。内核无缓存时会本地编译。
 
-仅检查求值（也可在 macOS 执行），不代替 Linux 完整构建与硬件验证：
+## 备注
 
-```sh
-nix flake check path:. --all-systems --no-build --show-trace
-```
-
-## 使用备注
-
-- `Super` 打开启动器，`Super+Enter` 打开 Ghostty；右上角停留 0.5 秒打开 Noctalia 控制中心。
-- 显示器 32M2N8800P 的 **4K 240Hz、常开 HDR 待配置**，当前使用首选模式与自动 HDR，VRR 关闭。安装后用 `umbriel outputs` 取得输出名称，在桌面配置中绑定 `mode = "3840x2160@240"`、`hdr = "on"`，移除窗口级 HDR 规则；用 `umbriel color` 确认。
-- 显示器菜单开启 DDC/CI；ReBAR/SAM 在 UEFI 开启 Above 4G Decoding 与 Re-Size BAR。
-- sing-box 首次在 GUI 导入订阅并连接。
-- Obsidian 笔记库为 `~/Documents/notes`。
-- GameMode 不会自动作用于 Steam 游戏，启动选项用 `gamemoderun %command%`；叠加性能显示用 `gamemoderun mangohud %command%`。
-- containerd 的 CNI 网络尚未配置，gVisor 需显式选择 `runsc`。
-- 剪贴板使用 Noctalia 内置功能，暂不用 Ringboard；Vibex、MetaOOM 目前没有 Nix 包，分别使用 Sheprd、systemd-oomd。
+- `Super` 启动器，`Super+Enter` Ghostty，右上角停留 0.5 秒打开控制中心。
+- 显示器 4K 240Hz 与常开 HDR 待配置：用 `umbriel outputs` 取输出名，绑定 `mode = "3840x2160@240"`、`hdr = "on"` 并移除窗口级 HDR 规则，用 `umbriel color` 确认。
+- 显示器开启 DDC/CI；UEFI 开启 Above 4G Decoding 与 Re-Size BAR。
+- sing-box 首次需在 GUI 导入订阅；Obsidian 笔记库在 `~/Documents/notes`。
+- Steam 启动选项：`gamemoderun %command%`，需性能叠加用 `gamemoderun mangohud %command%`。
+- containerd 未配置 CNI，gVisor 需显式选 `runsc`。
+- 全局预加载 mimalloc：自带 jemalloc 的程序会在启动时崩溃，需在 `system/memory.nix` 关闭其 jemalloc；排查用 `coredumpctl list`，调用栈出现 `je_*` 即是。
+- 剪贴板用 Noctalia 内置；Vibex、MetaOOM 无 Nix 包，以 Sheprd、systemd-oomd 代替。

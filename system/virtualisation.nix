@@ -11,7 +11,7 @@
 
   systemd.services.containerd.path = [ pkgs.gvisor ];
 
-  environment.systemPackages = with pkgs; [
+  home-manager.users.maxwell.home.packages = with pkgs; [
     buildkit
     cloud-hypervisor
   ];
