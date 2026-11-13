@@ -12,34 +12,43 @@ Home Manager 随 `nixos-rebuild` 生效；冲突文件备份为 `*.hm-backup`，
 
 Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia/settings.toml`。Zed、Sheprd 保留可变配置；删除 Nix 字段后，用户文件中的旧值需手动清理。
 
-## 安装
+## 首次接管
 
-分区挂载到 `/mnt`，在仓库目录执行：
-
-```sh
-sudo nixos-generate-config --root /mnt --show-hardware-config > ./hardware-configuration.nix
-sudo nixos-install --flake .#nixos
-sudo nixos-enter --root /mnt -c 'passwd maxwell'
-```
-
-## 日常使用
-
-在仓库目录执行，修改配置后用这一条应用：
+先正常安装 NixOS，再在本仓库目录执行，无需手动挂载。仅更换机器或首次接管时生成硬件配置；已有正确配置则跳过。
 
 ```sh
-run0 nixos-rebuild switch --flake .#nixos
+sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
+git add hardware-configuration.nix
 ```
 
-需要升级软件时，先运行 `nix flake update`，再执行上面的命令。内核无缓存时会本地编译。
+核对 `system/hardware.nix` 中的 CPU、显卡设置。尚未应用本配置时，用仓库指定的 rebuild 工具首次接管；命令临时启用 flakes，使用原系统的 sudo：
+
+```sh
+nix --extra-experimental-features 'nix-command flakes' run .#nixosConfigurations.nixos.config.system.build.nixos-rebuild -- switch --flake .#nixos --elevate sudo
+```
+
+## 常用命令
+
+均在仓库目录执行。应用配置（普通用户运行，仅激活时提权）：
+
+```sh
+nixos-rebuild switch --flake .#nixos --elevate run0
+```
+
+升级软件：先运行 `nix flake update`，再应用配置。新增配置文件先 `git add 文件路径`；不必提交。内核等软件无缓存时会本地编译。
 
 <details>
-<summary>单独检查配置</summary>
+<summary>检查、构建与回滚（按需执行）</summary>
 
-NixOS：`nix flake check`。
+| 用途 | 命令 |
+| --- | --- |
+| 检查配置与仓库校验项 | `nix flake check` |
+| 查看构建计划，不编译 | `nixos-rebuild dry-build --flake .#nixos` |
+| 完整构建，不切换系统 | `nixos-rebuild build --flake .#nixos` |
+| 回到上一代系统 | `nixos-rebuild switch --rollback --no-reexec --elevate run0` |
+| 在 macOS 上仅检查求值 | `nix flake check --all-systems --no-build` |
 
-macOS（只检查求值）：`nix flake check --all-systems --no-build`。
-
-新增文件需先 `git add`，才会被 flake 纳入。
+回滚不修改仓库文件；无法进入系统时，在启动菜单选择旧代。
 
 </details>
 
@@ -50,6 +59,7 @@ macOS（只检查求值）：`nix flake check --all-systems --no-build`。
 - 显示器 4K 240Hz 与常开 HDR 待配置：用 `umbriel outputs` 取输出名，绑定 `mode = "3840x2160@240"`、`hdr = "on"` 并移除窗口级 HDR 规则，用 `umbriel color` 确认。
 - 显示器开启 DDC/CI；UEFI 开启 Above 4G Decoding 与 Re-Size BAR。
 - sing-box 首次需在 GUI 导入订阅；NetworkManager + systemd-resolved 随 TUN 启停切换 DNS，防火墙放行 `tun0`。
+- [Hickory DNS](https://github.com/hickory-dns/hickory-dns/tree/main/bin)：注重性能的现代 Rust 异步架构，可作 DNS 替换候选；完整递归仍属实验性，与当前 sing-box TUN/DNS 链路配合需额外适配，暂未启用，未实测性能优势。
 - Obsidian 笔记库在 `~/Documents/notes`。
 - Steam 启动选项：`gamemoderun %command%`，需性能叠加用 `gamemoderun mangohud %command%`。
 - containerd 未配置 CNI，gVisor 需显式选 `runsc`。
