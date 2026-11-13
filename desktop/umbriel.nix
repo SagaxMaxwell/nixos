@@ -8,6 +8,8 @@
 }:
 
 let
+  # Fill in the output name from `umbriel outputs`.
+  outputName = "";
   # Bind NixOS GPU drivers into the preview sandbox; drop after lgse/strata#2261.
   strata =
     inputs.strata.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
@@ -112,6 +114,13 @@ in
     programs.umbriel = {
       enable = true;
       settings = {
+        output = lib.optionalAttrs (outputName != "") {
+          ${outputName} = {
+            mode = "3840x2160@240";
+            hdr = "on";
+          };
+        };
+
         layout = {
           gap = 8;
           extent_presets = [
@@ -146,8 +155,7 @@ in
         keybinds = lib.recursiveUpdate defaults.keybinds {
           "Mod+Return".action = "spawn ghostty";
         };
-        inherit (defaults) layer_rule;
-        window_rule = defaults.window_rule ++ [ { hdr = "auto"; } ];
+        inherit (defaults) layer_rule window_rule;
       };
     };
 

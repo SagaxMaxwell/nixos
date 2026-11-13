@@ -56,7 +56,7 @@ nixos-rebuild switch --flake .#nixos --elevate run0
 
 - `Super` 启动器，`Super+Enter` Ghostty，右上角停留 0.5 秒打开控制中心。
 - `Ctrl+Space` 切换美式键盘与雾凇拼音；`Super+Space` 保留 Umbriel 默认功能。输入法列表由 Home Manager 写入；修改列表时先退出图形会话，在 TTY 应用配置，避免旧进程回写。
-- 显示器 4K 240Hz 与常开 HDR 待配置：用 `umbriel outputs` 取输出名，绑定 `mode = "3840x2160@240"`、`hdr = "on"` 并移除窗口级 HDR 规则，用 `umbriel color` 确认。
+- 等待支持 HDR、240Hz、4K 显示器的设备名称；填入 `desktop/umbriel.nix` 的 `outputName` 后启用 4K 240Hz、常开 HDR，留空不生效。
 - 显示器开启 DDC/CI；UEFI 开启 Above 4G Decoding 与 Re-Size BAR。
 - sing-box 首次需在 GUI 导入订阅；NetworkManager + systemd-resolved 随 TUN 启停切换 DNS，防火墙放行 `tun0`。
 - [Hickory DNS](https://github.com/hickory-dns/hickory-dns/tree/main/bin)：注重性能的现代 Rust 异步架构，可作 DNS 替换候选；完整递归仍属实验性，与当前 sing-box TUN/DNS 链路配合需额外适配，暂未启用，未实测性能优势。
