@@ -2,9 +2,16 @@
   config,
   lib,
   pkgs,
+  opacity,
   ...
 }:
 
+let
+  # Two-digit hex alpha for #RRGGBBAA colors.
+  alpha = lib.fixedWidthString 2 "0" (
+    lib.toLower (lib.toHexString (builtins.floor (opacity * 255 + 0.5)))
+  );
+in
 {
   home = {
     stateVersion = "26.05";
@@ -18,7 +25,7 @@
         path = "${config.xdg.configHome}/herdr/config-gpui.local.toml";
         staticSettings = (pkgs.formats.toml { }).generate "sheprd.toml" {
           backdrop = {
-            opacity = 0.8;
+            inherit opacity;
             blur = true;
           };
         };
@@ -114,7 +121,7 @@
       enable = true;
       settings = {
         theme = "light:GitHub Light Default,dark:Atom One Dark";
-        background-opacity = 0.8;
+        background-opacity = opacity;
         background-opacity-cells = true;
         background-blur = true;
       };
@@ -241,8 +248,8 @@
             ] (_: "#00000000")
           )
           {
-            "One Light" = "#fafafacc";
-            "One Dark" = "#282c33cc";
+            "One Light" = "#fafafa${alpha}";
+            "One Dark" = "#282c33${alpha}";
           };
       userSettings.auto_install_extensions = {
         nix = true;
@@ -311,7 +318,7 @@
       enable = true;
       config = {
         hwdec = "auto";
-        background-color = "#CC000000";
+        background-color = "#${alpha}000000";
       };
       scripts = [ pkgs.mpvScripts.mpris ];
     };

@@ -50,6 +50,8 @@
     inputs@{ self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
+      # Background opacity shared by every translucent surface.
+      opacity = 0.8;
     in
     {
       devShells.${system}.default =
@@ -78,7 +80,7 @@
 
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs; };
+        specialArgs = { inherit inputs opacity; };
         modules = [
           ./configuration.nix
 
@@ -96,6 +98,7 @@
               useUserPackages = true;
               backupFileExtension = "hm-backup";
               overwriteBackup = true;
+              extraSpecialArgs = { inherit opacity; };
               users.maxwell = {
                 imports = [
                   inputs.nix-index-database.homeModules.default

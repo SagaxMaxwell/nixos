@@ -3,6 +3,7 @@
   lib,
   pkgs,
   inputs,
+  opacity,
   ...
 }:
 
@@ -112,7 +113,7 @@ in
       enable = true;
       settings = {
         layout = {
-          gap = 12;
+          gap = 8;
           extent_presets = [
             0.5
             0.7
@@ -126,7 +127,16 @@ in
           follows_mouse_max_scroll = 0.0;
         };
 
-        appearance.blur.radius = 3;
+        appearance = {
+          border_width = 4;
+          blur = {
+            radius = 3;
+            brightness = 1.0;
+            contrast = 1.0;
+            saturation = 1.2;
+            noise = 0.0;
+          };
+        };
 
         # Keep upstream keys and shell rules; only replace the terminal.
         keybinds = lib.recursiveUpdate defaults.keybinds {
@@ -154,8 +164,8 @@ in
 
         wallpaper.fill_color = "surface";
         weather.enabled = false;
-        notification.background_opacity = 0.8;
-        osd.background_opacity = 0.8;
+        notification.background_opacity = opacity;
+        osd.background_opacity = opacity;
 
         nightlight = {
           enabled = true;
