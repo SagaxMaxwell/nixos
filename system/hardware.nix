@@ -2,6 +2,7 @@
 
 {
   hardware = {
+    cpu.amd.updateMicrocode = true;
     amdgpu = {
       initrd.enable = true;
       opencl.enable = true;

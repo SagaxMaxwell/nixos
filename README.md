@@ -8,7 +8,9 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 
 用户级应用、工具和 dotfiles 一律由 Home Manager（`home-manager.users.maxwell`）管理，优先 `programs.<name>.enable`，其次 `home.packages`。仅以下留在系统层：服务、驱动、内核与硬件；需要系统权限、udev、PAM 的程序；必须在 `/etc` 的配置与登录 shell；非本用户进程用的资源（如登录界面字体）。
 
-Home Manager 仅作为 NixOS 模块随 `nixos-rebuild` 生效，不启用 `programs.home-manager`、不用 `home-manager switch`；冲突文件备份为 `*.hm-backup`。
+Home Manager 随 `nixos-rebuild` 生效；冲突文件备份为 `*.hm-backup`，只保留最近一份。
+
+Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia/settings.toml`。Zed、Sheprd 保留可变配置；删除 Nix 字段后，用户文件中的旧值需手动清理。
 
 ## 安装
 
@@ -44,6 +46,7 @@ macOS（只检查求值）：`nix flake check --all-systems --no-build`。
 ## 备注
 
 - `Super` 启动器，`Super+Enter` Ghostty，右上角停留 0.5 秒打开控制中心。
+- `Ctrl+Space` 切换美式键盘与雾凇拼音；`Super+Space` 保留 Umbriel 默认功能。输入法列表由 Home Manager 写入；修改列表时先退出图形会话，在 TTY 应用配置，避免旧进程回写。
 - 显示器 4K 240Hz 与常开 HDR 待配置：用 `umbriel outputs` 取输出名，绑定 `mode = "3840x2160@240"`、`hdr = "on"` 并移除窗口级 HDR 规则，用 `umbriel color` 确认。
 - 显示器开启 DDC/CI；UEFI 开启 Above 4G Decoding 与 Re-Size BAR。
 - sing-box 首次需在 GUI 导入订阅；Obsidian 笔记库在 `~/Documents/notes`。

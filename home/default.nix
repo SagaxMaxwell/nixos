@@ -360,8 +360,6 @@ in
 
   xdg = {
     enable = true;
-    # Apps rewrite this file; Home Manager owns MIME defaults.
-    configFile."mimeapps.list".force = true;
     mimeApps.defaultApplications = lib.genAttrs [
       "video/mp4"
       "video/x-matroska"
