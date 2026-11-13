@@ -122,9 +122,13 @@ in
           scrolling.default_extent_fraction = 0.7;
         };
 
-        input.focus = {
-          follows_mouse = true;
-          follows_mouse_max_scroll = 0.0;
+        input = {
+          focus = {
+            follows_mouse = true;
+            follows_mouse_max_scroll = 0.0;
+          };
+          # Warp the cursor to the window a keybind focuses.
+          cursor.follows_focus = true;
         };
 
         appearance = {
