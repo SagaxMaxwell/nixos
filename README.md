@@ -49,7 +49,8 @@ macOS（只检查求值）：`nix flake check --all-systems --no-build`。
 - `Ctrl+Space` 切换美式键盘与雾凇拼音；`Super+Space` 保留 Umbriel 默认功能。输入法列表由 Home Manager 写入；修改列表时先退出图形会话，在 TTY 应用配置，避免旧进程回写。
 - 显示器 4K 240Hz 与常开 HDR 待配置：用 `umbriel outputs` 取输出名，绑定 `mode = "3840x2160@240"`、`hdr = "on"` 并移除窗口级 HDR 规则，用 `umbriel color` 确认。
 - 显示器开启 DDC/CI；UEFI 开启 Above 4G Decoding 与 Re-Size BAR。
-- sing-box 首次需在 GUI 导入订阅；Obsidian 笔记库在 `~/Documents/notes`。
+- sing-box 首次需在 GUI 导入订阅；NetworkManager + systemd-resolved 随 TUN 启停切换 DNS，防火墙放行 `tun0`。
+- Obsidian 笔记库在 `~/Documents/notes`。
 - Steam 启动选项：`gamemoderun %command%`，需性能叠加用 `gamemoderun mangohud %command%`。
 - containerd 未配置 CNI，gVisor 需显式选 `runsc`。
 - mimalloc 全局替换有风险：运行时预加载不能覆盖应用内置或直接调用的分配器，混用时可能因分配与释放不匹配导致崩溃。保留系统默认 libc 分配器及各应用默认分配器；有明确性能需求时再针对单个应用测试启用。

@@ -23,7 +23,7 @@ _:
   services = {
     fwupd.enable = true;
     openssh.enable = true;
-    knot-resolver.enable = true;
+    resolved.enable = true;
     chrony.enable = true;
 
     pipewire = {
@@ -35,9 +35,10 @@ _:
 
   networking.networkmanager = {
     enable = true;
-    dns = "none";
     wifi.backend = "iwd";
   };
 
   networking.nftables.enable = true;
+  # Allow sing-box TUN traffic back into the host.
+  networking.firewall.trustedInterfaces = [ "tun0" ];
 }
