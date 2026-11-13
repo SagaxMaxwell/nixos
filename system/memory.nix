@@ -6,14 +6,20 @@
   nixpkgs.overlays = [
     (
       _: prev:
-      lib.genAttrs [ "noctalia" "umbriel" ] (
-        name:
-        prev.${name}.overrideAttrs (previous: {
-          mesonFlags = lib.filter (flag: !lib.hasPrefix "-Djemalloc=" flag) (previous.mesonFlags or [ ]) ++ [
-            "-Djemalloc=disabled"
-          ];
-        })
-      )
+      lib.mapAttrs
+        (
+          name: option:
+          prev.${name}.overrideAttrs (previous: {
+            mesonFlags = lib.filter (flag: !lib.hasPrefix "${option}=" flag) (previous.mesonFlags or [ ]) ++ [
+              "${option}=disabled"
+            ];
+          })
+        )
+        {
+          knot-resolver_6 = "-Dmalloc";
+          noctalia = "-Djemalloc";
+          umbriel = "-Djemalloc";
+        }
     )
   ];
 
