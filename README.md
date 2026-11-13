@@ -2,7 +2,7 @@
 
 Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Noctalia。
 
-入口 `configuration.nix`；`desktop/` 桌面，`system/` 系统（`memory.nix` 管分配器、zram 与 OOM），`home/` 用户应用。
+入口 `configuration.nix`；`desktop/` 桌面，`system/` 系统（`memory.nix` 管 zram 与 OOM），`home/` 用户应用。
 
 ## 管理约定
 
@@ -12,23 +12,34 @@ Home Manager 仅作为 NixOS 模块随 `nixos-rebuild` 生效，不启用 `progr
 
 ## 安装
 
-分区挂载到 `/mnt`，仓库放到 `/mnt/etc/nixos`：
+分区挂载到 `/mnt`，在仓库目录执行：
 
 ```sh
-sudo nixos-generate-config --root /mnt --show-hardware-config | sudo tee /mnt/etc/nixos/hardware-configuration.nix >/dev/null
-sudo nixos-install --flake path:/mnt/etc/nixos#nixos
+sudo nixos-generate-config --root /mnt --show-hardware-config > ./hardware-configuration.nix
+sudo nixos-install --flake .#nixos
 sudo nixos-enter --root /mnt -c 'passwd maxwell'
 ```
 
-## 构建与更新
+## 日常使用
+
+在仓库目录执行，修改配置后用这一条应用：
 
 ```sh
-nix flake update                                       # 可选：更新依赖
-nix flake check path:. --show-trace
-run0 nixos-rebuild switch --flake path:.#nixos
+run0 nixos-rebuild switch --flake .#nixos
 ```
 
-macOS 上只能检查求值：`nix flake check path:. --all-systems --no-build`。内核无缓存时会本地编译。
+需要升级软件时，先运行 `nix flake update`，再执行上面的命令。内核无缓存时会本地编译。
+
+<details>
+<summary>单独检查配置</summary>
+
+NixOS：`nix flake check`。
+
+macOS（只检查求值）：`nix flake check --all-systems --no-build`。
+
+新增文件需先 `git add`，才会被 flake 纳入。
+
+</details>
 
 ## 备注
 
@@ -38,5 +49,5 @@ macOS 上只能检查求值：`nix flake check path:. --all-systems --no-build`�
 - sing-box 首次需在 GUI 导入订阅；Obsidian 笔记库在 `~/Documents/notes`。
 - Steam 启动选项：`gamemoderun %command%`，需性能叠加用 `gamemoderun mangohud %command%`。
 - containerd 未配置 CNI，gVisor 需显式选 `runsc`。
-- 全局预加载 mimalloc：自带 jemalloc 的程序会在启动时崩溃，需在 `system/memory.nix` 关闭其 jemalloc；排查用 `coredumpctl list`，调用栈出现 `je_*` 即是。
+- mimalloc 全局替换有风险：运行时预加载不能覆盖应用内置或直接调用的分配器，混用时可能因分配与释放不匹配导致崩溃。保留系统默认 libc 分配器及各应用默认分配器；有明确性能需求时再针对单个应用测试启用。
 - 剪贴板用 Noctalia 内置；Vibex、MetaOOM 无 Nix 包，以 Sheprd、systemd-oomd 代替。
