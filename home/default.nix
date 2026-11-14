@@ -7,7 +7,8 @@
 }:
 
 let
-  # Two-digit hex alpha for #RRGGBBAA colors.
+
+  # Hex alpha for #RRGGBBAA.
   alpha = lib.fixedWidthString 2 "0" (
     lib.toLower (lib.toHexString (builtins.floor (opacity * 255 + 0.5)))
   );
@@ -33,6 +34,7 @@ in
     );
 
     packages = with pkgs; [
+
       # Nix tooling.
       nix-output-monitor
       nix-tree
@@ -57,6 +59,7 @@ in
   };
 
   programs = {
+
     # Shells.
     bash.enable = true;
 
@@ -224,7 +227,8 @@ in
 
     zed-editor = {
       enable = true;
-      # Paint opacity once; nested surfaces must not accumulate alpha.
+
+      # Apply alpha once; nested surfaces stay clear.
       userSettings.theme_overrides =
         lib.mapAttrs
           (

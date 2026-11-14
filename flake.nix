@@ -50,7 +50,8 @@
     inputs@{ self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
-      # Background opacity shared by every translucent surface.
+
+      # Shared background opacity.
       opacity = 0.8;
     in
     {

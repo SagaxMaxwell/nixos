@@ -39,6 +39,7 @@ _:
   };
 
   networking.nftables.enable = true;
-  # Allow sing-box TUN traffic back into the host.
+
+  # Let sing-box TUN traffic reach the host.
   networking.firewall.trustedInterfaces = [ "tun0" ];
 }
