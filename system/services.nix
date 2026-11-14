@@ -15,6 +15,7 @@ _:
       enable = true;
       settings = {
         startAtLogin = true;
+        appearance = "auto";
         core.insecureMode = false;
       };
     };

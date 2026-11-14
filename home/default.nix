@@ -25,10 +25,24 @@ in
         jqOperation = "$dynamic * $static";
         path = "${config.xdg.configHome}/herdr/config-gpui.local.toml";
         staticSettings = (pkgs.formats.toml { }).generate "sheprd.toml" {
+          theme = "light:GitHub Light Default,dark:Atom One Dark";
           backdrop = {
             inherit opacity;
             blur = true;
           };
+        };
+      }
+    );
+
+    activation.tabularisAppearance = lib.hm.dag.entryAfter [ "linkGeneration" ] (
+      lib.hm.generators.mkImpureConfigMerger {
+        inherit pkgs;
+        format = "json";
+        empty = "{}";
+        jqOperation = "$dynamic * $static";
+        path = "${config.xdg.configHome}/tabularis/config.json";
+        staticSettings = (pkgs.formats.json { }).generate "tabularis-appearance.json" {
+          followSystemTheme = true;
         };
       }
     );
@@ -54,6 +68,7 @@ in
 
       # GUI apps.
       (blender.override { rocmSupport = true; })
+      mission-center
       sheprd
       tabularis
     ];
@@ -91,6 +106,22 @@ in
 
     atuin.enable = true;
 
+    bottom = {
+      enable = true;
+      # Follow the terminal palette in light and dark modes.
+      settings.styles = {
+        widgets = {
+          text = "reset";
+          widget_title = "reset";
+          border_color = "reset";
+        };
+        graphs = {
+          graph_color = "reset";
+          legend_text = "reset";
+        };
+      };
+    };
+
     yazi.enable = true;
 
     zoxide.enable = true;
@@ -98,11 +129,19 @@ in
     # Development tools.
     bun.enable = true;
 
-    claude-code.enable = true;
+    claude-code = {
+      enable = true;
+      mutableSettings = true;
+      settings.theme = "auto";
+    };
 
     codex.enable = true;
 
-    herdr.enable = true;
+    herdr = {
+      enable = true;
+      mutableSettings = true;
+      settings.theme.auto_switch = true;
+    };
 
     difftastic = {
       enable = true;

@@ -12,17 +12,7 @@ let
   # Output name from `umbriel outputs`.
   outputName = "";
 
-  # Expose GPU drivers to the preview sandbox; drop after lgse/strata#2261.
-  strata =
-    inputs.strata.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
-      (previous: {
-        postPatch = (previous.postPatch or "") + ''
-          substituteInPlace src/sandbox/command.rs \
-            --replace-fail 'command.args(["--ro-bind", "/sys", "/sys"]);' \
-              'bind_try(command, "/run/opengl-driver");
-                  command.args(["--ro-bind", "/sys", "/sys"]);'
-        '';
-      });
+  strata = inputs.strata.packages.${pkgs.stdenv.hostPlatform.system}.default;
   defaults = fromTOML (builtins.readFile "${pkgs.umbriel.src}/examples/config.toml");
   accent = rec {
     primary = "#629EE8";
@@ -123,6 +113,22 @@ in
     "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
   };
 
+  fonts.fontconfig = {
+    hinting.style = "medium";
+    useEmbeddedBitmaps = false;
+    defaultFonts = {
+      sansSerif = [
+        "IBM Plex Sans"
+        "Source Han Sans SC"
+      ];
+      serif = [ "Source Han Serif SC" ];
+      monospace = [
+        "JetBrainsMono Nerd Font Mono"
+        "Source Han Mono SC"
+      ];
+    };
+  };
+
   fonts.packages = with pkgs; [
     ibm-plex
     lxgw-wenkai
@@ -132,10 +138,28 @@ in
     source-han-serif
   ];
 
-  home-manager.users.maxwell = {
+  home-manager.users.maxwell = { lib, ... }: {
     imports = [ "${pkgs.umbriel.src}/nix/home-module.nix" ];
 
     home.packages = [ strata ];
+    qt = {
+      enable = true;
+      platformTheme.name = "xdgdesktopportal";
+    };
+
+    home.activation.strataAppearance = lib.hm.dag.entryAfter [ "linkGeneration" ] (
+      lib.hm.generators.mkImpureConfigMerger {
+        inherit pkgs;
+        format = "toml";
+        empty = "{}";
+        jqOperation = "$dynamic * $static";
+        path = "${config.home-manager.users.maxwell.xdg.configHome}/strata/settings.toml";
+        staticSettings = (pkgs.formats.toml { }).generate "strata-appearance.toml" {
+          mode = "system";
+          theme = "atelier-cave-light";
+        };
+      }
+    );
     xdg.mimeApps = {
       enable = true;
       defaultApplications = {
@@ -151,6 +175,8 @@ in
     programs.umbriel = {
       enable = true;
       settings = {
+        general.xwayland_native_resolution = true;
+
         output = lib.optionalAttrs (outputName != "") {
           ${outputName} = {
             mode = "3840x2160@240";
@@ -169,10 +195,7 @@ in
         };
 
         input = {
-          focus = {
-            follows_mouse = true;
-            follows_mouse_max_scroll = 0.0;
-          };
+          focus.follows_mouse = true;
 
           # Cursor follows keyboard focus.
           cursor.follows_focus = true;

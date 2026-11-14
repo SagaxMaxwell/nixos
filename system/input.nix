@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   i18n.inputMethod = {
@@ -7,7 +7,7 @@
     fcitx5 = {
       waylandFrontend = true;
       addons = with pkgs; [
-        (fcitx5-rime.override { rimeDataPkgs = [ rime-ice ]; })
+        (fcitx5-rime.override { rimeDataPkgs = [ rime-wanxiang ]; })
       ];
     };
   };
@@ -27,13 +27,23 @@
       GroupOrder."0" = "Default";
     };
 
-    dataFile."fcitx5/rime/default.custom.yaml".source =
-      (pkgs.formats.yaml { }).generate "rime-default.custom.yaml"
-        {
-          patch = {
-            __include = "rime_ice_suggestion:/";
-            schema_list = [ { schema = "rime_ice"; } ];
-          };
+    dataFile."fcitx5/rime/default.custom.yaml" = {
+      source = (pkgs.formats.yaml { }).generate "rime-default.custom.yaml" {
+        patch = {
+          __include = "wanxiang_suggested_default:/";
+          schema_list = [ { schema = "wanxiang"; } ];
         };
+      };
+      # Rime timestamps cannot detect changed Nix store files.
+      onChange = ''
+        rm -f "${config.home-manager.users.maxwell.xdg.dataHome}/fcitx5/rime/build/default.yaml"
+        if ${pkgs.systemd}/bin/busctl --user status org.fcitx.Fcitx5 >/dev/null 2>&1; then
+          ${pkgs.systemd}/bin/busctl --user call org.fcitx.Fcitx5 /controller \
+            org.fcitx.Fcitx.Controller1 SetConfig sv \
+            fcitx://config/addon/rime/deploy 'a{sv}' 0 \
+            || echo "Rime will redeploy when Fcitx restarts." >&2
+        fi
+      '';
+    };
   };
 }

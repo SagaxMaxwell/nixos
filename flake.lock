@@ -248,11 +248,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794164014,
-        "narHash": "sha256-X5BDZXpt462w/D1WADy3wG9qqWO/rAYqnjleUZe/48g=",
+        "lastModified": 1794590073,
+        "narHash": "sha256-i4WKuhxCVRa0sSmWEDVAxelBCJ69/HXopzBqrGv1qW8=",
         "owner": "lgse",
         "repo": "strata",
-        "rev": "afa70b348326803868c335156de2abbc9be5b93f",
+        "rev": "6eb4bf60104d416171b72cefc8db7a8116b58d43",
         "type": "github"
       },
       "original": {
