@@ -8,9 +8,11 @@
 }:
 
 let
-  # Fill in the output name from `umbriel outputs`.
+
+  # Output name from `umbriel outputs`.
   outputName = "";
-  # Bind NixOS GPU drivers into the preview sandbox; drop after lgse/strata#2261.
+
+  # Expose GPU drivers to the preview sandbox; drop after lgse/strata#2261.
   strata =
     inputs.strata.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
       (previous: {
@@ -21,34 +23,29 @@ let
                   command.args(["--ro-bind", "/sys", "/sys"]);'
         '';
       });
-  defaults = builtins.fromTOML (builtins.readFile "${pkgs.umbriel.src}/examples/config.toml");
-  palette = rec {
+  defaults = fromTOML (builtins.readFile "${pkgs.umbriel.src}/examples/config.toml");
+  accent = rec {
     primary = "#629EE8";
     onPrimary = "#182B45";
     secondary = primary;
     onSecondary = onPrimary;
     tertiary = primary;
     onTertiary = onPrimary;
-    error = "#BA3547";
-    onError = "#FFFFFF";
-    surface = "#FFFFFF";
-    onSurface = "#253244";
-    surfaceVariant = "#F8FAFC";
-    onSurfaceVariant = "#526174";
-    outline = "#DCE4ED";
-    shadow = "#CBD5E1";
-    hover = "#E5F0FD";
-    onHover = onPrimary;
-    terminal = rec {
-      background = surface;
-      foreground = onSurface;
-      cursor = onSurface;
-      cursorText = surface;
-      selectionBg = hover;
-      selectionFg = onSurface;
-      normal = {
+  };
+  modes = {
+    light = rec {
+      error = "#BA3547";
+      onError = "#FFFFFF";
+      surface = "#FFFFFF";
+      onSurface = "#253244";
+      surfaceVariant = "#F8FAFC";
+      onSurfaceVariant = "#526174";
+      outline = "#DCE4ED";
+      shadow = "#CBD5E1";
+      hover = "#E5F0FD";
+      onHover = accent.onPrimary;
+      ansi = {
         black = onSurface;
-        red = error;
         green = "#347A54";
         yellow = "#8C681D";
         blue = "#316BB0";
@@ -56,9 +53,49 @@ let
         cyan = "#267B8A";
         white = surfaceVariant;
       };
-      bright = normal;
+    };
+    dark = rec {
+      error = "#FFB4AB";
+      onError = "#690005";
+      surface = "#151A22";
+      onSurface = "#E4EAF2";
+      surfaceVariant = "#222B38";
+      onSurfaceVariant = "#B4C1D2";
+      outline = "#455468";
+      shadow = "#000000";
+      hover = "#2D4360";
+      onHover = onSurface;
+      ansi = {
+        black = "#354153";
+        green = "#9AD6AF";
+        yellow = "#E9CA83";
+        blue = "#9CC9FF";
+        magenta = "#D8B4EF";
+        cyan = "#8CD5DF";
+        white = onSurface;
+      };
     };
   };
+
+  # Merge the accent and derive terminal colors.
+  palette =
+    colors:
+    accent
+    // removeAttrs colors [ "ansi" ]
+    // {
+      terminal = rec {
+        background = colors.surface;
+        foreground = colors.onSurface;
+        cursor = colors.onSurface;
+        cursorText = colors.surface;
+        selectionBg = colors.hover;
+        selectionFg = colors.onSurface;
+        normal = colors.ansi // {
+          red = colors.error;
+        };
+        bright = normal;
+      };
+    };
 in
 {
   programs.umbriel.enable = true;
@@ -136,7 +173,8 @@ in
             follows_mouse = true;
             follows_mouse_max_scroll = 0.0;
           };
-          # Warp the cursor to the window a keybind focuses.
+
+          # Cursor follows keyboard focus.
           cursor.follows_focus = true;
         };
 
@@ -151,7 +189,7 @@ in
           };
         };
 
-        # Keep upstream keys and shell rules; only replace the terminal.
+        # Upstream defaults; swap the terminal only.
         keybinds = lib.recursiveUpdate defaults.keybinds {
           "Mod+Return".action = "spawn ghostty";
         };
@@ -162,14 +200,13 @@ in
     programs.noctalia = {
       enable = true;
       systemd.enable = true;
-      customPalettes.WhiteBlue = lib.genAttrs [ "light" "dark" ] (_: palette);
+      customPalettes.WhiteBlue = lib.mapAttrs (_: palette) modes;
 
       settings = {
         brightness.enable_ddcutil = true;
 
         theme = {
           mode = "auto";
-          shell_mode = "light";
           source = "custom";
           custom_palette = "WhiteBlue";
         };
@@ -186,8 +223,8 @@ in
 
         location = {
           custom_schedule = true;
-          sunset = "22:00";
-          sunrise = "07:00";
+          sunset = "18:00";
+          sunrise = "06:00";
         };
 
         shell = {
