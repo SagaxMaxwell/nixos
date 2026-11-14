@@ -228,11 +228,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1794118848,
-        "narHash": "sha256-pyd4pi1uuTykxL71vOzMhRyLB16G0O86TeSPc81CTZ4=",
+        "lastModified": 1794555003,
+        "narHash": "sha256-St/W9ABuuX6yjJ4i+BxQHcZQFGaWndlOTpw7Z3VItR4=",
         "owner": "sheprd-labs",
         "repo": "sheprd",
-        "rev": "044aed20e3be0a78a6328760604518dd28fc8aba",
+        "rev": "ec2ebf0e186da908a949cf8109e5cb4a56dc3c10",
         "type": "github"
       },
       "original": {

@@ -76,6 +76,7 @@
     ];
   };
   users.defaultUserShell = pkgs.nushell;
+  environment.shells = [ pkgs.nushell ];
   programs.nushell.enable = true;
   programs.nix-ld.enable = true;
 
