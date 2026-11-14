@@ -40,7 +40,7 @@
     };
 
     sfd-nix = {
-      url = "github:asaineko/sfd-nix";
+      url = "git+https://forge.asnk.io/sugar/sfd-nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs-cronet.follows = "nixpkgs";
     };

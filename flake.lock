@@ -209,15 +209,15 @@
       "locked": {
         "lastModified": 1793442144,
         "narHash": "sha256-wBSkYDn2KH+cBjIUd15cVA11KsqXZb8I3YAlCZaASq0=",
-        "owner": "asaineko",
-        "repo": "sfd-nix",
+        "ref": "refs/heads/main",
         "rev": "f5e2817f5e24d8403ff672180f623c47d9752aa5",
-        "type": "github"
+        "revCount": 37,
+        "type": "git",
+        "url": "https://forge.asnk.io/sugar/sfd-nix"
       },
       "original": {
-        "owner": "asaineko",
-        "repo": "sfd-nix",
-        "type": "github"
+        "type": "git",
+        "url": "https://forge.asnk.io/sugar/sfd-nix"
       }
     },
     "sheprd": {
