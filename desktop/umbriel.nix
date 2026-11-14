@@ -179,13 +179,16 @@ in
         };
 
         appearance = {
-          border_width = 4;
+          border_width = 0;
+
+          # Frosted glass; blur windows behind too.
           blur = {
-            radius = 3;
+            optimized = false;
+            passes = 3;
+            radius = 8;
             brightness = 1.0;
             contrast = 1.0;
             saturation = 1.2;
-            noise = 0.0;
           };
         };
 
@@ -193,7 +196,15 @@ in
         keybinds = lib.recursiveUpdate defaults.keybinds {
           "Mod+Return".action = "spawn ghostty";
         };
-        inherit (defaults) layer_rule window_rule;
+        inherit (defaults) layer_rule;
+
+        # Focus border draws into the gap.
+        window_rule = defaults.window_rule ++ [
+          {
+            match.is_focused = true;
+            border_width = 4;
+          }
+        ];
       };
     };
 
@@ -231,7 +242,7 @@ in
           polkit_agent = true;
           font_family = "IBM Plex Sans";
           panel = {
-            transparency_mode = "soft";
+            transparency_mode = "glass";
             control_center_placement = "floating";
             control_center_position = "top_right";
           };

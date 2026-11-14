@@ -51,8 +51,8 @@
     let
       system = "x86_64-linux";
 
-      # Shared background opacity.
-      opacity = 0.8;
+      # Shared glass opacity; lower is clearer.
+      opacity = 0.55;
     in
     {
       devShells.${system}.default =
