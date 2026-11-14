@@ -215,9 +215,15 @@ in
           };
         };
 
-        # Upstream defaults; swap the terminal only.
+        # Upstream defaults; swap the terminal, wrap horizontal focus.
         keybinds = lib.recursiveUpdate defaults.keybinds {
           "Mod+Return".action = "spawn ghostty";
+          "Mod+Left" = "window-focus-previous";
+          "Mod+Right" = "window-focus-next";
+          "Mod+H" = "window-focus-previous";
+          "Mod+L" = "window-focus-next";
+          "Mod+WheelUp" = "window-focus-previous";
+          "Mod+WheelDown" = "window-focus-next";
         };
         inherit (defaults) layer_rule;
 
