@@ -291,14 +291,25 @@ in
           ];
         };
 
-        idle.behavior = {
-          lock = {
-            timeout = 600;
-            action = "lock";
-          };
-          screen-off = {
-            timeout = 660;
-            action = "screen_off";
+        idle = {
+          behavior_order = [
+            "lock"
+            "screen-off"
+            "suspend"
+          ];
+          behavior = {
+            lock = {
+              timeout = 600;
+              action = "lock";
+            };
+            screen-off = {
+              timeout = 900;
+              action = "screen_off";
+            };
+            suspend = {
+              timeout = 1200;
+              action = "lock_and_suspend";
+            };
           };
         };
       };

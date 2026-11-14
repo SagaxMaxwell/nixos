@@ -22,6 +22,12 @@ _:
   };
 
   services = {
+    journald.settings.Journal = {
+      Storage = "persistent";
+      SystemMaxUse = "1G";
+      MaxRetentionSec = "30day";
+    };
+
     fwupd.enable = true;
     openssh.enable = true;
     resolved.enable = true;
