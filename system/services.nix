@@ -1,4 +1,17 @@
-_:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+let
+  throneAutostart = pkgs.makeDesktopItem {
+    name = "Throne";
+    desktopName = "Throne";
+    exec = "${lib.getExe config.programs.throne.package} -tray";
+  };
+in
 
 {
   security = {
@@ -10,15 +23,14 @@ _:
     };
   };
 
-  programs = {
-    sing-box-for-desktop = {
-      enable = true;
-      settings = {
-        startAtLogin = true;
-        appearance = "auto";
-        core.insecureMode = false;
-      };
-    };
+  programs.throne = {
+    enable = true;
+    tunMode.enable = true;
+  };
+
+  home-manager.users.maxwell.xdg.autostart = {
+    enable = true;
+    entries = [ "${throneAutostart}/share/applications/Throne.desktop" ];
   };
 
   services = {
@@ -47,7 +59,4 @@ _:
   };
 
   networking.nftables.enable = true;
-
-  # Let sing-box TUN traffic reach the host.
-  networking.firewall.trustedInterfaces = [ "tun0" ];
 }

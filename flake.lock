@@ -171,74 +171,7 @@
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",
         "obsidian-extensions": "obsidian-extensions",
-        "sfd-nix": "sfd-nix",
-        "sheprd": "sheprd",
         "strata": "strata"
-      }
-    },
-    "rust-overlay": {
-      "inputs": {
-        "nixpkgs": [
-          "sheprd",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1793956102,
-        "narHash": "sha256-dASUovwB3DUoTm6daga0hsNZZAFCCGlUS4FPBjK0OwA=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "74cebce67ef6671ea48fda353a5be2d229bd2920",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "sfd-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "nixpkgs-cronet": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1793442144,
-        "narHash": "sha256-wBSkYDn2KH+cBjIUd15cVA11KsqXZb8I3YAlCZaASq0=",
-        "ref": "refs/heads/main",
-        "rev": "f5e2817f5e24d8403ff672180f623c47d9752aa5",
-        "revCount": 37,
-        "type": "git",
-        "url": "https://forge.asnk.io/sugar/sfd-nix"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://forge.asnk.io/sugar/sfd-nix"
-      }
-    },
-    "sheprd": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "rust-overlay": "rust-overlay"
-      },
-      "locked": {
-        "lastModified": 1794636179,
-        "narHash": "sha256-UJG3NqlN82JFWk7G27s3Ub8gB9gj+fJyF41p8kH2ssc=",
-        "owner": "sheprd-labs",
-        "repo": "sheprd",
-        "rev": "ae61bac9c120051abb8c4275208605cc4a90e713",
-        "type": "github"
-      },
-      "original": {
-        "owner": "sheprd-labs",
-        "repo": "sheprd",
-        "type": "github"
       }
     },
     "strata": {

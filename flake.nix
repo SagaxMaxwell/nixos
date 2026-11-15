@@ -29,21 +29,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    sheprd = {
-      url = "github:sheprd-labs/sheprd";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     strata = {
       url = "github:lgse/strata";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    sfd-nix = {
-      url = "git+https://forge.asnk.io/sugar/sfd-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixpkgs-cronet.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -86,12 +76,10 @@
           ./configuration.nix
 
           inputs.home-manager.nixosModules.home-manager
-          inputs.sfd-nix.nixosModules.default
           {
             nixpkgs.overlays = [
               inputs.nix-cachyos-kernel.overlays.pinned
               inputs.obsidian-extensions.overlays.default
-              inputs.sheprd.overlays.default
             ];
 
             home-manager = {

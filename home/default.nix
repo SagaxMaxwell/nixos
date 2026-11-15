@@ -17,34 +17,6 @@ in
   home = {
     stateVersion = "26.05";
 
-    activation.sheprdAppearance = lib.hm.dag.entryAfter [ "linkGeneration" ] (
-      lib.hm.generators.mkImpureConfigMerger {
-        inherit pkgs;
-        format = "toml";
-        empty = "{}";
-        jqOperation = "$dynamic * $static";
-        path = "${config.xdg.configHome}/herdr/config-gpui.local.toml";
-        staticSettings = (pkgs.formats.toml { }).generate "sheprd.toml" {
-          features = {
-            acp_chats = true;
-          };
-
-          chat = {
-            render_existing = true;
-            layout = "bubbles";
-            launcher = "plus";
-            glide = true;
-          };
-
-          theme = "light:GitHub Light Default,dark:Atom One Dark";
-          backdrop = {
-            inherit opacity;
-            blur = true;
-          };
-        };
-      }
-    );
-
     activation.tabularisAppearance = lib.hm.dag.entryAfter [ "linkGeneration" ] (
       lib.hm.generators.mkImpureConfigMerger {
         inherit pkgs;
@@ -80,7 +52,6 @@ in
       # GUI apps.
       (blender.override { rocmSupport = true; })
       mission-center
-      sheprd
       tabularis
     ];
   };
@@ -151,7 +122,17 @@ in
     herdr = {
       enable = true;
       mutableSettings = true;
-      settings.theme.auto_switch = true;
+      settings = {
+        theme.auto_switch = true;
+        session.resume_agents_on_restore = true;
+        remote.manage_ssh_config = true;
+        terminal.default_shell = "nu";
+        worktrees.directory = "~/.herdr/worktrees";
+        ui.toast.delivery = "herdr";
+        ui.toast.delay_seconds = 0;
+        ui.sound.enabled = true;
+        experimental.pane_history = true;
+      };
     };
 
     difftastic = {

@@ -10,7 +10,7 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 
 Home Manager 随 `nixos-rebuild` 生效；冲突文件备份为 `*.hm-backup`，只保留最近一份。
 
-Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia/settings.toml`。Zed、Strata、Sheprd、Herdr、Tabularis、Claude Code 保留可变配置；删除 Nix 字段后，用户文件中的旧值需手动清理。
+Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia/settings.toml`。Zed、Strata、Herdr、Tabularis、Claude Code 保留可变配置；删除 Nix 字段后，用户文件中的旧值需手动清理。
 
 ## 首次接管
 
@@ -45,11 +45,11 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 - `Super` 启动器，`Super+Enter` Ghostty，右上角停留 0.5 秒打开控制中心。
 - `Ctrl+Space` 切换美式键盘与万象拼音；`Super+Space` 保留 Umbriel 默认功能。Rime 数据更新并应用配置后，重启 Fcitx5 重新部署；修改输入法列表时先退出图形会话，在 TTY 应用配置，避免旧进程回写。
 - 主题与夜间暖色按本地时间 18:00–06:00 切换；暖色在边界前后各 30 分钟渐变。
-- Strata（Atelier Cave）、Sheprd、Herdr、Tabularis、sing-box、Claude Code、Fcitx5 启用深浅联动；Qt 应用接入系统 portal。Ghostty、Zed、Obsidian、Chrome、Yazi、bat 沿用已有联动。
+- Strata（Atelier Cave）、Herdr、Tabularis、Throne、Claude Code、Fcitx5 启用深浅联动；Qt 应用接入系统 portal。Ghostty、Zed、Obsidian、Chrome、Yazi、bat 沿用已有联动。
 - Mission Center 默认跟随系统主题；bottom 使用终端前景色与 ANSI 调色板，随 Ghostty 昼夜配色变化。
 - 原生背景透明度由 `flake.nix` 的 `opacity = 0.55` 统一，表示 55% 不透明，与 Noctalia `glass` 外层一致（内部卡片 65%）。不强制整窗透明；数值越低越透明。
 - 显示器开启 DDC/CI；UEFI 开启 Above 4G Decoding 与 Re-Size BAR。
-- sing-box 首次在 GUI 导入订阅；NetworkManager + systemd-resolved 随 TUN 启停切换 DNS，防火墙放行 `tun0`。
+- Throne（sing-box 内核）登录后启动到托盘；首次在 GUI 导入订阅并启动 TUN，再开启 Remember last proxy（记住上次代理），之后按保存状态恢复。主题保留 System。NixOS 提供 TUN/DNS 权限，保留 NetworkManager + systemd-resolved，防火墙继续过滤 TUN 入站流量；迁移时先退出旧客户端，避免同时接管网络。
 - SSH 支持 SFTP/SCP 和远程开发：`ssh maxwell@<主机-IP>`。
 - Obsidian 笔记库：`~/Documents/notes`。
 - Steam 启动选项：`gamemoderun %command%`；需性能叠加时用 `gamemoderun mangohud %command%`。
@@ -58,9 +58,9 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 
 | 软件／方案 | 取舍 | 当前方案 |
 | --- | --- | --- |
-| Vibex | 暂未找到可用 Nix 包 | Sheprd |
+| Vibex | 暂未找到可用 Nix 包 | Herdr |
 | Meta oomd | 暂未找到可用 Nix 包，不自行打包 | systemd-oomd |
-| [Hickory DNS](https://github.com/hickory-dns/hickory-dns/tree/main/bin) | 已有 Nix 包；与 sing-box 的 TUN/DNS 联动需额外适配；Rust 异步架构，完整递归仍属实验性，性能未实测 | NetworkManager + systemd-resolved |
+| [Hickory DNS](https://github.com/hickory-dns/hickory-dns/tree/main/bin) | 已有 Nix 包；与 Throne TUN/DNS 联动需额外适配；Rust 异步架构，完整递归仍属实验性，性能未实测 | NetworkManager + systemd-resolved |
 | Cassotis IME | 当前锁定 nixpkgs 没有包，不自行封装 | Fcitx5 + Rime + 万象 |
 | 万象语法模型 | 上游 LTS 可覆盖，nixpkgs 未包含模型 | [快照 20261112153433](https://github.com/OrdChaos/RIME-LMDG.snapshot/releases/tag/20261112153433) + 固定 SHA-256 校验，经 `rimeDataPkgs` 合并；约 389.6 MiB，哈希与官方 LTS 一致，更新时同步修改 `system/input.nix` 的版本与哈希 |
 | Rime 缓存兼容 | Nix store 时间戳固定，Rime 可能复用旧编译结果 | 跟踪词库、模型和配置；变化时清理 `build` 缓存，保留用户词库，重启 Fcitx5 后部署 |
