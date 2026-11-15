@@ -14,78 +14,7 @@ let
 
   strata = inputs.strata.packages.${pkgs.stdenv.hostPlatform.system}.default;
   defaults = fromTOML (builtins.readFile "${pkgs.umbriel.src}/examples/config.toml");
-  accent = rec {
-    primary = "#629EE8";
-    onPrimary = "#182B45";
-    secondary = primary;
-    onSecondary = onPrimary;
-    tertiary = primary;
-    onTertiary = onPrimary;
-  };
-  modes = {
-    light = rec {
-      error = "#BA3547";
-      onError = "#FFFFFF";
-      surface = "#FFFFFF";
-      onSurface = "#253244";
-      surfaceVariant = "#F8FAFC";
-      onSurfaceVariant = "#526174";
-      outline = "#DCE4ED";
-      shadow = "#CBD5E1";
-      hover = "#E5F0FD";
-      onHover = accent.onPrimary;
-      ansi = {
-        black = onSurface;
-        green = "#347A54";
-        yellow = "#8C681D";
-        blue = "#316BB0";
-        magenta = "#8655A6";
-        cyan = "#267B8A";
-        white = surfaceVariant;
-      };
-    };
-    dark = rec {
-      error = "#FFB4AB";
-      onError = "#690005";
-      surface = "#151A22";
-      onSurface = "#E4EAF2";
-      surfaceVariant = "#222B38";
-      onSurfaceVariant = "#B4C1D2";
-      outline = "#455468";
-      shadow = "#000000";
-      hover = "#2D4360";
-      onHover = onSurface;
-      ansi = {
-        black = "#354153";
-        green = "#9AD6AF";
-        yellow = "#E9CA83";
-        blue = "#9CC9FF";
-        magenta = "#D8B4EF";
-        cyan = "#8CD5DF";
-        white = onSurface;
-      };
-    };
-  };
 
-  # Merge the accent and derive terminal colors.
-  palette =
-    colors:
-    accent
-    // removeAttrs colors [ "ansi" ]
-    // {
-      terminal = rec {
-        background = colors.surface;
-        foreground = colors.onSurface;
-        cursor = colors.onSurface;
-        cursorText = colors.surface;
-        selectionBg = colors.hover;
-        selectionFg = colors.onSurface;
-        normal = colors.ansi // {
-          red = colors.error;
-        };
-        bright = normal;
-      };
-    };
 in
 {
   programs.umbriel.enable = true;
@@ -177,6 +106,9 @@ in
       settings = {
         general.xwayland_native_resolution = true;
 
+        # Noctalia owns the generated colors; keep the base config declarative.
+        include.optional.files = [ "noctalia.toml" ];
+
         output = lib.optionalAttrs (outputName != "") {
           ${outputName} = {
             mode = "3840x2160@240";
@@ -240,15 +172,18 @@ in
     programs.noctalia = {
       enable = true;
       systemd.enable = true;
-      customPalettes.WhiteBlue = lib.mapAttrs (_: palette) modes;
 
       settings = {
         brightness.enable_ddcutil = true;
 
         theme = {
           mode = "auto";
-          source = "custom";
-          custom_palette = "WhiteBlue";
+          source = "community";
+          community_palette = "One Dark Warmer";
+          templates.builtin_ids = [
+            "umbriel"
+            "ghostty"
+          ];
         };
 
         wallpaper.fill_color = "surface";

@@ -155,7 +155,7 @@ in
     ghostty = {
       enable = true;
       settings = {
-        theme = "light:GitHub Light Default,dark:Atom One Dark";
+        theme = "noctalia";
         background-opacity = opacity;
         background-opacity-cells = true;
         background-blur = true;

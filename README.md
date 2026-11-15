@@ -44,7 +44,7 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 - 系统字体使用 Fontconfig 的 medium hinting 并禁用内嵌位图；应用可能采用自己的渲染策略。高分屏 XWayland 使用原生分辨率，重新登录生效；不自行缩放界面的旧应用可能显示较小。
 - `Super` 启动器，`Super+Enter` Ghostty，右上角停留 0.5 秒打开控制中心。
 - `Ctrl+Space` 切换美式键盘与万象拼音；`Super+Space` 保留 Umbriel 默认功能。Rime 数据更新并应用配置后，重启 Fcitx5 重新部署；修改输入法列表时先退出图形会话，在 TTY 应用配置，避免旧进程回写。
-- 主题与夜间暖色按本地时间 18:00–06:00 切换；暖色在边界前后各 30 分钟渐变。
+- Noctalia 使用 One Dark Warmer，Umbriel 与 Ghostty 通过内置模板跟随；白天为配套浅色，18:00–06:00 为深色。夜间暖色沿用同一时间表，在边界前后各 30 分钟渐变。
 - Strata（Atelier Cave）、Herdr、Tabularis、Throne、Claude Code、Fcitx5 启用深浅联动；Qt 应用接入系统 portal。Ghostty、Zed、Obsidian、Chrome、Yazi、bat 沿用已有联动。
 - Mission Center 默认跟随系统主题；bottom 使用终端前景色与 ANSI 调色板，随 Ghostty 昼夜配色变化。
 - 原生背景透明度由 `flake.nix` 的 `opacity = 0.55` 统一，表示 55% 不透明，与 Noctalia `glass` 外层一致（内部卡片 65%）。不强制整窗透明；数值越低越透明。
