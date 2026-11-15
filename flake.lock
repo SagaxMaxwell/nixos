@@ -18,6 +18,27 @@
     },
     "flake-parts": {
       "inputs": {
+        "nixpkgs-lib": [
+          "justray",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793576659,
+        "narHash": "sha256-V1h85lUaJBQoHFrB2vpXZOE0Ju1MYSnIpsehoVZYlDo=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "ea2630b7470978622c7689a1ff75d2b389175399",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "flake-parts_2": {
+      "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
       },
       "locked": {
@@ -54,10 +75,31 @@
         "type": "github"
       }
     },
+    "justray": {
+      "inputs": {
+        "flake-parts": "flake-parts",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794650281,
+        "narHash": "sha256-RZe4fDfRRlz7JfK3Uwv+J8znfY4AaL2jZMVixvy4q4A=",
+        "owner": "luynrs",
+        "repo": "justray",
+        "rev": "94be6e1285a7a76b6365d1fa338fea1d6d0e508c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "luynrs",
+        "repo": "justray",
+        "type": "github"
+      }
+    },
     "nix-cachyos-kernel": {
       "inputs": {
         "flake-compat": "flake-compat",
-        "flake-parts": "flake-parts",
+        "flake-parts": "flake-parts_2",
         "nixpkgs": "nixpkgs"
       },
       "locked": {
@@ -167,6 +209,7 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
+        "justray": "justray",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",

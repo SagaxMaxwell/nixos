@@ -45,11 +45,15 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 - `Super` 启动器，`Super+Enter` Ghostty，右上角停留 0.5 秒打开控制中心。
 - `Ctrl+Space` 切换美式键盘与万象拼音；`Super+Space` 保留 Umbriel 默认功能。Rime 数据更新并应用配置后，重启 Fcitx5 重新部署；修改输入法列表时先退出图形会话，在 TTY 应用配置，避免旧进程回写。
 - Noctalia 使用 One Dark Warmer，Umbriel 与 Ghostty 通过内置模板跟随；白天为配套浅色，18:00–06:00 为深色。夜间暖色沿用同一时间表，在边界前后各 30 分钟渐变。
-- Strata（Atelier Cave）、Herdr、Tabularis、Throne、Claude Code、Fcitx5 启用深浅联动；Qt 应用接入系统 portal。Ghostty、Zed、Obsidian、Chrome、Yazi、bat 沿用已有联动。
+- Strata（Atelier Cave）、Herdr、Tabularis、Claude Code、Fcitx5 启用深浅联动；Qt 应用接入系统 portal。Ghostty、Zed、Obsidian、Chrome、Yazi、bat 沿用已有联动。
 - Mission Center 默认跟随系统主题；bottom 使用终端前景色与 ANSI 调色板，随 Ghostty 昼夜配色变化。
 - 原生背景透明度由 `flake.nix` 的 `opacity = 0.55` 统一，表示 55% 不透明，与 Noctalia `glass` 外层一致（内部卡片 65%）。不强制整窗透明；数值越低越透明。
 - 显示器开启 DDC/CI；UEFI 开启 Above 4G Decoding 与 Re-Size BAR。
-- Throne（sing-box 内核）登录后启动到托盘；首次在 GUI 导入订阅并启动 TUN，再开启 Remember last proxy（记住上次代理），之后按保存状态恢复。主题保留 System。NixOS 提供 TUN/DNS 权限，保留 NetworkManager + systemd-resolved，防火墙继续过滤 TUN 入站流量；迁移时先退出旧客户端，避免同时接管网络。
+- JustRay 使用上游 flake，内嵌 sing-box-lx；`justray`（或 `jray`）打开 TUI，字体、背景和 ANSI 配色跟随 Ghostty。后台登录启动，关闭 TUI 保持连接，重启后恢复活动节点与模式；自启动由 Nix 管理。
+- 首次按 `a` 导入订阅、`m` 切换 TUN、`Enter` 连接；`o` 设置、`q` 退出界面。`justray down` 断开，`justray status` 查看状态。订阅仅导入节点，不继承旧客户端分流；默认局域网直连，其余代理。应用新系统前退出旧代理客户端。
+- JustRay 配置、订阅和连接状态保存在 `~/.config/justray/`；Nix 合并阿里 DoH、允许 QUIC，订阅不写入仓库。保留 NetworkManager + systemd-resolved，授予 maxwell 用户切换隧道 DNS 的权限；不开放局域网代理端口。
+- Chrome 启用硬件加速和平衡档省内存模式；视频硬解取决于显卡、驱动与编码格式，可在 `chrome://media-internals` 查看实际解码器。
+- TCP 使用 BBR + FQ；Btrfs 使用 `compress=zstd:1`，仅影响后续写入，不自动重压缩旧文件。
 - SSH 支持 SFTP/SCP 和远程开发：`ssh maxwell@<主机-IP>`。
 - Obsidian 笔记库：`~/Documents/notes`。
 - Steam 启动选项：`gamemoderun %command%`；需性能叠加时用 `gamemoderun mangohud %command%`。
@@ -60,7 +64,7 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 | --- | --- | --- |
 | Vibex | 暂未找到可用 Nix 包 | Herdr |
 | Meta oomd | 暂未找到可用 Nix 包，不自行打包 | systemd-oomd |
-| [Hickory DNS](https://github.com/hickory-dns/hickory-dns/tree/main/bin) | 已有 Nix 包；与 Throne TUN/DNS 联动需额外适配；Rust 异步架构，完整递归仍属实验性，性能未实测 | NetworkManager + systemd-resolved |
+| [Hickory DNS](https://github.com/hickory-dns/hickory-dns/tree/main/bin) | 已有 Nix 包；与代理 TUN/DNS 联动需额外适配；Rust 异步架构，完整递归仍属实验性，性能未实测 | NetworkManager + systemd-resolved |
 | Cassotis IME | 当前锁定 nixpkgs 没有包，不自行封装 | Fcitx5 + Rime + 万象 |
 | 万象语法模型 | 上游 LTS 可覆盖，nixpkgs 未包含模型 | [快照 20261112153433](https://github.com/OrdChaos/RIME-LMDG.snapshot/releases/tag/20261112153433) + 固定 SHA-256 校验，经 `rimeDataPkgs` 合并；约 389.6 MiB，哈希与官方 LTS 一致，更新时同步修改 `system/input.nix` 的版本与哈希 |
 | Rime 缓存兼容 | Nix store 时间戳固定，Rime 可能复用旧编译结果 | 跟踪词库、模型和配置；变化时清理 `build` 缓存，保留用户词库，重启 Fcitx5 后部署 |
@@ -73,6 +77,7 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 
 ## 已知问题与待配置
 
+- JustRay：若 URI 订阅报 `tcp: unsupported header type: multi`，改用订阅商的 sing-box JSON／Clash YAML；当前订阅支持在链接末尾加 `?flag=sing-box`，无需源码补丁。
 - 《艾尔登法环》：Steam 大屏幕下姓名框无法打开，允许 Umbriel 输入控制后仍无效；普通模式可输入英文，中文候选无法提交，原因待定位。
 - 显示器：等待实际输出名称；填入 `desktop/umbriel.nix` 的 `outputName` 后启用 4K 240Hz、常开 HDR，留空不生效。
 - WireGuard：已提供 `wg`、`wg-quick` 和 NetworkManager 导入方式，连接参数待配置。

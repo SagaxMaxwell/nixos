@@ -17,11 +17,20 @@
   time.timeZone = "Asia/Shanghai";
   i18n.defaultLocale = "zh_CN.UTF-8";
 
+  fileSystems = lib.genAttrs [ "/" "/home" "/nix" ] (_: {
+    options = [ "compress=zstd:1" ];
+  });
+
   programs.chromium = {
     enable = true;
-    extraOpts.ExtensionSettings."bgnkhhnnamicmpeenaelnjfhikgbkllg" = {
-      installation_mode = "force_installed";
-      update_url = "https://clients2.google.com/service/update2/crx";
+    extraOpts = {
+      HardwareAccelerationModeEnabled = true;
+      HighEfficiencyModeEnabled = true;
+      MemorySaverModeSavings = 1;
+      ExtensionSettings."bgnkhhnnamicmpeenaelnjfhikgbkllg" = {
+        installation_mode = "force_installed";
+        update_url = "https://clients2.google.com/service/update2/crx";
+      };
     };
   };
 
