@@ -25,6 +25,17 @@ in
         jqOperation = "$dynamic * $static";
         path = "${config.xdg.configHome}/herdr/config-gpui.local.toml";
         staticSettings = (pkgs.formats.toml { }).generate "sheprd.toml" {
+          features = {
+            acp_chats = true;
+          };
+
+          chat = {
+            render_existing = true;
+            layout = "bubbles";
+            launcher = "plus";
+            glide = true;
+          };
+
           theme = "light:GitHub Light Default,dark:Atom One Dark";
           backdrop = {
             inherit opacity;
