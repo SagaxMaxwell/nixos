@@ -14,7 +14,7 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 
 ## 首次接管
 
-先正常安装 NixOS，再在本仓库目录执行，无需手动挂载。核对 `system/hardware.nix` 中的 CPU、显卡设置；已有正确硬件配置则跳过前两步。首次接管命令临时启用 flakes，使用原系统的 sudo。
+先正常安装 NixOS，再在本仓库目录执行，无需手动挂载。`hardware-configuration.nix` 由 NixOS 工具按目标机器自动生成，仓库不附带；首次构建前须生成并纳入 flake。核对 `system/hardware.nix` 中的 CPU、显卡设置；已有正确硬件配置则跳过前两步。首次接管命令临时启用 flakes，使用原系统的 sudo。
 
 | 步骤 | 命令 |
 | --- | --- |
@@ -35,7 +35,7 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 | 查看构建计划，不编译 | `nixos-rebuild dry-build --flake .#nixos` |
 | 完整构建，不切换系统 | `nixos-rebuild build --flake .#nixos` |
 | 回到上一代系统 | `nixos-rebuild switch --rollback --no-reexec --elevate run0` |
-| 在 macOS 上仅检查求值 | `nix flake check --all-systems --no-build` |
+| 在 macOS 上仅检查求值（需目标机硬件配置） | `nix flake check --all-systems --no-build` |
 
 回滚不修改仓库文件；无法进入系统时，在启动菜单选择旧代。
 
@@ -53,7 +53,7 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 - 首次按 `a` 导入订阅、`m` 切换 TUN、`Enter` 连接；`o` 设置、`q` 退出界面。`justray down` 断开，`justray status` 查看状态。订阅仅导入节点，不继承旧客户端分流；默认局域网直连，其余代理。应用新系统前退出旧代理客户端。
 - JustRay 配置、订阅和连接状态保存在 `~/.config/justray/`；Nix 合并阿里 DoH、允许 QUIC，订阅不写入仓库。保留 NetworkManager + systemd-resolved，授予 maxwell 用户切换隧道 DNS 的权限；不开放局域网代理端口。
 - Chrome 启用硬件加速和平衡档省内存模式；视频硬解取决于显卡、驱动与编码格式，可在 `chrome://media-internals` 查看实际解码器。
-- TCP 使用 BBR + FQ；Btrfs 使用 `compress=zstd:1`，仅影响后续写入，不自动重压缩旧文件。
+- TCP 使用 BBR + FQ；显式启用 Btrfs 支持，所有声明为 Btrfs 的挂载统一使用 `compress=zstd:1`。仅影响后续写入，不转换文件系统或自动重压缩旧文件。
 - SSH 支持 SFTP/SCP 和远程开发：`ssh maxwell@<主机-IP>`。
 - Obsidian 笔记库：`~/Documents/notes`。
 - Steam 启动选项：`gamemoderun %command%`；需性能叠加时用 `gamemoderun mangohud %command%`。
@@ -83,3 +83,4 @@ Noctalia 的 GUI 设置可覆盖 Nix 配置，保存在 `~/.local/state/noctalia
 - WireGuard：已提供 `wg`、`wg-quick` 和 NetworkManager 导入方式，连接参数待配置。
 - containerd：CNI 网络尚未配置；gVisor 需显式选择 `runsc`。
 - 深浅主题：Helix、ONLYOFFICE Linux、Blender、Steam、mpv 暂不强制切换；Codex 仅在启动时探测。
+- Herdr 内 Agent 图片：已开启 `terminal.kitty_graphics = true`；Claude Code／Codex 在 Herdr pane 中的图片发送仍受上游终端识别限制，等待修复。

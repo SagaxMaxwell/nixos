@@ -135,6 +135,7 @@ in
 
         appearance = {
           border_width = 0;
+          corner_radius = 12;
 
           # Frosted glass; blur windows behind too.
           blur = {
@@ -145,7 +146,11 @@ in
             contrast = 1.0;
             saturation = 1.2;
           };
+
+          shadow.softness = 24;
         };
+
+        animation.windows_in.style = "zoom";
 
         # Upstream defaults; swap the terminal, wrap horizontal focus.
         keybinds = lib.recursiveUpdate defaults.keybinds {
@@ -164,6 +169,12 @@ in
           {
             match.is_focused = true;
             border_width = 4;
+          }
+
+          # Only floating windows get the macOS-ish title bar; tiled columns stay clean.
+          {
+            match.is_floating = true;
+            title_bar = "negotiated";
           }
         ];
       };
@@ -187,7 +198,6 @@ in
         };
 
         wallpaper.fill_color = "surface";
-        weather.enabled = false;
         notification.background_opacity = opacity;
         osd.background_opacity = opacity;
 
@@ -197,6 +207,7 @@ in
         };
 
         location = {
+          auto_locate = true;
           custom_schedule = true;
           sunset = "18:00";
           sunrise = "06:00";

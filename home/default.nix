@@ -127,6 +127,7 @@ in
         session.resume_agents_on_restore = true;
         remote.manage_ssh_config = true;
         terminal.default_shell = "nu";
+        terminal.kitty_graphics = true;
         worktrees.directory = "~/.herdr/worktrees";
         ui.toast.delivery = "herdr";
         ui.toast.delay_seconds = 0;
