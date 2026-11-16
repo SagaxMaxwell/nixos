@@ -1,7 +1,4 @@
-{
-  inputs,
-  ...
-}:
+{ inputs, ... }:
 
 {
   imports = [ inputs.justray.nixosModules.default ];
@@ -40,18 +37,21 @@
     };
   };
 
-  networking.networkmanager = {
-    enable = true;
-    wifi.backend = "iwd";
-    wifi.powersave = false;
+  networking = {
+    networkmanager = {
+      enable = true;
+      wifi.backend = "iwd";
+      wifi.powersave = false;
+    };
+    nftables.enable = true;
+    firewall.checkReversePath = "loose";
   };
 
-  networking.nftables.enable = true;
-  networking.firewall.checkReversePath = "loose";
-
-  boot.kernelModules = [ "tcp_bbr" ];
-  boot.kernel.sysctl = {
-    "net.ipv4.tcp_congestion_control" = "bbr";
-    "net.core.default_qdisc" = "fq";
+  boot = {
+    kernelModules = [ "tcp_bbr" ];
+    kernel.sysctl = {
+      "net.ipv4.tcp_congestion_control" = "bbr";
+      "net.core.default_qdisc" = "fq";
+    };
   };
 }

@@ -3,12 +3,10 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./desktop/umbriel.nix
-    ./system/services.nix
+    ./umbriel
     ./system/gaming.nix
     ./system/hardware.nix
-    ./system/memory.nix
-    ./system/input.nix
+    ./system/services.nix
     ./system/virtualisation.nix
   ];
 
@@ -32,7 +30,6 @@
 
   nix = {
     package = pkgs.lix;
-
     settings = {
       experimental-features = [
         "nix-command"
@@ -63,12 +60,10 @@
         enable = true;
         configurationLimit = 10;
       };
-
       efi.canTouchEfiVariables = true;
     };
 
     tmp.cleanOnBoot = true;
-
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
   };
 

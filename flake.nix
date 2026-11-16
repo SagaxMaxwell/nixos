@@ -15,7 +15,6 @@
 
     home-manager = {
       url = "github:nix-community/home-manager";
-
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -38,16 +37,21 @@
       url = "github:lgse/strata";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
   };
 
   outputs =
     inputs@{ self, nixpkgs, ... }:
     let
+      inherit (nixpkgs) lib;
       system = "x86_64-linux";
 
       # Shared glass opacity; lower is clearer.
       opacity = 0.55;
+
+      # The same value as the alpha byte of #RRGGBBAA.
+      alpha = lib.fixedWidthString 2 "0" (
+        lib.toLower (lib.toHexString (builtins.floor (opacity * 255 + 0.5)))
+      );
     in
     {
       devShells.${system}.default =
@@ -74,8 +78,7 @@
           '';
         };
 
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-        inherit system;
+      nixosConfigurations.nixos = lib.nixosSystem {
         specialArgs = { inherit inputs opacity; };
         modules = [
           ./configuration.nix
@@ -92,13 +95,11 @@
               useUserPackages = true;
               backupFileExtension = "hm-backup";
               overwriteBackup = true;
-              extraSpecialArgs = { inherit opacity; };
-              users.maxwell = {
-                imports = [
-                  inputs.nix-index-database.homeModules.default
-                  ./home
-                ];
-              };
+              extraSpecialArgs = { inherit opacity alpha; };
+              users.maxwell.imports = [
+                inputs.nix-index-database.homeModules.default
+                ./home.nix
+              ];
             };
           }
         ];

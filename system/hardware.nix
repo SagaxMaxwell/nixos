@@ -1,36 +1,43 @@
 { lib, pkgs, ... }:
 
 {
-  config = {
-    # List options merge, so the subvol entries from hardware-configuration.nix
-    # survive. Setting them here rather than in the generated file keeps the
-    # compression choice out of nixos-generate-config's overwrite path.
-    fileSystems."/".options = [ "compress=zstd:1" ];
-    fileSystems."/home".options = [ "compress=zstd:1" ];
-    fileSystems."/nix".options = [ "compress=zstd:1" ];
+  # List options merge, so the subvol entries from hardware-configuration.nix
+  # survive, and regenerating that file does not drop the compression choice.
+  fileSystems = lib.genAttrs [ "/" "/home" "/nix" ] (_: {
+    options = [ "compress=zstd:1" ];
+  });
 
-    boot.supportedFilesystems.btrfs = true;
-
-    hardware = {
-      cpu.amd.updateMicrocode = true;
-      amdgpu = {
-        initrd.enable = true;
-        opencl.enable = true;
-      };
-      i2c.enable = true;
+  hardware = {
+    amdgpu = {
+      initrd.enable = true;
+      opencl.enable = true;
     };
-
-    services.udev.packages = [ pkgs.openrgb ];
-
-    home-manager.users.maxwell.home.packages = with pkgs; [
-      ddcutil
-      libva-utils
-      mesa-demos
-      nvtopPackages.amd
-      openrgb
-      pciutils
-      vulkan-tools
-      vulkan-validation-layers
-    ];
+    i2c.enable = true;
   };
+
+  services.udev.packages = [ pkgs.openrgb ];
+
+  home-manager.users.maxwell.home.packages = with pkgs; [
+    ddcutil
+    libva-utils
+    mesa-demos
+    nvtopPackages.amd
+    openrgb
+    pciutils
+    vulkan-tools
+    vulkan-validation-layers
+  ];
+
+  # Zram only.
+  swapDevices = lib.mkForce [ ];
+  boot.kernelParams = [ "zswap.enabled=0" ];
+  services.zram-generator = {
+    enable = true;
+    settings.zram0 = {
+      zram-size = "ram / 2";
+      compression-algorithm = "zstd";
+    };
+  };
+
+  systemd.oomd.enableUserSlices = true;
 }

@@ -4,43 +4,51 @@
 { lib, modulesPath, ... }:
 
 {
-  imports =
-    [
-       (modulesPath + "/installer/scan/not-detected.nix")
-    ];
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+  ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "nvme"
+    "usbhid"
+    "usb_storage"
+    "sd_mod"
+  ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/140a7023-ceb7-47c5-b2f2-faae242be5e8";
-      fsType = "btrfs";
-    };
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/140a7023-ceb7-47c5-b2f2-faae242be5e8";
+    fsType = "btrfs";
+  };
 
-  fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/140a7023-ceb7-47c5-b2f2-faae242be5e8";
-      fsType = "btrfs";
-      options = [ "subvol=home" ];
-    };
+  fileSystems."/home" = {
+    device = "/dev/disk/by-uuid/140a7023-ceb7-47c5-b2f2-faae242be5e8";
+    fsType = "btrfs";
+    options = [ "subvol=home" ];
+  };
 
-  fileSystems."/nix" =
-    { device = "/dev/disk/by-uuid/140a7023-ceb7-47c5-b2f2-faae242be5e8";
-      fsType = "btrfs";
-      options = [ "subvol=nix" ];
-    };
+  fileSystems."/nix" = {
+    device = "/dev/disk/by-uuid/140a7023-ceb7-47c5-b2f2-faae242be5e8";
+    fsType = "btrfs";
+    options = [ "subvol=nix" ];
+  };
 
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/0A89-A6FC";
-      fsType = "vfat";
-      options = [ "fmask=0077" "dmask=0077" ];
-    };
-
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/a8fd7b9f-d95b-4281-8f6b-f65f8e9164e3"; }
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/0A89-A6FC";
+    fsType = "vfat";
+    options = [
+      "fmask=0077"
+      "dmask=0077"
     ];
+  };
+
+  swapDevices = [
+    { device = "/dev/disk/by-uuid/a8fd7b9f-d95b-4281-8f6b-f65f8e9164e3"; }
+  ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault true;
+  hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
 }
