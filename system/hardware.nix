@@ -1,19 +1,14 @@
 { lib, pkgs, ... }:
 
 {
-  # Apply compression to each declared Btrfs mount, preserving its other options.
-  options.fileSystems = lib.mkOption {
-    type = lib.types.attrsOf (
-      lib.types.submodule (
-        { config, ... }:
-        {
-          config.options = lib.mkIf (config.fsType == "btrfs") [ "compress=zstd:1" ];
-        }
-      )
-    );
-  };
-
   config = {
+    # List options merge, so the subvol entries from hardware-configuration.nix
+    # survive. Setting them here rather than in the generated file keeps the
+    # compression choice out of nixos-generate-config's overwrite path.
+    fileSystems."/".options = [ "compress=zstd:1" ];
+    fileSystems."/home".options = [ "compress=zstd:1" ];
+    fileSystems."/nix".options = [ "compress=zstd:1" ];
+
     boot.supportedFilesystems.btrfs = true;
 
     hardware = {

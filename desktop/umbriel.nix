@@ -13,7 +13,168 @@ let
   outputName = "";
 
   strata = inputs.strata.packages.${pkgs.stdenv.hostPlatform.system}.default;
-  defaults = fromTOML (builtins.readFile "${pkgs.umbriel.src}/examples/config.toml");
+
+  # NixOS-level value, captured here because the home-manager block below takes
+  # its own `config` argument, which shadows this one.
+  systemTimeZone = config.time.timeZone;
+
+  # Keybinds are compiled into the binary; only express overrides and additions
+  # here. Window and layer rules have no built-in defaults, so the upstream
+  # example's entries are spelled out below.
+  keybinds = {
+    # Applications and session.
+    "Mod+Return" = {
+      action = "spawn ghostty";
+      repeat = false;
+    };
+    "Mod" = "spawn noctalia msg panel-toggle launcher";
+    "Mod+Shift+Escape" = {
+      action = "shortcuts-inhibit-toggle";
+      allow_when_inhibited = true;
+      repeat = false;
+    };
+
+    # Media keys, routed through Noctalia so its OSDs show.
+    "XF86AudioRaiseVolume" = {
+      action = "spawn noctalia msg volume-up";
+      allow_when_locked = true;
+    };
+    "XF86AudioLowerVolume" = {
+      action = "spawn noctalia msg volume-down";
+      allow_when_locked = true;
+    };
+    "XF86AudioMute" = {
+      action = "spawn noctalia msg volume-mute";
+      allow_when_locked = true;
+      repeat = false;
+    };
+    "XF86AudioPlay" = {
+      action = "spawn noctalia msg media toggle";
+      allow_when_locked = true;
+      repeat = false;
+    };
+    "XF86AudioNext" = {
+      action = "spawn noctalia msg media next";
+      allow_when_locked = true;
+    };
+    "XF86AudioPrev" = {
+      action = "spawn noctalia msg media previous";
+      allow_when_locked = true;
+    };
+    "XF86MonBrightnessUp" = {
+      action = "spawn noctalia msg brightness-up";
+      allow_when_locked = true;
+    };
+    "XF86MonBrightnessDown" = {
+      action = "spawn noctalia msg brightness-down";
+      allow_when_locked = true;
+    };
+
+    # Wrap horizontal focus instead of stopping at the ends.
+    "Mod+Left" = "window-focus-previous";
+    "Mod+Right" = "window-focus-next";
+    "Mod+H" = "window-focus-previous";
+    "Mod+L" = "window-focus-next";
+    "Mod+WheelUp" = "window-focus-previous";
+    "Mod+WheelDown" = "window-focus-next";
+
+    # Extent tuning.
+    "Mod+Minus" = "window-modify-primary-extent -0.02";
+    "Mod+Equal" = "window-modify-primary-extent +0.02";
+    "Mod+Ctrl+Minus" = "window-modify-secondary-extent -0.02";
+    "Mod+Ctrl+Equal" = "window-modify-secondary-extent +0.02";
+
+    "Mod+Shift+T" = {
+      action = "window-focus-switch-floating";
+      repeat = false;
+    };
+
+    # Tabs.
+    "Mod+Alt+Right" = "column-focus-tab-next";
+    "Mod+Alt+Left" = "column-focus-tab-previous";
+
+    # Scratchpad.
+    "Mod+Shift+Space" = {
+      action = "window-move-to-scratchpad";
+      repeat = false;
+    };
+    "Mod+Space" = "scratchpad-toggle";
+    "Mod+Ctrl+Space" = {
+      action = "window-restore-from-scratchpad";
+      repeat = false;
+    };
+    "Mod+Tab" = "scratchpad-focus-next";
+  };
+
+  layerRule = [
+    {
+      match.namespace = "^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd|desktop-widget-[^\"]*)$";
+      blur = true;
+      blur_ignore_alpha = 0.5;
+      blur_popups = true;
+    }
+    {
+      # Surfaces that open over windows blur live content behind them.
+      match.namespace = "^noctalia-(notification|dock|panel|attached-panel|osd)$";
+      blur_optimized = false;
+    }
+  ];
+
+  windowRule = [
+    { blur = true; }
+
+    {
+      match.app_id = "^dev.noctalia.Noctalia$";
+      default_floating = true;
+      default_floating_size_px = {
+        width = 1020;
+        height = 900;
+      };
+    }
+    {
+      match.app_id = "^dev.noctalia.UmbrielSharePicker$";
+      default_floating = true;
+      default_floating_size_px = {
+        width = 800;
+        height = 600;
+      };
+    }
+    {
+      match.title = "^(Picture-in-Picture|Picture in picture)$";
+      default_floating = true;
+      default_maximize = false;
+      default_position = {
+        x = 20;
+        y = 20;
+        anchor = "bottom_right";
+      };
+    }
+    {
+      match.title = "^notificationtoasts_.+_desktop";
+      default_position = {
+        x = 0;
+        y = 0;
+        anchor = "bottom_right";
+      };
+      default_focused = false;
+      default_pinned = true;
+    }
+
+    # Focus border draws into the gap.
+    {
+      match.is_focused = true;
+      border_width = 4;
+    }
+
+    # Only unfocused floating windows get a negotiated title bar.
+    {
+      match = {
+        is_focused = false;
+        is_floating = true;
+      };
+      title_bar = "negotiated";
+    }
+  ];
 
 in
 {
@@ -67,7 +228,7 @@ in
     source-han-serif
   ];
 
-  home-manager.users.maxwell = { lib, ... }: {
+  home-manager.users.maxwell = { config, lib, ... }: {
     imports = [ "${pkgs.umbriel.src}/nix/home-module.nix" ];
 
     home.packages = [ strata ];
@@ -82,7 +243,7 @@ in
         format = "toml";
         empty = "{}";
         jqOperation = "$dynamic * $static";
-        path = "${config.home-manager.users.maxwell.xdg.configHome}/strata/settings.toml";
+        path = "${config.xdg.configHome}/strata/settings.toml";
         staticSettings = (pkgs.formats.toml { }).generate "strata-appearance.toml" {
           mode = "system";
           theme = "atelier-cave-light";
@@ -98,8 +259,8 @@ in
     };
 
     systemd.user.services.noctalia.Unit.X-Restart-Triggers = lib.optional (
-      config.time.timeZone != null
-    ) config.time.timeZone;
+      systemTimeZone != null
+    ) systemTimeZone;
 
     programs.umbriel = {
       enable = true;
@@ -152,31 +313,9 @@ in
 
         animation.windows_in.style = "zoom";
 
-        # Upstream defaults; swap the terminal, wrap horizontal focus.
-        keybinds = lib.recursiveUpdate defaults.keybinds {
-          "Mod+Return".action = "spawn ghostty";
-          "Mod+Left" = "window-focus-previous";
-          "Mod+Right" = "window-focus-next";
-          "Mod+H" = "window-focus-previous";
-          "Mod+L" = "window-focus-next";
-          "Mod+WheelUp" = "window-focus-previous";
-          "Mod+WheelDown" = "window-focus-next";
-        };
-        inherit (defaults) layer_rule;
-
-        # Focus border draws into the gap.
-        window_rule = defaults.window_rule ++ [
-          {
-            match.is_focused = true;
-            border_width = 4;
-          }
-
-          # Only floating windows get the macOS-ish title bar; tiled columns stay clean.
-          {
-            match.is_floating = true;
-            title_bar = "negotiated";
-          }
-        ];
+        inherit keybinds;
+        layer_rule = layerRule;
+        window_rule = windowRule;
       };
     };
 
@@ -190,14 +329,17 @@ in
         theme = {
           mode = "auto";
           source = "community";
-          community_palette = "One Dark Warmer";
+          community_palette = "One";
           templates.builtin_ids = [
             "umbriel"
             "ghostty"
           ];
         };
 
-        wallpaper.fill_color = "surface";
+        wallpaper = {
+          default.path = "${config.programs.noctalia.package}/share/noctalia/assets/noctalia-wallpaper.png";
+          fill_color = "surface";
+        };
         notification.background_opacity = opacity;
         osd.background_opacity = opacity;
 

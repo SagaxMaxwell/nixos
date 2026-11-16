@@ -15,9 +15,6 @@
         gamemode
         mangohud
       ];
-      package = pkgs.steam.override {
-        extraLibraries = p: [ p.gamemode.lib ];
-      };
       gamescopeSession.enable = true;
     };
   };
