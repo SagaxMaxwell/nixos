@@ -92,7 +92,7 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 | [Hickory DNS](https://github.com/hickory-dns/hickory-dns/tree/main/bin) | 有 Nix 包，但接入代理 TUN/DNS 链路需要额外适配；历史评估时完整递归仍属实验性，未实测性能优势 | NetworkManager + systemd-resolved，代理 DNS 由 JustRay 的 TUN 处理 |
 | Cassotis IME | 当时锁定的 nixpkgs 没有包，不自行封装 | Fcitx5 + Rime + 雾凇拼音 |
 | Rime 万象及独立语法模型 | 曾使用固定快照与 SHA-256 安装模型；上游 LTS 发布资源可能覆盖旧文件，模型未随 nixpkgs 方案包提供，需要额外维护下载、快照与校验 | `pkgs.rime-ice`，方案、词库与 Lua 脚本随包提供，不再单独下载万象模型 |
-| COSMIC Files | 2026-11-09 曾替换 Strata、撤回后又重新采用；当时 README 记录未启用提供 FileManager1 的桌面进程，部分“显示所在文件夹”调用可能不可用。历史未明确最终回到 Strata 的全部原因 | Strata，并注册其 FileManager1 服务；终端保留 Yazi |
+| Spacedrive（曾通过 `spacedrive.nix` 打包） | 当前 nixpkgs 暂无所需的 Spacedrive 2.x 版本；锁定版本仅有较旧且标记 broken 的 0.4.3。曾自行打包 2.0.0-alpha.2，因目录浏览与索引兼容问题撤回，已移除 `spacedrive.nix` | Strata；终端保留 Yazi |
 | 原版 niri／Hyprland 会话 | 历史配置曾使用，后来切换为 Umbriel 并清理旧模块；提交记录没有完整说明选型原因 | Umbriel + Noctalia；不能再通过切换一个旧模块路径恢复其他桌面 |
 | Ringboard | 有 Nix 包，但与 Noctalia 已有的剪贴板历史功能重复 | Noctalia 内置剪贴板 |
 | mimalloc 全局替换 | 曾通过全局预加载试用；无法覆盖应用内置或直接调用的分配器，与 jemalloc 等混用存在分配、释放不匹配及启动崩溃风险，后已撤回 | 系统 libc 与各应用默认分配器；有明确性能需求时再针对单个应用测试 |
