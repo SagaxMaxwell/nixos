@@ -35,7 +35,12 @@
         "nix-command"
         "flakes"
       ];
-      substituters = lib.mkAfter [ "https://cache.lantian.pub/lantian" ];
+      keep-outputs = true;
+      keep-derivations = true;
+      substituters = lib.mkAfter [
+        "https://cache.lantian.pub/lantian"
+        "https://nix-community.cachix.org"
+      ];
       trusted-public-keys = lib.mkAfter [
         "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
       ];
