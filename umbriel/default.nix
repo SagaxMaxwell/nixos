@@ -8,8 +8,7 @@
 let
   strata = inputs.strata.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
-  # NixOS-level value, captured here because the home-manager block below takes
-  # its own `config` argument, which shadows this one.
+  # Preserve the system time zone.
   systemTimeZone = config.time.timeZone;
 in
 {

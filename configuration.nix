@@ -15,19 +15,6 @@
   time.timeZone = "Asia/Shanghai";
   i18n.defaultLocale = "zh_CN.UTF-8";
 
-  programs.chromium = {
-    enable = true;
-    extraOpts = {
-      HardwareAccelerationModeEnabled = true;
-      HighEfficiencyModeEnabled = true;
-      MemorySaverModeSavings = 1;
-      ExtensionSettings."bgnkhhnnamicmpeenaelnjfhikgbkllg" = {
-        installation_mode = "force_installed";
-        update_url = "https://clients2.google.com/service/update2/crx";
-      };
-    };
-  };
-
   nix = {
     package = pkgs.lix;
     settings = {
@@ -35,14 +22,13 @@
         "nix-command"
         "flakes"
       ];
-      keep-outputs = true;
-      keep-derivations = true;
       substituters = lib.mkAfter [
         "https://cache.lantian.pub/lantian"
         "https://nix-community.cachix.org"
       ];
       trusted-public-keys = lib.mkAfter [
         "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkqCX+/rkCWyvRCYg3Fs="
       ];
     };
 

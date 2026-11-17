@@ -1,14 +1,14 @@
 { lib, ... }:
 
 let
-  # Output name from `umbriel outputs`; empty keeps automatic detection.
+
+  # Output name; empty enables detection.
   outputName = "";
 
-  # Keybinds are compiled into the binary; only express overrides and additions
-  # here. Window and layer rules have no built-in defaults, so the upstream
-  # example's entries are spelled out below.
+  # Define keybind overrides and additions.
   keybinds = {
-    # Applications and session.
+
+    # Apps and session.
     "Mod+Return" = {
       action = "spawn ghostty";
       repeat = false;
@@ -20,7 +20,7 @@ let
       repeat = false;
     };
 
-    # Media keys, routed through Noctalia so its OSDs show.
+    # Media controls.
     "XF86AudioRaiseVolume" = {
       action = "spawn noctalia msg volume-up";
       allow_when_locked = true;
@@ -56,7 +56,7 @@ let
       allow_when_locked = true;
     };
 
-    # Wrap horizontal focus instead of stopping at the ends.
+    # Wrap horizontal focus.
     "Mod+Left" = "window-focus-previous";
     "Mod+Right" = "window-focus-next";
     "Mod+H" = "window-focus-previous";
@@ -64,7 +64,7 @@ let
     "Mod+WheelUp" = "window-focus-previous";
     "Mod+WheelDown" = "window-focus-next";
 
-    # Extent tuning.
+    # Adjust column extents.
     "Mod+Minus" = "window-modify-primary-extent -0.02";
     "Mod+Equal" = "window-modify-primary-extent +0.02";
     "Mod+Ctrl+Minus" = "window-modify-secondary-extent -0.02";
@@ -75,7 +75,7 @@ let
       repeat = false;
     };
 
-    # Tabs.
+    # Tab navigation.
     "Mod+Alt+Right" = "column-focus-tab-next";
     "Mod+Alt+Left" = "column-focus-tab-previous";
 
@@ -100,7 +100,8 @@ let
       blur_popups = true;
     }
     {
-      # Surfaces that open over windows blur live content behind them.
+
+      # Blur overlay surfaces.
       match.namespace = "^noctalia-(notification|dock|panel|attached-panel|osd)$";
       blur_optimized = false;
     }
@@ -146,13 +147,13 @@ let
       default_pinned = true;
     }
 
-    # Focus border draws into the gap.
+    # Draw focus borders in the gap.
     {
       match.is_focused = true;
       border_width = 4;
     }
 
-    # Only unfocused floating windows get a negotiated title bar.
+    # Add title bars to unfocused floating windows.
     {
       match = {
         is_focused = false;
@@ -169,7 +170,7 @@ in
     settings = {
       general.xwayland_native_resolution = true;
 
-      # Noctalia owns the generated colors; keep the base config declarative.
+      # Let Noctalia manage generated colors.
       include.optional.files = [ "noctalia.toml" ];
 
       output = lib.optionalAttrs (outputName != "") {
@@ -192,7 +193,7 @@ in
       input = {
         focus.follows_mouse = true;
 
-        # Cursor follows keyboard focus.
+        # Follow keyboard focus with the cursor.
         cursor.follows_focus = true;
       };
 
@@ -200,7 +201,7 @@ in
         border_width = 0;
         corner_radius = 12;
 
-        # Frosted glass; blur windows behind too.
+        # Blur windows behind the glass.
         blur = {
           optimized = false;
           passes = 3;

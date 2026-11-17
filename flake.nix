@@ -2,9 +2,13 @@
   description = "NixOS configuration";
 
   nixConfig = {
-    extra-substituters = [ "https://cache.lantian.pub/lantian" ];
+    extra-substituters = [
+      "https://cache.lantian.pub/lantian"
+      "https://nix-community.cachix.org"
+    ];
     extra-trusted-public-keys = [
       "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkqCX+/rkCWyvRCYg3Fs="
     ];
   };
 
@@ -17,6 +21,8 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.8.0";
 
     justray = {
       url = "github:luynrs/justray";
@@ -45,10 +51,10 @@
       inherit (nixpkgs) lib;
       system = "x86_64-linux";
 
-      # Shared glass opacity; lower is clearer.
+      # Shared opacity.
       opacity = 0.55;
 
-      # The same value as the alpha byte of #RRGGBBAA.
+      # Alpha byte for RGBA colors.
       alpha = lib.fixedWidthString 2 "0" (
         lib.toLower (lib.toHexString (builtins.floor (opacity * 255 + 0.5)))
       );
@@ -82,6 +88,8 @@
         specialArgs = { inherit inputs opacity; };
         modules = [
           ./configuration.nix
+
+          inputs.nix-flatpak.nixosModules.nix-flatpak
 
           inputs.home-manager.nixosModules.home-manager
           {

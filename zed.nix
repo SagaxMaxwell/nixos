@@ -13,7 +13,8 @@ in
     enable = true;
 
     userSettings = {
-      # Apply alpha once; nested surfaces stay clear.
+
+      # Apply alpha to outer surfaces.
       theme_overrides =
         lib.mapAttrs
           (

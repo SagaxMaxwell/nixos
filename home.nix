@@ -31,13 +31,13 @@
 
     packages = with pkgs; [
 
-      # Nix tooling.
+      # Nix tools.
       nix-output-monitor
       nix-tree
       nixd
       nixfmt
 
-      # Command-line tools.
+      # CLI tools.
       gh
       oxfmt
       ruff
@@ -45,10 +45,10 @@
       xh
       wireguard-tools
 
-      # Development environments.
+      # Development tools.
       rustup
 
-      # GUI apps.
+      # Desktop apps.
       (blender.override { rocmSupport = true; })
       mission-center
       tabularis
@@ -73,7 +73,7 @@
 
     starship.enable = true;
 
-    # Command-line tools.
+    # CLI tools.
     bat.enable = true;
     eza.enable = true;
     fd.enable = true;
@@ -83,7 +83,8 @@
 
     bottom = {
       enable = true;
-      # Follow the terminal palette in light and dark modes.
+
+      # Follow the terminal palette.
       settings.styles = {
         widgets = {
           text = "reset";
@@ -158,9 +159,6 @@
     nix-index-database.comma.enable = true;
 
     uv.enable = true;
-
-    # GUI apps.
-    onlyoffice.enable = true;
 
     mpv = {
       enable = true;

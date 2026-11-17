@@ -1,8 +1,8 @@
 { lib, pkgs, ... }:
 
 {
-  # List options merge, so the subvol entries from hardware-configuration.nix
-  # survive, and regenerating that file does not drop the compression choice.
+
+  # Preserve generated subvolume options.
   fileSystems = lib.genAttrs [ "/" "/home" "/nix" ] (_: {
     options = [ "compress=zstd:1" ];
   });
@@ -28,7 +28,7 @@
     vulkan-validation-layers
   ];
 
-  # Zram only.
+  # Use zram only.
   swapDevices = lib.mkForce [ ];
   boot.kernelParams = [ "zswap.enabled=0" ];
   services.zram-generator = {

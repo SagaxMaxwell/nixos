@@ -1,8 +1,8 @@
 { pkgs, ... }:
 
 let
-  # Rime Ice ships schema, dictionaries and Lua scripts in one reproducible
-  # package, so no extra model file has to be fetched at build time.
+
+  # Use the bundled Rime Ice data.
   rimeDataPkgs = [ pkgs.rime-ice ];
 
   defaultCustom = (pkgs.formats.yaml { }).generate "rime-default.custom.yaml" {
@@ -42,7 +42,7 @@ in
 
     xdg.dataFile."fcitx5/rime/default.custom.yaml".source = defaultCustom;
 
-    # Track store paths because Rime's timestamp checks can miss updates.
+    # Track Rime data changes.
     xdg.dataFile."fcitx5/rime/.nix-deployment-fingerprint" = {
       text = builtins.toString ([ defaultCustom ] ++ rimeDataPkgs);
       onChange = ''

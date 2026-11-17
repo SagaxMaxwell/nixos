@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 
 {
   imports = [ inputs.justray.nixosModules.default ];
@@ -19,6 +19,29 @@
   };
 
   services = {
+    flatpak = {
+      enable = true;
+      remotes = [
+        {
+          name = "flathub";
+          location = "https://dl.flathub.org/repo/flathub.flatpakrepo";
+        }
+        {
+          name = "flathub-beta";
+          location = "https://dl.flathub.org/beta-repo/flathub-beta.flatpakrepo";
+        }
+        {
+          name = "gnome-nightly";
+          location = "https://nightly.gnome.org/gnome-nightly.flatpakrepo";
+        }
+      ];
+      packages = [ "org.onlyoffice.desktopeditors" ];
+      uninstallUnused = true;
+      update.auto = {
+        enable = true;
+        onCalendar = "weekly";
+      };
+    };
     journald.settings.Journal = {
       Storage = "persistent";
       SystemMaxUse = "1G";
@@ -35,6 +58,12 @@
       alsa.enable = true;
       pulse.enable = true;
     };
+  };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = [ "gtk" ];
   };
 
   networking = {
