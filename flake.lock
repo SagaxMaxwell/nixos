@@ -62,11 +62,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794865930,
-        "narHash": "sha256-a3My+u9CEwEFmuGXb3PV9COj7Gd8o28b19TvtDiKPfg=",
+        "lastModified": 1794897420,
+        "narHash": "sha256-hMI9Xg+lxS8kbnxIxL/jPQn688dstoxQAcMEbCb1ax0=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "9d7ba6bef3904a018d38b92f83132eaf01eb8ef3",
+        "rev": "5b76c5b8eec25fdbce4f43309b3ee10584374a26",
         "type": "github"
       },
       "original": {
@@ -208,10 +208,10 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1794835780,
-        "narHash": "sha256-ZMXzOKKG10ZdIY7CjRuLhqwrhUdKHmuUDGVLnT8xBYU=",
+        "lastModified": 1794924490,
+        "narHash": "sha256-UvM8ES/bdHRFCMeuF+bOr6pkVME8808xFWdCX2yHSYo=",
         "ref": "refs/heads/main",
-        "rev": "61645967c5f072816ee65369e6c3fa2d20feb2bc",
+        "rev": "3eb1852f1eec7cc18e51711e359567375a24d00c",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/karaolidis/nix-obsidian-extensions"
@@ -241,11 +241,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794845756,
-        "narHash": "sha256-d6avzOhMLpUdMnq2jYwzRj0uhtf62VAOCzMwUWovgFM=",
+        "lastModified": 1794891220,
+        "narHash": "sha256-dhkpWXxwZV90id7gmz+n8+XnVBeP2lc+YZjiSYbD3vE=",
         "owner": "lgse",
         "repo": "strata",
-        "rev": "d4679c61d31c58bc3c8af3d6241d8514b6d0e9c1",
+        "rev": "7cc1543e9c4bc00e68f1525b0b3d47f4624bc375",
         "type": "github"
       },
       "original": {
