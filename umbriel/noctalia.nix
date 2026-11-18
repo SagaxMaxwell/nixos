@@ -14,7 +14,6 @@
         community_palette = "One";
         templates.builtin_ids = [
           "umbriel"
-          "ghostty"
         ];
       };
 

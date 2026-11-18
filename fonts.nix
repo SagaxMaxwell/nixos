@@ -2,34 +2,89 @@
 
 let
 
-  # Install upstream font binaries without rebuilding them.
+  # Use the standard font installer.
   mkFont =
     {
       pname,
       version,
       sources,
-      format ? "ttf",
       license ? lib.licenses.ofl,
     }:
-    pkgs.runCommand "${pname}-${version}"
-      {
-        meta = {
-          inherit license;
-          platforms = lib.platforms.all;
-        };
-      }
-      (
-        ''
-          fontDir="$out/share/fonts/${if format == "otf" then "opentype" else "truetype"}"
-          mkdir -p "$fontDir"
-        ''
-        + lib.concatImapStringsSep "\n" (index: source: ''
-          install -m444 ${pkgs.fetchurl source} "$fontDir/${pname}-${toString index}.${format}"
-        '') sources
+    pkgs.stdenvNoCC.mkDerivation {
+      inherit pname version;
+      src = pkgs.linkFarm "${pname}-sources" (
+        map (source: {
+          inherit (source) name;
+          path = pkgs.fetchurl source;
+        }) sources
       );
+      nativeBuildInputs = [ pkgs.installFonts ];
+      dontBuild = true;
+      meta = {
+        inherit license;
+        platforms = lib.platforms.all;
+      };
+    };
 
   # Pin extra font packages.
   extraFonts = {
+    maple-mono-nf = pkgs.stdenvNoCC.mkDerivation {
+      pname = "maple-mono-nf";
+      version = "8.0-beta.3";
+      src = pkgs.fetchurl {
+        url = "https://github.com/subframe7536/maple-font/releases/download/v8.0-beta.3/MapleMono-NF-VF.zip";
+        hash = "sha256-uzydYW868FVeuC6/wC28FqssWdLNVHHS+BXFU6+YPUE=";
+      };
+      nativeBuildInputs = [
+        pkgs.unzip
+        pkgs.installFonts
+      ];
+      sourceRoot = ".";
+      dontBuild = true;
+      meta = {
+        license = lib.licenses.ofl;
+        platforms = lib.platforms.all;
+      };
+    };
+
+    maple-mono-nf-cn = pkgs.stdenvNoCC.mkDerivation {
+      pname = "maple-mono-nf-cn";
+      version = "8.0-beta.3";
+      src = pkgs.fetchurl {
+        url = "https://github.com/subframe7536/maple-font/releases/download/v8.0-beta.3/MapleMono-NF-CN-VF.zip";
+        hash = "sha256-BVd6/BuJZpw2Qr8OK+dkpZGWeE4ODqfkRPcDwpUPpps=";
+      };
+      nativeBuildInputs = [
+        pkgs.unzip
+        pkgs.installFonts
+      ];
+      sourceRoot = ".";
+      dontBuild = true;
+      meta = {
+        license = lib.licenses.ofl;
+        platforms = lib.platforms.all;
+      };
+    };
+
+    zhuque-fangsong = pkgs.stdenvNoCC.mkDerivation {
+      pname = "zhuque-fangsong";
+      version = "0.212";
+      src = pkgs.fetchurl {
+        url = "https://github.com/TrionesType/zhuque/releases/download/v0.212/ZhuqueFangsong-v0.212.zip";
+        hash = "sha256-u4tmGnZD0ilqctnRBTCgCUlBnE5Sf7YXg/c8K6GowGI=";
+      };
+      nativeBuildInputs = [
+        pkgs.unzip
+        pkgs.installFonts
+      ];
+      sourceRoot = ".";
+      dontBuild = true;
+      meta = {
+        license = lib.licenses.ofl;
+        platforms = lib.platforms.all;
+      };
+    };
+
     alimama-fangyuan = mkFont {
       pname = "alimama-fangyuan";
       version = "1.004-beta";
@@ -76,30 +131,6 @@ let
       ];
     };
 
-    playwrite = mkFont {
-      pname = "playwrite";
-      version = "unstable-7af0d90";
-      sources = [
-        {
-          name = "playwrite-1.ttf";
-          url = "https://raw.githubusercontent.com/google/fonts/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/playwriteusmodern/PlaywriteUSModern%5Bwght%5D.ttf";
-          hash = "sha256-E1Ihmohn4E4lcn7GPTViHXBLYnp+tb8n19b3l04dOy0=";
-        }
-      ];
-    };
-
-    nabla = mkFont {
-      pname = "nabla";
-      version = "unstable-7af0d90";
-      sources = [
-        {
-          name = "nabla-1.ttf";
-          url = "https://raw.githubusercontent.com/google/fonts/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/nabla/Nabla%5BEDPT%2CEHLT%5D.ttf";
-          hash = "sha256-5FzsYOsgmbS0/+6OvgBdHTBgdxBx7eHK7usS43osAK4=";
-        }
-      ];
-    };
-
     noto-colrv1 = mkFont {
       pname = "noto-colrv1";
       version = "2.051";
@@ -128,7 +159,6 @@ let
     chiron-sung = mkFont {
       pname = "chiron-sung";
       version = "1.024";
-      format = "otf";
       sources = [
         {
           name = "ChironSungHKVF.otf";
@@ -146,7 +176,6 @@ let
     wenyuan-rounded = mkFont {
       pname = "wenyuan-rounded";
       version = "1.110";
-      format = "otf";
       sources = [
         {
           name = "WenYuanRoundedSCVF.otf";
@@ -169,8 +198,11 @@ let
     "Chiron Sung HK VF"
   ];
   mono = [
+    "Cascadia Code NF"
+    "Maple Mono NF"
+    "Maple Mono NF CN"
     "Monaspace Neon Var"
-    "Recursive Mono Linear Static"
+    "Recursive"
     "Sarasa Mono SC"
     "Sarasa Term SC"
   ];
@@ -196,6 +228,7 @@ let
       "Smiley Sans"
     ];
     math = [ "STIX Two Math" ];
+    fangsong = [ "Zhuque Fangsong (technical preview)" ];
   };
 in
 {
@@ -206,11 +239,18 @@ in
       with pkgs;
       [
         roboto-flex
-        roboto-serif
+        (google-fonts.override {
+          fonts = [
+            "Roboto Serif"
+            "Recursive"
+            "Shantell Sans"
+            "Playwrite US Modern"
+            "Nabla"
+            "STIX Two Math"
+          ];
+        })
         monaspace.variable
-        recursive
-        shantell-sans
-        stix-two
+        (cascadia-code.override { useVariableFont = true; })
         source-han-sans-vf-ttf
         source-han-serif-vf-ttf
         sarasa-gothic
@@ -244,36 +284,30 @@ in
         # Preserve CJK fallback for explicit application fonts.
         "Roboto Flex".accept = builtins.tail sans;
         "Amstelvar Roman".accept = builtins.tail serif;
-        "Monaspace Neon Var".accept = builtins.tail mono;
+        ${builtins.head mono}.accept = builtins.tail mono;
       };
 
       confPackages = [
-        (pkgs.writeTextDir "etc/fonts/conf.d/54-font-features.conf" ''
+        (pkgs.writeTextDir "etc/fonts/conf.d/54-font-families.conf" ''
           <?xml version="1.0"?>
           <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
           <fontconfig>
 
-            <!-- Select Amstelvar's separate italic family after aliases. -->
             <match target="pattern">
               <test name="family"><string>Amstelvar Roman</string></test>
               <test name="slant" compare="more_eq"><const>italic</const></test>
               <edit name="family" mode="assign" binding="same"><string>Amstelvar</string></edit>
             </match>
 
-            <!-- Use the rounded axis only for rounded UI requests. -->
-            <match target="pattern">
-              <test name="family"><string>ui-rounded</string></test>
-              <edit name="fontvariations" mode="append"><string>ROND=100</string></edit>
+            <match target="font">
+              <test name="family"><string>Recursive</string></test>
+              <edit name="fontvariations" mode="append"><string>MONO=1</string></edit>
             </match>
 
-            <!-- Enable standard OpenType shaping features. -->
             <match target="font">
-              <edit name="fontfeatures" mode="append">
-                <string>kern=1</string>
-                <string>liga=1</string>
-                <string>clig=1</string>
-                <string>calt=1</string>
-              </edit>
+              <test target="pattern" name="family"><string>ui-rounded</string></test>
+              <test name="family"><string>Google Sans Flex</string></test>
+              <edit name="fontvariations" mode="append"><string>ROND=100</string></edit>
             </match>
           </fontconfig>
         '')

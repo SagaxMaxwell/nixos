@@ -14,7 +14,6 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 | `home.nix` | Shell、命令行工具、开发工具和用户应用 |
 | `helix.nix` / `zed.nix` | 编辑器、格式化器和语言服务 |
 | `system/hardware.nix` | AMD 显卡、Btrfs 压缩、zram、OOM 和硬件工具 |
-| `fonts.nix` | 字体包与下载来源、字体优先级、渲染参数、OpenType 和应用字体 |
 | `system/services.nix` | Flatpak、portal、网络、音频、JustRay、SSH 和权限服务 |
 | `system/gaming.nix` | Steam、GameMode、Gamescope、MangoHud 和 Wine |
 | `system/virtualisation.nix` | Podman、containerd、gVisor 和虚拟化工具 |
@@ -25,13 +24,13 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 
 ## 配置约定
 
-小型应用配置放在 `home.nix`，独立的编辑器和桌面配置使用单独模块。用户应用和 dotfiles 优先使用 Home Manager 的 `programs.<name>`，其次使用 `home.packages`；内核、驱动、系统服务、udev、PAM 和 `/etc` 资源留在 NixOS 层。编辑器语言服务使用 Nix store 路径，同一 derivation 不重复安装。
+小型应用配置放在 `home.nix`，独立的编辑器和桌面配置使用单独模块。用户应用和 dotfiles 优先使用 Home Manager 的 `programs.<name>`，其次使用 `home.packages`；内核、驱动、系统服务、udev、PAM 和 `/etc` 资源留在 NixOS 层。编辑器语言服务使用 Nix store 路径；系统与 Home Manager 共用同一包路径，不会重复下载或存储。
 
-优先使用上游模块：JustRay 同时声明系统模块和用户服务，Umbriel 使用上游 Home Manager 模块，Rime 使用 `fcitx5-rime.override { rimeDataPkgs; }`，不自行下载词库。快捷键只声明覆盖和新增项。Home Manager 随系统配置生效，冲突文件备份为 `*.hm-backup`；两个 `stateVersion` 是数据兼容基线，不随依赖更新。
+优先使用上游模块：JustRay 分别提供系统集成和用户服务，Umbriel 由 NixOS 模块安装 GTK portal、由上游 Home Manager 模块管理用户配置，Rime 使用 nixpkgs 的词库包。快捷键只声明覆盖和新增项。Home Manager 随系统配置生效，冲突文件备份为 `*.hm-backup`；两个 `stateVersion` 是数据兼容基线，不随依赖更新。
 
 Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，Zed、Strata、Herdr、Tabularis 和 Claude Code 保留可变配置，Nix 声明优先。删除声明字段后，旧值可能需要手动清理。
 
-软件来源保持单一：系统服务、驱动、CLI、编辑器、Steam、Ghostty、Chrome、Obsidian 和 Strata 来自 nixpkgs 或 Home Manager；OnlyOffice 使用 nix-flatpak，因为它是独立桌面应用且上游发布较快。nix-flatpak 固定到 v0.8.0，由 Nix 声明 Flathub Stable、Flathub Beta、GNOME Nightly、OnlyOffice 和每周更新；Beta 与 Nightly 只提供仓库，不默认安装测试版应用。Flatpak 数据位于 `/var/lib/flatpak`，不进入 Nix store；删除声明不会回滚旧数据，需要时执行 `flatpak uninstall --unused`。Homebrew 只用于独立的 Darwin 配置，NixOS 不依赖 Homebrew。
+软件优先使用 nixpkgs，由 NixOS 或 Home Manager 配置；Strata、JustRay 等使用 `flake.nix` 锁定的上游输入。OnlyOffice 使用 nix-flatpak v0.8.0，声明 Flathub Stable、Flathub Beta、GNOME Nightly，默认从 Stable 安装，每周更新；Beta 与 Nightly 不默认安装应用。Flatpak 数据位于 `/var/lib/flatpak`，不随 Nix 代回滚；可用 `flatpak uninstall --unused` 清理未使用的运行时。Homebrew 仅用于独立的 Darwin 配置。
 
 ## 补丁与参数覆盖
 
@@ -43,9 +42,14 @@ Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，Zed�
 | `home.nix` 的 `blender.override` | 包参数 | 打开 ROCm 支持以使用 AMD GPU |
 | `umbriel/input.nix` 的 `fcitx5-rime.override` | 包参数 | 注入 nixpkgs 的 `rime-ice` 数据 |
 | `umbriel/input.nix` 的 `defaultCustom.patch` | 应用配置 | 选择 Rime Ice schema |
-| `fonts.nix` 的 Fontconfig 规则 | 字体匹配与排版配置 | 选择 Amstelvar 正斜体家族，设置圆角轴和标准 OpenType 特性；不修改字体文件 |
 
-字体例外包只安装带 SHA-256 校验的上游字体文件，不打补丁、不重新编译字形。OpenMoji 直接使用上游 COLRv1 文件，未使用 nixpkgs 中带构建补丁的 OpenMoji 源码包。
+依赖包仍可能包含 nixpkgs 维护的构建适配。以下是已确认的例子，不代表整个传递依赖闭包：
+
+| 依赖 | 适配内容 |
+| --- | --- |
+| Zed | 移除上游链接参数覆盖，调整 WebRTC 动态链接、GLib 头文件路径和许可证生成工具版本 |
+| gVisor | 将 `/sbin/ldconfig` 替换为 Nix store 中的路径 |
+| Helix 的 Perl 语法依赖 | 移除与 glibc 冲突的 `bsearch` 实现及引用 |
 
 ## 部署与检查
 
@@ -66,7 +70,7 @@ Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，Zed�
 
 `hardware-configuration.nix` 的磁盘 UUID 保留现有值，CPU 按 AMD 主机配置。换机时用 `nixos-generate-config` 重新生成并核对；Btrfs 压缩独立放在 `system/hardware.nix`，不受重新生成影响。回滚不修改仓库；无法启动时在启动菜单选择旧代。
 
-Nix 使用 Lix，默认只保留仍被 GC 根关联的输出；每周清理超过 30 天的旧代并优化 store。缓存为官方缓存、lantian 和 nix-community，官方缓存排在最前，签名密钥均已配置。
+Nix 使用 Lix，每周清理超过 30 天的旧代和不再被引用的 store 路径，并优化 store。缓存按官方、lantian、nix-community 排序；`flake.nix` 为构建调用提供缓存配置，`configuration.nix` 配置安装后的 Nix 服务。
 
 ## 桌面
 
@@ -74,12 +78,12 @@ Nix 使用 Lix，默认只保留仍被 GC 根关联的输出；每周清理超�
 - Ghostty 和 Chrome 通过 Home Manager 的 `xdg.autostart` 在图形登录后启动，适用于 Umbriel 及其他支持 XDG 自启动的桌面；Chrome 保留 Home Manager 声明的启动参数。
 - Umbriel 使用原生 Wayland、TOML、wlroots 0.20 和 SceneFX；合成器本身不是 Vulkan 渲染，安装 Vulkan 工具不会改变这一点。
 - 滚动布局间距 8px，聚焦边框 4px，圆角 12；未聚焦的浮动窗口协商显示标题栏，应用自绘标题栏不受影响。
-- Noctalia 使用 One 配色和 `mode = "auto"`，18:00–06:00 深色，夜间色温 5500K；Umbriel 与 Ghostty 通过内置模板跟随，Helix 使用 onedark，Zed 使用自己的主题，其余应用不强制跟随。
+- Noctalia 使用 One 配色，18:00–06:00 为夜间时段，夜间色温 5500K；Umbriel 通过模板跟随。Ghostty 与 Zed 跟随系统外观：日间使用 Tokyo Night Storm 深色，夜间使用更黑的 IR Black；关闭 Noctalia 的 Ghostty 配色模板，Zed 自动安装对应主题扩展。Helix 固定 onedark；OnlyOffice、Blender、Steam、mpv 不强制切换，Codex 仅在启动时探测。
 - `opacity = 0.55` 为统一透明度，自动计算的 `alpha` 供 Zed 和 mpv 使用。
 - 空闲 10 分钟锁屏、15 分钟关闭屏幕、20 分钟挂起；显示器需开启 DDC/CI，UEFI 需开启 Above 4G Decoding 与 Re-Size BAR。
 - Obsidian 笔记库为 `~/Documents/notes`，社区插件和主题由 Nix 管理。
 
-Rime 词库或配置更新后会清理编译缓存但保留用户词库，需重启 Fcitx5 重新部署：
+Rime 通过配置与词库指纹检测变化并清理编译缓存，避免 Nix store 时间戳导致旧缓存复用；用户词库保留。更新后重启 Fcitx5 重新部署：
 
 ```sh
 systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
@@ -90,17 +94,17 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 ## 网络、工具与游戏
 
 - JustRay 使用上游内嵌 sing-box-lx 与权限包装，`justrayd` 用户服务已启用登录自启动，不依赖 Ghostty 或 TUI；关闭终端不影响后台连接。后台启动时会尝试恢复保存的活动连接；首次连接仍需在终端运行 `justray`，按 `a` 导入订阅、`m` 切换 TUN、`Enter` 连接。订阅只导入节点，不继承其他客户端的分流规则；应用前退出旧代理客户端。
-- Chrome 启用硬件加速与平衡档省内存模式，实际视频解码器可在 `chrome://media-internals` 查看。
+- Chrome 声明实验性硬件编码特性；内存节省模式由浏览器设置管理，实际视频解码器可在 `chrome://media-internals` 查看。
 - NetworkManager 使用 iwd，DNS 使用 systemd-resolved，TCP 使用 BBR + FQ。
 - Btrfs 使用 `compress=zstd:1`，磁盘 swap 禁用，zram 使用一半内存和 zstd，配合 systemd-oomd。
 - SSH：`ssh maxwell@<主机-IP>`，支持 SFTP、SCP 和远程开发；WireGuard 提供工具与 NetworkManager 导入方式，连接参数待配置。
 - Blender 使用启用 ROCm 的 nixpkgs 构建，Cycles 的 HIP 设备需在应用内选择；Strata 和 Blender 不添加自定义 ThinLTO 参数，Strata 的全量 LTO 与 `codegen-units = 1` 由上游决定。
 - Steam 启动选项为 `gamemoderun %command%`；性能叠加使用 `gamemoderun mangohud %command%`。
-- containerd 未配置 CNI，gVisor 需要显式选择 `runsc` runtime。
+- Podman 与 containerd 是独立运行时，不共享容器状态；BuildKit、Cloud Hypervisor 仅安装工具。containerd 尚未声明 CNI 网络配置，gVisor 需显式选择 `runsc` runtime。
 
 ## 软件取舍
 
-以下结论来自当前锁定依赖和配置，更新依赖后可以重新评估。
+以下保留此前的选型理由；其中包可用性属于当时的检查结果，更新依赖后可以重新评估。
 
 | 方案 | 未采用或撤回原因 | 当前选择 |
 | --- | --- | --- |
@@ -118,12 +122,9 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 | mdevd | 不能替换桌面、硬件和服务依赖的 udev | systemd-udevd |
 | 替换 systemd | NixOS、登录会话和系统/用户服务都依赖 systemd | systemd |
 
-Rime 的 Nix store 时间戳可能复用旧编译缓存；当前通过词库和配置指纹变化清理 `build`，保留用户词库，再重启 Fcitx5 部署。
-
 ## 已知限制
 
 - 显示器：`umbriel/compositor.nix` 的 `outputName` 留空，4K 240Hz/HDR 输出块未生效。先用 `umbriel outputs` 确认输出名和支持模式；HDR 是否可用取决于显示器 EDID。
 - JustRay：订阅报 `tcp: unsupported header type: multi` 时，改用 sing-box JSON / Clash YAML，或尝试在链接末尾加 `?flag=sing-box`。
-- 主题：Helix、OnlyOffice、Blender、Steam、mpv 不强制切换；Codex 仅在启动时探测。
 - Herdr 已启用 Kitty 图片协议，但 Agent 在 pane 内发图仍受上游终端识别限制；Codex 重启后需要手动 `codex resume`，Claude Code 不受影响。
 - 《艾尔登法环》：Steam 大屏幕下姓名框无法打开，普通模式中文候选无法提交，原因待定位。

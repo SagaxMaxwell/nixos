@@ -13,6 +13,11 @@ in
     enable = true;
 
     userSettings = {
+      theme = {
+        mode = "system";
+        light = "Tokyo Night Storm";
+        dark = "IR Black";
+      };
 
       # Apply alpha to outer surfaces.
       theme_overrides =
@@ -38,11 +43,13 @@ in
             ] (_: "#00000000")
           )
           {
-            "One Light" = "#fafafa${alpha}";
-            "One Dark" = "#282c33${alpha}";
+            "Tokyo Night Storm" = "#24283b${alpha}";
+            "IR Black" = "#000000${alpha}";
           };
 
       auto_install_extensions = {
+        tokyo-night = true;
+        ir-black = true;
         nix = true;
         oxc = true;
         tombi = true;

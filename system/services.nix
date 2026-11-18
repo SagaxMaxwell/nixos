@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ inputs, ... }:
 
 {
   imports = [ inputs.justray.nixosModules.default ];
@@ -62,7 +62,6 @@
 
   xdg.portal = {
     enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     config.common.default = [ "gtk" ];
   };
 

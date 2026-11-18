@@ -29,7 +29,7 @@
       ];
       trusted-public-keys = lib.mkAfter [
         "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkqCX+/rkCWyvRCYg3Fs="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
     };
 

@@ -149,7 +149,7 @@
     ghostty = {
       enable = true;
       settings = {
-        theme = "noctalia";
+        theme = "light:TokyoNight Storm,dark:IR Black";
         background-opacity = opacity;
         background-opacity-cells = true;
         background-blur = true;
