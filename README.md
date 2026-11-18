@@ -67,6 +67,7 @@ Nix 使用 Lix，默认只保留仍被 GC 根关联的输出；每周清理超�
 ## 桌面
 
 - `Super` 打开启动器，`Super+Enter` 打开 Ghostty；状态栏关闭，鼠标停在右上角 0.5 秒打开控制中心，`Ctrl+Space` 切换美式键盘与 Rime。
+- Ghostty 和 Chrome 通过 Home Manager 的 `xdg.autostart` 在图形登录后启动，适用于 Umbriel 及其他支持 XDG 自启动的桌面；Chrome 保留 Home Manager 声明的启动参数。
 - Umbriel 使用原生 Wayland、TOML、wlroots 0.20 和 SceneFX；合成器本身不是 Vulkan 渲染，安装 Vulkan 工具不会改变这一点。
 - 滚动布局间距 8px，聚焦边框 4px，圆角 12；未聚焦的浮动窗口协商显示标题栏，应用自绘标题栏不受影响。
 - Noctalia 使用 One 配色和 `mode = "auto"`，18:00–06:00 深色，夜间色温 5500K；Umbriel 与 Ghostty 通过内置模板跟随，Helix 使用 onedark，Zed 使用自己的主题，其余应用不强制跟随。
@@ -84,7 +85,7 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 
 ## 网络、工具与游戏
 
-- JustRay 使用上游内嵌 sing-box-lx 与权限包装，以用户服务运行；首次按 `a` 导入订阅、`m` 切换 TUN、`Enter` 连接。订阅只导入节点，不继承其他客户端的分流规则；应用前退出旧代理客户端。
+- JustRay 使用上游内嵌 sing-box-lx 与权限包装，`justrayd` 用户服务已启用登录自启动，不依赖 Ghostty 或 TUI；关闭终端不影响后台连接。后台启动时会尝试恢复保存的活动连接；首次连接仍需在终端运行 `justray`，按 `a` 导入订阅、`m` 切换 TUN、`Enter` 连接。订阅只导入节点，不继承其他客户端的分流规则；应用前退出旧代理客户端。
 - Chrome 启用硬件加速与平衡档省内存模式，实际视频解码器可在 `chrome://media-internals` 查看。
 - NetworkManager 使用 iwd，DNS 使用 systemd-resolved，TCP 使用 BBR + FQ。
 - Btrfs 使用 `compress=zstd:1`，磁盘 swap 禁用，zram 使用一半内存和 zstd，配合 systemd-oomd。

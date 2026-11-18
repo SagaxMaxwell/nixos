@@ -206,6 +206,15 @@
 
   xdg = {
     enable = true;
+
+    autostart = {
+      enable = true;
+      entries = [
+        "${config.programs.ghostty.package}/share/applications/com.mitchellh.ghostty.desktop"
+        "${config.programs.google-chrome.finalPackage}/share/applications/google-chrome.desktop"
+      ];
+    };
+
     mimeApps.defaultApplications = lib.genAttrs [
       "video/mp4"
       "video/x-matroska"
