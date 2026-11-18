@@ -39,7 +39,6 @@
 
       shell = {
         polkit_agent = true;
-        font_family = "IBM Plex Sans";
         panel = {
           transparency_mode = "glass";
           control_center_placement = "floating";

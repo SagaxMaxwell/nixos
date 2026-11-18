@@ -14,10 +14,11 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 | `home.nix` | Shell、命令行工具、开发工具和用户应用 |
 | `helix.nix` / `zed.nix` | 编辑器、格式化器和语言服务 |
 | `system/hardware.nix` | AMD 显卡、Btrfs 压缩、zram、OOM 和硬件工具 |
+| `fonts.nix` | 字体包与下载来源、字体优先级、渲染参数、OpenType 和应用字体 |
 | `system/services.nix` | Flatpak、portal、网络、音频、JustRay、SSH 和权限服务 |
 | `system/gaming.nix` | Steam、GameMode、Gamescope、MangoHud 和 Wine |
 | `system/virtualisation.nix` | Podman、containerd、gVisor 和虚拟化工具 |
-| `umbriel/default.nix` | Umbriel、登录、portal、字体和 Strata |
+| `umbriel/default.nix` | Umbriel、登录、portal 和 Strata |
 | `umbriel/compositor.nix` | 布局、窗口规则、快捷键和显示器 |
 | `umbriel/noctalia.nix` | 外壳、主题、夜间模式和空闲动作 |
 | `umbriel/input.nix` | Fcitx5、Rime 和词库缓存更新 |
@@ -42,6 +43,9 @@ Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，Zed�
 | `home.nix` 的 `blender.override` | 包参数 | 打开 ROCm 支持以使用 AMD GPU |
 | `umbriel/input.nix` 的 `fcitx5-rime.override` | 包参数 | 注入 nixpkgs 的 `rime-ice` 数据 |
 | `umbriel/input.nix` 的 `defaultCustom.patch` | 应用配置 | 选择 Rime Ice schema |
+| `fonts.nix` 的 Fontconfig 规则 | 字体匹配与排版配置 | 选择 Amstelvar 正斜体家族，设置圆角轴和标准 OpenType 特性；不修改字体文件 |
+
+字体例外包只安装带 SHA-256 校验的上游字体文件，不打补丁、不重新编译字形。OpenMoji 直接使用上游 COLRv1 文件，未使用 nixpkgs 中带构建补丁的 OpenMoji 源码包。
 
 ## 部署与检查
 

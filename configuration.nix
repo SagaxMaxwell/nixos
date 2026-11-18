@@ -3,6 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./fonts.nix
     ./umbriel
     ./system/gaming.nix
     ./system/hardware.nix

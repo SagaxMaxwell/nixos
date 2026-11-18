@@ -39,31 +39,6 @@ in
     "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
   };
 
-  fonts.fontconfig = {
-    hinting.style = "medium";
-    useEmbeddedBitmaps = false;
-    defaultFonts = {
-      sansSerif = [
-        "IBM Plex Sans"
-        "Source Han Sans SC"
-      ];
-      serif = [ "Source Han Serif SC" ];
-      monospace = [
-        "JetBrainsMono Nerd Font Mono"
-        "Source Han Mono SC"
-      ];
-    };
-  };
-
-  fonts.packages = with pkgs; [
-    ibm-plex
-    lxgw-wenkai
-    nerd-fonts.jetbrains-mono
-    source-han-mono
-    source-han-sans
-    source-han-serif
-  ];
-
   home-manager.users.maxwell = { config, lib, ... }: {
     imports = [
       "${pkgs.umbriel.src}/nix/home-module.nix"
