@@ -1,7 +1,8 @@
-# Generated hardware file; keep changes in modules.
 { lib, modulesPath, ... }:
 
 {
+
+  # Keep hardware policy in system/hardware.nix.
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
@@ -13,9 +14,7 @@
     "usb_storage"
     "sd_mod"
   ];
-  boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/140a7023-ceb7-47c5-b2f2-faae242be5e8";

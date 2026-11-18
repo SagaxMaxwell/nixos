@@ -96,6 +96,26 @@
         "type": "github"
       }
     },
+    "luciole": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795005044,
+        "narHash": "sha256-NXcI5OI17ZEy6Wbq6DS0+YPka26mfABu+aElGJDyNss=",
+        "owner": "noctalia-dev",
+        "repo": "luciole",
+        "rev": "90689cc89d05853871036b1772b71e441bd72f69",
+        "type": "github"
+      },
+      "original": {
+        "owner": "noctalia-dev",
+        "repo": "luciole",
+        "type": "github"
+      }
+    },
     "nix-cachyos-kernel": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -226,32 +246,12 @@
       "inputs": {
         "home-manager": "home-manager",
         "justray": "justray",
+        "luciole": "luciole",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nix-flatpak": "nix-flatpak",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",
-        "obsidian-extensions": "obsidian-extensions",
-        "strata": "strata"
-      }
-    },
-    "strata": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1794891220,
-        "narHash": "sha256-dhkpWXxwZV90id7gmz+n8+XnVBeP2lc+YZjiSYbD3vE=",
-        "owner": "lgse",
-        "repo": "strata",
-        "rev": "7cc1543e9c4bc00e68f1525b0b3d47f4624bc375",
-        "type": "github"
-      },
-      "original": {
-        "owner": "lgse",
-        "repo": "strata",
-        "type": "github"
+        "obsidian-extensions": "obsidian-extensions"
       }
     },
     "treefmt-nix": {

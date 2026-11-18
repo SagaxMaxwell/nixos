@@ -19,6 +19,14 @@ in
         dark = "IR Black";
       };
 
+      terminal = {
+        font_family = "Cascadia Code NF";
+        font_fallbacks = [
+          "Maple Mono NF"
+          "Maple Mono NF CN"
+        ];
+      };
+
       # Apply alpha to outer surfaces.
       theme_overrides =
         lib.mapAttrs
@@ -53,8 +61,6 @@ in
         nix = true;
         oxc = true;
         tombi = true;
-        toml = false;
-        github-theme = false;
       };
 
       diagnostics.inline.enabled = true;

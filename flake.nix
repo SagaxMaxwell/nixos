@@ -24,6 +24,11 @@
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.8.0";
 
+    luciole = {
+      url = "github:noctalia-dev/luciole";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     justray = {
       url = "github:luynrs/justray";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -38,11 +43,6 @@
       url = "git+https://github.com/karaolidis/nix-obsidian-extensions?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    strata = {
-      url = "github:lgse/strata";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -51,8 +51,8 @@
       inherit (nixpkgs) lib;
       system = "x86_64-linux";
 
-      # Shared opacity.
-      opacity = 0.55;
+      # Shared background opacity.
+      opacity = 0.8;
 
       # Alpha byte for RGBA colors.
       alpha = lib.fixedWidthString 2 "0" (

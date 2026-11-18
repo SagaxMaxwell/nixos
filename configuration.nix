@@ -1,10 +1,14 @@
 { lib, pkgs, ... }:
 
+let
+  inherit (import ./flake.nix) nixConfig;
+in
 {
   imports = [
     ./hardware-configuration.nix
-    ./fonts.nix
-    ./umbriel
+    ./system/fonts.nix
+    ./notalia
+    ./system/input.nix
     ./system/gaming.nix
     ./system/hardware.nix
     ./system/services.nix
@@ -23,14 +27,8 @@
         "nix-command"
         "flakes"
       ];
-      substituters = lib.mkAfter [
-        "https://cache.lantian.pub/lantian"
-        "https://nix-community.cachix.org"
-      ];
-      trusted-public-keys = lib.mkAfter [
-        "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
+      substituters = lib.mkAfter nixConfig.extra-substituters;
+      trusted-public-keys = lib.mkAfter nixConfig.extra-trusted-public-keys;
     };
 
     gc = {
