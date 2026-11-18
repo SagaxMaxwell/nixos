@@ -9,7 +9,7 @@ in
     extraPackages = [ pkgs.wl-clipboard ];
 
     settings = {
-      theme = "onedark";
+      theme = "base16_terminal";
 
       editor = {
         true-color = true;
