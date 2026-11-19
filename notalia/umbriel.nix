@@ -19,6 +19,8 @@
         lib.recursiveUpdate
           (builtins.fromTOML (builtins.readFile "${pkgs.umbriel.src}/examples/config.toml"))
           {
+            keybinds."Mod+Return".action = "spawn ${lib.getExe config.programs.ghostty.package}";
+
             general = {
               xwayland_native_resolution = true;
               autostart = [
@@ -55,12 +57,6 @@
               drag_opacity = opacity;
             };
           };
-    };
-
-    # Support the upstream terminal shortcut.
-    programs.kitty = {
-      enable = true;
-      settings.background_opacity = opacity;
     };
   };
 }

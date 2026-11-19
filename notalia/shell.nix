@@ -17,11 +17,25 @@
       systemd.enable = true;
 
       settings = {
+        theme = {
+          source = "wallpaper";
+          mode = "auto";
+          shell_mode = "auto";
+        };
         location.auto_locate = true;
+
+        wallpaper.automation = {
+          enabled = true;
+          interval_seconds = 900;
+          order = "random";
+          recursive = true;
+        };
 
         bar.default = {
           position = "top";
-          auto_hide = true;
+          auto_hide = false;
+          smart_auto_hide = true;
+          contact_shadow = true;
           reserve_space = false;
           background_opacity = opacity;
           compositor_blur = true;

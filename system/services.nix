@@ -1,12 +1,25 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 
+let
+
+  # Correct the upstream dependency hash.
+  justray = inputs.justray.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs {
+    vendorHash = "sha256-IGRz+7u0vpk4DPjXoFwXkffSiwZb/EnnkTCrXNO2S4M=";
+  };
+in
 {
   imports = [ inputs.justray.nixosModules.default ];
-  programs.justray.enable = true;
+  programs.justray = {
+    enable = true;
+    package = justray;
+  };
 
   home-manager.users.maxwell = {
     imports = [ inputs.justray.homeManagerModules.default ];
-    services.justray.enable = true;
+    services.justray = {
+      enable = true;
+      package = justray;
+    };
   };
 
   security = {
@@ -70,6 +83,21 @@
       enable = true;
       wifi.backend = "iwd";
       wifi.powersave = false;
+      dispatcherScripts = [
+        {
+          source = pkgs.writeShellScript "justray-dns" ''
+            set -eu
+
+            case "$1:$2" in
+              justray:up|justray:reapply)
+                ${pkgs.systemd}/bin/resolvectl dns "$1" 172.19.0.2
+                ${pkgs.systemd}/bin/resolvectl domain "$1" '~.'
+                ${pkgs.systemd}/bin/resolvectl flush-caches
+                ;;
+            esac
+          '';
+        }
+      ];
     };
     nftables.enable = true;
     firewall.checkReversePath = "loose";

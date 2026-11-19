@@ -12,7 +12,6 @@
   ];
 
   programs = {
-
     bun.enable = true;
 
     claude-code = {

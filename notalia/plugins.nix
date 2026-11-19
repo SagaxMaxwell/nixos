@@ -34,6 +34,8 @@ let
 in
 {
   home-manager.users.maxwell = {
+    programs.noctalia.settings.plugin_settings."noctalia/screen_recorder".video_encoder = "gpu";
+
     programs.noctalia.settings.plugins = {
       enabled = map (name: "noctalia/${name}") names;
       auto_update = "none";
@@ -66,6 +68,7 @@ in
       mpvpaper
       python3
       slurp
+      socat
     ];
   };
 }

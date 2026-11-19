@@ -15,7 +15,7 @@ in
     userSettings = {
       theme = {
         mode = "system";
-        light = "Tokyo Night Storm";
+        light = "GitHub Dark Dimmed";
         dark = "IR Black";
       };
 
@@ -51,12 +51,12 @@ in
             ] (_: "#00000000")
           )
           {
-            "Tokyo Night Storm" = "#24283b${alpha}";
+            "GitHub Dark Dimmed" = "#212830${alpha}";
             "IR Black" = "#000000${alpha}";
           };
 
       auto_install_extensions = {
-        tokyo-night = true;
+        github-theme = true;
         ir-black = true;
         nix = true;
         oxc = true;

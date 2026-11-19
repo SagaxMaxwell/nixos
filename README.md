@@ -2,7 +2,7 @@
 
 Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Noctalia。
 
-本仓库对应 AMD 台式机。远程 `~/Downloads/nixos` 是 Intel + NVIDIA 笔记本，保留自己的硬件配置、NVIDIA PRIME、Ayuz、supergfxd 和 Intel 媒体驱动，不能用本仓库的硬件文件覆盖。
+本仓库对应 AMD 台式机。远程 `~/Downloads/nixos` 是 Intel + NVIDIA 笔记本，保留硬件配置、NVIDIA 优先策略、PRIME、Ayuz 和 Intel 媒体驱动；supergfxd 保持禁用，不能用 AMD 硬件文件覆盖。
 
 ## 结构
 
@@ -35,7 +35,7 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 
 `notalia/` 每个组件一个文件，用户部分通过 `home-manager.users.maxwell` 声明。应用和 dotfiles 优先使用 Home Manager 的 `programs.<name>`，其次使用 `home.packages`；内核、驱动、系统服务、udev、PAM 和 `/etc` 留在 NixOS 层。编辑器语言服务使用 Nix store 路径；多处引用同一包不会重复下载或存储。注释使用简短英文，前留空行，不写同行注释。
 
-优先使用上游模块：JustRay 分别提供系统集成和用户服务，Umbriel 和 Luciole 使用上游 NixOS/Home Manager 模块，Rime 使用 nixpkgs 的词库包。Umbriel 以锁定版本的上游 `examples/config.toml` 为基础，仅覆盖滚动布局、窗口边框、拖动不透明度、XWayland 原生分辨率和应用自启动；其余设置随上游更新，不维护本地默认值副本。Home Manager 冲突文件备份为 `*.hm-backup`；两个 `stateVersion` 是数据兼容基线，不随依赖更新。
+优先使用上游模块：JustRay 分别提供系统集成和用户服务，Umbriel 和 Luciole 使用上游 NixOS/Home Manager 模块，Rime 使用 nixpkgs 的词库包。Umbriel 基于锁定版本的 `examples/config.toml`，覆盖 Ghostty 快捷键、滚动布局、窗口边框、拖动不透明度、XWayland 原生分辨率和应用自启动；其余随上游更新，不维护默认值副本。Home Manager 冲突文件备份为 `*.hm-backup`；两个 `stateVersion` 是数据兼容基线，不随依赖更新。
 
 Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，可以覆盖声明配置；移除 Nix 设置不会自动清除已有 GUI 设置。Luciole、Zed、Herdr、Tabularis 和 Claude Code 也保留可变配置，具体合并方式由各自模块决定，删除声明字段后旧值可能仍保留。
 
@@ -51,6 +51,7 @@ Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，可�
 | `apps/desktop.nix` 的 `blender.override` | 包参数 | 打开 ROCm 支持以使用 AMD GPU |
 | `system/input.nix` 的 `fcitx5-rime.override` | 包参数 | 注入 nixpkgs 的 `rime-ice` 数据 |
 | `system/input.nix` 的 `defaultCustom.patch` | 应用配置 | 选择 Rime Ice schema |
+| `system/services.nix` 的 `overrideAttrs` | 依赖校验值修正 | 修正 JustRay 锁定提交的 `vendorHash`，系统与用户服务共用同一包；不修改源码 |
 
 依赖包仍可能包含 nixpkgs 维护的构建适配。以下是已确认的例子，不代表整个传递依赖闭包：
 
@@ -75,7 +76,7 @@ Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，可�
 | macOS 上检查求值 | `nix flake check --all-systems --no-build` |
 | 含未跟踪文件的求值 | `nix flake check path:. --all-systems --no-build` |
 
-`--no-build` 只验证求值；Umbriel 配置验证器和 Noctalia 配置生成需要 Linux 上的完整检查。内核等没有缓存时需要本地编译。
+`--no-build` 不构建检查项，但求值中的 IFD 仍可能触发下载或构建。Umbriel 配置验证器和 Noctalia 配置生成需要 Linux 上的完整检查；内核等没有缓存时需要本地编译。
 
 `hardware-configuration.nix` 的磁盘 UUID 保留现有值，CPU 按 AMD 主机配置。换机时用 `nixos-generate-config` 重新生成并核对；Btrfs 压缩独立放在 `system/hardware.nix`，不受重新生成影响。回滚不修改仓库；无法启动时在启动菜单选择旧代。
 
@@ -85,27 +86,30 @@ Nix 使用 Lix，每周清理超过 30 天的旧代和未引用的 store 路径�
 
 | 功能 | 配置 |
 | --- | --- |
-| 快捷键 | 上游默认：`Super` 启动器、`Super+Enter` Kitty；`Ctrl+Space` 切换美式键盘与 Rime |
+| 快捷键 | `Super+Enter` 启动 Ghostty，其余沿用上游默认；`Super` 打开启动器，`Ctrl+Space` 切换美式键盘与 Rime |
 | 自启动 | Ghostty、Chrome 使用 Umbriel `general.autostart`，引用 Home Manager 程序路径并保留 Chrome 参数；更改后重新登录 |
 | 平铺 | `scrolling`，默认列宽 `0.7`，档位 `[0.5, 0.7, 0.9]`；横纵间距 `8px`、边框 `0px`，四侧 struts 均为 `-8`，抵消外侧间距；不足一屏时居中，仍尊重面板占位 |
-| 状态栏 | 顶部自动隐藏、不占位，控制中心入口最右；当前版本触及边缘即显示，`auto_hide_delay_ms` 仅控制隐藏延迟 |
+| 状态栏 | 顶部智能隐藏、不占位，开启接触阴影，控制中心入口最右；空工作区或概览中显示，有窗口时按需隐藏，触及边缘可显示；`auto_hide_delay_ms` 是普通自动隐藏模式的隐藏延迟 |
 | Dock | 右侧自动隐藏、不占位，悬停 `500ms` 后出现 |
-| Shell 与登录 | 配色、热角、夜灯、闲置行为沿用默认值；Greeter 默认 Umbriel 会话 |
+| Shell 与登录 | Shell 随壁纸取色（`theme.source = "wallpaper"`），主题模式与 Shell 主题模式均为 `auto`；热角、夜灯、闲置行为沿用默认值；Greeter 默认 Umbriel 会话 |
 | 天气 | `location.auto_locate = true`，按 IP 定位；代理或 VPN 可能改变定位结果 |
+| 图片壁纸轮换 | 每 15 分钟随机切换，包含子目录；使用 Shell 原生 `wallpaper.automation`，视频壁纸轮播由插件单独管理 |
 | 文件管理 | Luciole 使用官方 Nix 包，作为默认目录和文件选择器；启用图片、视频、文本、PDF 预览，运行时包含 Glycin、FFmpeg、ffmpegthumbnailer 与 Poppler |
-| 应用主题 | Ghostty、Zed 对齐 `~/darwin` 设置，使用 Nix 包；日夜主题 Tokyo Night Storm / IR Black，Zed 自动安装主题扩展；Helix 使用 `base16_terminal` |
+| 应用主题 | Ghostty、Zed 对齐 `~/darwin` 设置，使用 Nix 包；日夜主题 GitHub Dark Dimmed / IR Black，Zed 自动安装主题扩展；Helix 使用 `base16_terminal` |
 | 应用字体 | Ghostty、Zed 界面及编辑区采用应用默认；Zed 内置终端 Cascadia Code NF → Maple Mono NF → Maple Mono NF CN |
-| Obsidian | 笔记库 `~/Documents/notes`，社区插件与主题由 Nix 管理 |
+| Obsidian | 笔记库 `~/Documents/notes`；Nix 管理插件与 Border 主题，Style Settings 在浅色、深色均启用卡片布局，左右侧栏及正文面板背景设为透明 |
 
 Umbriel 使用 Wayland、TOML、wlroots 0.20 和 SceneFX，上游包自带 XWayland 供 Steam、Wine 等使用，无需额外安装。保留 XWayland 原生分辨率设置，其余未覆盖的焦点、窗口规则和外观沿用上游配置。合成器不是 Vulkan 渲染，安装 Vulkan 工具不会改变这一点。OnlyOffice、Blender、Steam、mpv 不强制切换主题，Codex 仅在启动时探测。DDC 亮度控制需显示器开启 DDC/CI，UEFI 需开启 Above 4G Decoding 与 Re-Size BAR。
 
-`opacity = 0.8` 统一 Ghostty、Kitty、Zed、mpv、Luciole，以及 Shell 状态栏、Dock、通知、OSD 的背景不透明度；`alpha` 自动转为十六进制。Shell 面板采用 `soft`（外层 `0.8`，内卡片由上游调整）。mpv 视频、Luciole 菜单和对话框保持原样；Zed 内层保留零 alpha，避免叠色。Umbriel 拖动不透明度也为 `0.8`。
+`opacity = 0.8` 统一 Ghostty、Zed、mpv、Luciole，以及 Shell 状态栏、Dock、通知、OSD 的背景不透明度；`alpha` 自动转为十六进制。Shell 面板采用 `soft`（外层 `0.8`，内卡片由上游调整）。mpv 视频、Luciole 菜单和对话框保持原样；Zed 内层保留零 alpha，避免叠色。Umbriel 拖动不透明度也为 `0.8`。
 
-模糊使用 Umbriel 上游窗口及图层规则和强度，Ghostty、Zed 与 Shell 状态栏、Dock 启用原生模糊；不额外叠加整窗透明度。模糊强度不等于不透明度，Greeter 壁纸模糊不作数值同步。Obsidian、Chrome 未确认有适用的 Linux 原生背景数值设置，跳过；不注入 CSS、不安装透明化插件、不打补丁。
+模糊使用 Umbriel 上游窗口及图层规则和强度，Ghostty、Zed 与 Shell 状态栏、Dock 启用原生模糊；不额外叠加整窗透明度。模糊强度不等于不透明度，Greeter 壁纸模糊不作数值同步。Obsidian 的 Style Settings 仅配置主题内部面板透明，不保证透出桌面或产生系统毛玻璃；未同步 macOS 专用半透明开关。Obsidian、Chrome 未确认有适用的 Linux 原生背景数值设置，跳过该数值设置；不添加自定义 CSS snippet、不安装窗口透明化插件、不打补丁。
 
 14 个官方插件由 `notalia/plugins.nix` 固定源码版本和校验值，Home Manager 安装运行依赖，Shell 从原生 `path` 源 `nix-official` 加载。关闭 Shell Git 源与自动更新，避免在线导出阻塞界面；更新插件需单独更新该文件，不随 `nix flake update` 自动变化，也不修改插件源码。Companion 的 API 限制见下表。
 
 Settings → Plugins 管理插件；状态栏按钮需在状态栏设置添加，Timer 在桌面组件编辑器添加，Translator 使用启动器 `/tr` 前缀。Bitwarden 需登录、深度壁纸需安装模型；安装不代表这些条件已满足。
+
+Video Wallpaper 选择目录后，还需在视频面板选择显示器并点击视频；可用 `noctalia msg panel-toggle noctalia/mpvpaper:picker` 打开。支持 MOV、MP4、MKV、WebM、GIF 混放；Slideshow 按间隔轮播，设置持久保存，当前版本没有对应 Nix 间隔字段。`socat` 用于跟踪当前视频和同步静态帧；Shell 的图片轮换不控制视频轮播。
 
 Rime 通过配置与词库指纹检测变化并清理编译缓存，避免 Nix store 时间戳导致旧缓存复用；用户词库保留。更新后重启 Fcitx5 重新部署：
 
@@ -120,6 +124,7 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 - JustRay 使用上游内嵌 sing-box-lx 与权限包装，`justrayd` 用户服务已启用登录自启动，不依赖 Ghostty 或 TUI；关闭终端不影响后台连接。后台启动时会尝试恢复保存的活动连接；首次连接仍需在终端运行 `justray`，按 `a` 导入订阅、`m` 切换 TUN、`Enter` 连接。订阅只导入节点，不继承其他客户端的分流规则；应用前退出旧代理客户端。
 - Chrome 声明实验性硬件编码特性；内存节省模式由浏览器设置管理，实际视频解码器可在 `chrome://media-internals` 查看。
 - NetworkManager 使用 iwd，DNS 使用 systemd-resolved，TCP 使用 BBR + FQ。
+- JustRay 接口启动或重新应用时，NetworkManager 钩子将 DNS 指向 TUN 的 `172.19.0.2`，设置路由域 `~.` 并清理缓存；接口移除后自动恢复普通网络 DNS。
 - Btrfs 使用 `compress=zstd:1`，磁盘 swap 禁用，zram 使用一半内存和 zstd，配合 systemd-oomd。
 - SSH：`ssh maxwell@<主机-IP>`，支持 SFTP、SCP 和远程开发；WireGuard 提供工具与 NetworkManager 导入方式，连接参数待配置。
 - Blender 使用启用 ROCm 的 nixpkgs 构建，Cycles 的 HIP 设备需在应用内选择。
@@ -151,10 +156,32 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 | 项目 | 当前限制 |
 | --- | --- |
 | Umbriel Companion | 本机随插件源使用 1.4.0（API 54），当前 Shell 仅支持到 API 53，升级前无法加载；按用户选择不固定旧版。远程单独保留 1.3.0，同步时保留差异 |
-| JustRay 构建 | 当前锁定提交 `23dd90f` 曾确认存在 `vendorHash` 与依赖不匹配；本机未添加校验值覆盖，需采用上游修正版本后再确认构建 |
+| JustRay 构建 | 锁定提交 `23dd90f` 的依赖校验值不匹配；两端共用已验证的 `vendorHash` 修正，更新到上游修正版后可移除 |
 | GUI 覆盖 | Noctalia 的旧 `settings.toml` 可以关闭状态栏或覆盖插件配置；重建不会自动清除，先备份再处理冲突字段 |
 
-- 显示器：没有强制指定输出模式或 HDR。后续配置前用 `umbriel outputs` 确认输出名和支持模式；HDR 是否可用取决于显示器 EDID。
 - JustRay：订阅报 `tcp: unsupported header type: multi` 时，改用 sing-box JSON / Clash YAML，或尝试在链接末尾加 `?flag=sing-box`。
 - Herdr 已启用 Kitty 图片协议，但 Agent 在 pane 内发图仍受上游终端识别限制；Codex 重启后需要手动 `codex resume`，Claude Code 不受影响。
 - 《艾尔登法环》：Steam 大屏幕下姓名框无法打开，普通模式中文候选无法提交，原因待定位。
+
+## 待提供的硬件信息
+
+以下信息需在 AMD 的 NixOS 主机上获取。
+
+| 项目 | 待提供的信息 | 后续调整 |
+| --- | --- | --- |
+| RX 9070 XT | `lspci -Dnn` 中的显卡 PCI 地址，以及 `ls -l /dev/dri/by-path/` 输出 | 指定独显用于桌面、应用渲染、视频硬解与录屏编码；目前尚未指定具体设备 |
+| 显示器 | `umbriel outputs` 输出，确认输出名、分辨率和刷新率；HDR 另需确认 EDID 支持 | 确定输出模式和 HDR 设置；目前未强制指定 |
+
+## 显卡使用范围
+
+目标是支持 GPU 加速的功能优先使用独显。驱动安装、启用硬解与选择具体显卡是三件事；本机仍待提供 PCI 地址，不能把 `hwdec=auto` 或 `video_encoder=gpu` 当成已选中 RX 9070 XT。
+
+| 范围 | 当前配置与限制 |
+| --- | --- |
+| Umbriel、Greeter、Shell、Ghostty、Zed、游戏 | 本机待指定 AMD 独显；远程已声明 NVIDIA 渲染优先，需应用后验证实际设备 |
+| mpv、视频壁纸 | 本机自动选择硬解，待绑定 AMD 独显；远程已指定 NVDEC |
+| Screen Recorder | 显式使用 `video_encoder = "gpu"`；插件没有具体 GPU 选择字段，实际编码设备需录制时验证 |
+| Chrome、Obsidian 等 Chromium/Electron 应用 | GPU 渲染不等于视频硬解；Chrome 已声明硬件编码特性，解码路径与设备需通过 `chrome://gpu`、`chrome://media-internals` 核实；NVIDIA VA-API 不保证适用于 Chromium |
+| Blender | 本机包启用 ROCm，Cycles 仍需在应用内选择 HIP 与 RX 9070 XT；远程需选择可用的 CUDA/OptiX 与 NVIDIA 设备，不能仅靠图形渲染环境变量指定计算设备 |
+| Luciole 缩略图、插件缩略图与 FFmpeg | 当前相关调用没有统一的硬解设备字段；安装 FFmpeg 不会让所有调用自动使用 GPU，不修改上游代码来强制替换 |
+| Flatpak、容器和应用自带运行时 | 设备权限、驱动和加速选项由各自运行环境决定，宿主机变量不能保证全部覆盖 |
