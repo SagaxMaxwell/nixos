@@ -24,6 +24,21 @@
         };
         location.auto_locate = true;
 
+        idle.behavior = {
+          lock = {
+            enabled = true;
+            timeout = 900;
+          };
+          screen-off = {
+            enabled = true;
+            timeout = 1200;
+          };
+          lock-and-suspend = {
+            enabled = true;
+            timeout = 1500;
+          };
+        };
+
         wallpaper.automation = {
           enabled = true;
           interval_seconds = 900;

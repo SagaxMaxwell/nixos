@@ -22,6 +22,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    epic-games-launcher = {
+      url = "github:kjetteren/epic-games-launcher-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.8.0";
 
     luciole = {
@@ -88,6 +93,7 @@
         specialArgs = { inherit inputs opacity; };
         modules = [
           ./configuration.nix
+          inputs.epic-games-launcher.nixosModules.default
 
           inputs.nix-flatpak.nixosModules.nix-flatpak
 

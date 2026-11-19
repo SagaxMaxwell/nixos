@@ -19,7 +19,7 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 | `system/hardware.nix` | AMD 显卡、Btrfs 压缩、zram、OOM 和硬件工具 |
 | `system/fonts.nix` | 字体安装、渲染与应用字体设置 |
 | `system/services.nix` | Flatpak、portal、网络、音频、JustRay、SSH 和权限服务 |
-| `system/gaming.nix` | Steam、GameMode、Gamescope、MangoHud 和 Wine |
+| `system/gaming.nix` | Steam、Epic Games Launcher、GameMode、Gamescope、MangoHud 和 Wine |
 | `system/virtualisation.nix` | Podman、containerd、gVisor 和虚拟化工具 |
 | `notalia/default.nix` | 团队模块入口及共用桌面集成 |
 | `notalia/umbriel.nix` | Umbriel 滚动布局、窗口外观、XWayland 和应用自启动 |
@@ -91,7 +91,8 @@ Nix 使用 Lix，每周清理超过 30 天的旧代和未引用的 store 路径�
 | 平铺 | `scrolling`，默认列宽 `0.7`，档位 `[0.5, 0.7, 0.9]`；横纵间距 `8px`、边框 `0px`，四侧 struts 均为 `-8`，抵消外侧间距；不足一屏时居中，仍尊重面板占位 |
 | 状态栏 | 顶部智能隐藏、不占位，开启接触阴影，控制中心入口最右；空工作区或概览中显示，有窗口时按需隐藏，触及边缘可显示；`auto_hide_delay_ms` 是普通自动隐藏模式的隐藏延迟 |
 | Dock | 右侧自动隐藏、不占位，悬停 `500ms` 后出现 |
-| Shell 与登录 | Shell 随壁纸取色（`theme.source = "wallpaper"`），主题模式与 Shell 主题模式均为 `auto`；热角、夜灯、闲置行为沿用默认值；Greeter 默认 Umbriel 会话 |
+| Shell 与登录 | Shell 随壁纸取色（`theme.source = "wallpaper"`），主题模式与 Shell 主题模式均为 `auto`；热角、夜灯沿用默认值；Greeter 默认 Umbriel 会话 |
+| 闲置动作 | 启用闲置 15 分钟锁屏、20 分钟熄屏、25 分钟锁屏并睡眠（Suspend）；时间从闲置开始计算，不累加，合盖策略独立 |
 | 天气 | `location.auto_locate = true`，按 IP 定位；代理或 VPN 可能改变定位结果 |
 | 图片壁纸轮换 | 每 15 分钟随机切换，包含子目录；使用 Shell 原生 `wallpaper.automation`，视频壁纸轮播由插件单独管理 |
 | 文件管理 | Luciole 使用官方 Nix 包，作为默认目录和文件选择器；启用图片、视频、文本、PDF 预览，运行时包含 Glycin、FFmpeg、ffmpegthumbnailer 与 Poppler |
@@ -129,6 +130,7 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 - SSH：`ssh maxwell@<主机-IP>`，支持 SFTP、SCP 和远程开发；WireGuard 提供工具与 NetworkManager 导入方式，连接参数待配置。
 - Blender 使用启用 ROCm 的 nixpkgs 构建，Cycles 的 HIP 设备需在应用内选择。
 - Steam 启动选项为 `gamemoderun %command%`；性能叠加使用 `gamemoderun mangohud %command%`。
+- Epic Games Launcher 使用社区 `epic-games-launcher-flake` 的 NixOS 模块，封装 Epic 官方 Linux Preview `.deb`；专有软件，限 `x86_64-linux`，更新锁定输入以获取上游新构建。Windows 游戏由启动器下载并配置 GE-Proton。
 - Podman 与 containerd 是独立运行时，不共享容器状态；BuildKit、Cloud Hypervisor 仅安装工具。containerd 尚未声明 CNI 网络配置，gVisor 需显式选择 `runsc` runtime。
 
 ## 软件取舍

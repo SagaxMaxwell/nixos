@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "epic-games-launcher": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795007549,
+        "narHash": "sha256-ZTe1K3mEgtFUZXNaE3aeLugYJh4KU+bVtDCi8Gb5rRQ=",
+        "owner": "kjetteren",
+        "repo": "epic-games-launcher-flake",
+        "rev": "90a45e42e3a19249787c3308ace3eae90f0a9452",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kjetteren",
+        "repo": "epic-games-launcher-flake",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -244,6 +264,7 @@
     },
     "root": {
       "inputs": {
+        "epic-games-launcher": "epic-games-launcher",
         "home-manager": "home-manager",
         "justray": "justray",
         "luciole": "luciole",

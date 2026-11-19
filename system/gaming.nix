@@ -3,6 +3,7 @@
 {
   programs = {
     gamemode.enable = true;
+    epic-games-launcher.enable = true;
 
     gamescope = {
       enableWsi = true;
