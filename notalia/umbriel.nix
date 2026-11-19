@@ -2,6 +2,7 @@
   lib,
   pkgs,
   opacity,
+  inputs,
   ...
 }:
 
@@ -9,7 +10,7 @@
   programs.umbriel.enable = true;
 
   home-manager.users.maxwell = { config, ... }: {
-    imports = [ "${pkgs.umbriel.src}/nix/home-module.nix" ];
+    imports = [ "${inputs.umbriel}/nix/home-module.nix" ];
 
     programs.umbriel = {
       enable = true;
@@ -17,7 +18,7 @@
       # Extend the upstream starting configuration.
       settings =
         lib.recursiveUpdate
-          (builtins.fromTOML (builtins.readFile "${pkgs.umbriel.src}/examples/config.toml"))
+          (builtins.fromTOML (builtins.readFile "${inputs.umbriel}/examples/config.toml"))
           {
             keybinds."Mod+Return".action = "spawn ${lib.getExe config.programs.ghostty.package}";
 
@@ -27,6 +28,15 @@
                 (lib.getExe config.programs.ghostty.package)
                 (lib.getExe config.programs.google-chrome.finalPackage)
               ];
+            };
+
+            output."Philips 32M2N8900X" = {
+              mode = "3840x2160@240";
+              vrr = "fullscreen";
+              hdr = "on";
+              color_profile = "edid";
+              sdr_transfer = "srgb";
+              sdr_gamut = "srgb";
             };
 
             layout = {

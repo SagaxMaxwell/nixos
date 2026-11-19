@@ -22,6 +22,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    umbriel = {
+      url = "github:noctalia-dev/umbriel";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     epic-games-launcher = {
       url = "github:kjetteren/epic-games-launcher-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -100,6 +105,7 @@
           inputs.home-manager.nixosModules.home-manager
           {
             nixpkgs.overlays = [
+              inputs.umbriel.overlays.default
               inputs.nix-cachyos-kernel.overlays.pinned
               inputs.obsidian-extensions.overlays.default
             ];

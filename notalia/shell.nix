@@ -21,8 +21,26 @@
           source = "wallpaper";
           mode = "auto";
           shell_mode = "auto";
+          pure_black_dark = true;
         };
         location.auto_locate = true;
+
+        weather = {
+          enabled = true;
+          unit = "celsius";
+        };
+
+        calendar.enabled = true;
+
+        nightlight = {
+          enabled = true;
+          temperature_day = 6500;
+          temperature_night = 6000;
+        };
+
+        backdrop.enabled = true;
+
+        lockscreen.blurred_desktop = true;
 
         idle.behavior = {
           lock = {
@@ -62,10 +80,16 @@
             "notifications"
             "clipboard"
             "network"
+            "weather"
             "bluetooth"
+            "power-profile"
             "volume"
             "brightness"
+            "nightlight"
             "battery"
+            "privacy"
+            "sysmon"
+            "keyboard-layout"
             "session"
             "control-center"
           ];
@@ -73,8 +97,8 @@
         dock = {
           enabled = true;
           position = "right";
-          auto_hide = true;
-          auto_hide_reveal_delay_ms = 500;
+          auto_hide = false;
+          smart_auto_hide = true;
           reserve_space = false;
           background_opacity = opacity;
           compositor_blur = true;
@@ -82,8 +106,31 @@
         notification.background_opacity = opacity;
         osd.background_opacity = opacity;
 
-        # Soft panels use 0.8 background opacity upstream.
-        shell.panel.transparency_mode = "soft";
+        shell.panel.transparency_mode = "glass";
+
+        desktop_widgets = {
+          enabled = true;
+          widget_order = [ "desktop-clock" ];
+          widget."desktop-clock" = {
+            type = "clock";
+            output = "Philips 32M2N8900X";
+            cx = 1920.0;
+            cy = 140.0;
+            settings.format = "{:%H:%M}";
+          };
+        };
+
+        lockscreen_widgets = {
+          enabled = true;
+          widget_order = [ "lockscreen-clock" ];
+          widget."lockscreen-clock" = {
+            type = "clock";
+            output = "Philips 32M2N8900X";
+            cx = 1920.0;
+            cy = 160.0;
+            settings.format = "{:%H:%M}";
+          };
+        };
       };
     };
 
