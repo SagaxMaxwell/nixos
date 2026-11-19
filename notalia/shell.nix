@@ -42,6 +42,8 @@
 
         lockscreen.blurred_desktop = true;
 
+        wallpaper.transition_on_startup = true;
+
         idle.behavior = {
           lock = {
             enabled = true;
