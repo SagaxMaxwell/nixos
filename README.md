@@ -13,8 +13,9 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 | `hardware-configuration.nix` | 当前主机的磁盘、文件系统、CPU 和基础硬件 |
 | `home.nix` | `maxwell` 的 Home Manager 入口、应用模块导入和基础 XDG 设置 |
 | `apps/terminal.nix` | Ghostty、Shell 和终端工具 |
-| `apps/development.nix` | Git、开发工具和 AI 工具 |
-| `apps/desktop.nix` | 浏览器、播放器、Obsidian 和其他桌面应用 |
+| `apps/development.nix` | Git、开发工具、Pi、Delta 与 Herdr 模块接入 |
+| `apps/herdr.nix` | Herdr 外观、会话恢复及 Pi／Claude Code／Codex 官方集成 |
+| `apps/desktop.nix` | 浏览器、播放器、Anytype 和其他桌面应用 |
 | `editor/helix.nix` / `editor/zed.nix` | 编辑器、格式化器和语言服务 |
 | `system/hardware.nix` | AMD 显卡、Btrfs 压缩、zram、OOM 和硬件工具 |
 | `system/fonts.nix` | 字体安装、渲染与应用字体设置 |
@@ -37,9 +38,11 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 
 优先使用上游模块：JustRay 分别提供系统集成和用户服务，Umbriel 和 Luciole 使用上游 NixOS/Home Manager 模块，Rime 使用 nixpkgs 的词库包。Umbriel 基于锁定版本的 `examples/config.toml`，覆盖 Ghostty 快捷键、滚动布局、窗口边框、拖动不透明度、XWayland 原生分辨率和应用自启动；其余随上游更新，不维护默认值副本。Home Manager 冲突文件备份为 `*.hm-backup`；两个 `stateVersion` 是数据兼容基线，不随依赖更新。
 
-Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，可以覆盖声明配置；移除 Nix 设置不会自动清除已有 GUI 设置。Luciole、Zed、Herdr、Tabularis 和 Claude Code 也保留可变配置，具体合并方式由各自模块决定，删除声明字段后旧值可能仍保留。
+Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，可以覆盖声明配置；移除 Nix 设置不会自动清除已有 GUI 设置。Luciole、Zed、Herdr、Tabularis、Claude Code、Codex 和 Pi 也保留可变配置，具体合并方式由各自模块决定，删除声明字段后旧值可能仍保留。
 
-软件优先使用 nixpkgs，由 NixOS 或 Home Manager 配置；Luciole 使用其官方 flake 模块，JustRay 等使用 `flake.nix` 锁定的上游输入。OnlyOffice 使用 nix-flatpak v0.8.0，声明 Flathub Stable、Flathub Beta、GNOME Nightly，默认从 Stable 安装，每周更新；Beta 与 Nightly 不默认安装应用。Flatpak 数据位于 `/var/lib/flatpak`，不随 Nix 代回滚；可用 `flatpak uninstall --unused` 清理未使用的运行时。Homebrew 仅用于独立的 Darwin 配置。
+软件优先使用 nixpkgs，由 NixOS 或 Home Manager 配置；Luciole 使用其官方 flake 模块，JustRay 等使用 `flake.nix` 锁定的上游输入。OnlyOffice 使用 nixpkgs 包，原生解决跳过 NixOS 字体链接的问题。Flatpak 仍由 nix-flatpak v0.8.0 管理，保留 Flathub Stable、Flathub Beta、GNOME Nightly 和每周更新，目前不声明应用。Flatpak 数据位于 `/var/lib/flatpak`，不随 Nix 代回滚；可用 `flatpak uninstall --unused` 清理未使用的运行时。Homebrew 仅用于独立的 Darwin 配置。
+
+切换后先构建并验证 Nix 版 OnlyOffice，再用 `flatpak uninstall --system org.onlyoffice.desktopeditors` 移除旧应用；保留应用数据，不加 `--delete-data`。
 
 ## 补丁与参数覆盖
 
@@ -59,6 +62,9 @@ Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，可�
 | --- | --- |
 | Zed | 移除上游链接参数覆盖，调整 WebRTC 动态链接、GLib 头文件路径和许可证生成工具版本 |
 | gVisor | 将 `/sbin/ldconfig` 替换为 Nix store 中的路径 |
+| Delta 官方 flake | 修正发布二进制的 ELF 加载器／RPATH，使用 Nix 的 libxkbcommon 并包装运行环境、禁用应用自更新；上游 Linux 打包适配，本仓库无额外补丁 |
+| Herdr（Linux） | nixpkgs 固定 notify-send 路径，并调整内嵌 libghostty 的 compiler-rt／ubsan 构建选项 |
+| Pi | nixpkgs 从同版本 npm 发布补充模型目录并整理 workspace 依赖；上游离线构建与安装处理 |
 | Helix 的 Perl 语法依赖 | 移除与 glibc 冲突的 `bsearch` 实现及引用 |
 
 ## 部署与检查
@@ -93,18 +99,20 @@ Nix 使用 Lix，每周清理超过 30 天的旧代和未引用的 store 路径�
 | Dock | 右侧自动隐藏、不占位，悬停 `500ms` 后出现 |
 | Shell 与登录 | Shell 随壁纸取色（`theme.source = "wallpaper"`），主题模式与 Shell 主题模式均为 `auto`；热角、夜灯沿用默认值；Greeter 默认 Umbriel 会话 |
 | 闲置动作 | 启用闲置 15 分钟锁屏、20 分钟熄屏、25 分钟锁屏并睡眠（Suspend）；时间从闲置开始计算，不累加，合盖策略独立 |
+| 小组件 | 锁屏中央时钟、下方密码框；桌面左上天气、右下时钟、左下系统监控（CPU 与内存使用率）。普通组件背景默认 `0.8`；本机组件不指定屏幕，自动选择可用屏幕，密码框由 Shell 自动生成（默认 `0.88`）。布局在 `notalia/shell.nix`，坐标仍按 3840×2160、缩放 1 设置，不会自动适配所有分辨率；图形编辑器保存的布局可覆盖声明配置 |
+| 锁屏组件待排查 | 远程 Noctalia 5.5.0 锁定并挂起后，唤醒时钟可能消失；未发现相关配置或权限异常，热加载可暂时恢复但不稳定。已提交 [Noctalia #5444](https://github.com/noctalia-dev/noctalia/issues/5444)，尚未修复 |
 | 天气 | `location.auto_locate = true`，按 IP 定位；代理或 VPN 可能改变定位结果 |
 | 图片壁纸轮换 | 每 15 分钟随机切换，包含子目录；使用 Shell 原生 `wallpaper.automation`，视频壁纸轮播由插件单独管理 |
 | 文件管理 | Luciole 使用官方 Nix 包，作为默认目录和文件选择器；启用图片、视频、文本、PDF 预览，运行时包含 Glycin、FFmpeg、ffmpegthumbnailer 与 Poppler |
 | 应用主题 | Ghostty、Zed 对齐 `~/darwin` 设置，使用 Nix 包；日夜主题 GitHub Dark Dimmed / IR Black，Zed 自动安装主题扩展；Helix 使用 `base16_terminal` |
 | 应用字体 | Ghostty、Zed 界面及编辑区采用应用默认；Zed 内置终端 Cascadia Code NF → Maple Mono NF → Maple Mono NF CN |
-| Obsidian | 笔记库 `~/Documents/notes`；Nix 管理插件与 Border 主题，Style Settings 在浅色、深色均启用卡片布局，左右侧栏及正文面板背景设为透明 |
+| Anytype | 使用 nixpkgs 的 `anytype` 桌面包；本地优先，账户与同步方式在应用内选择；既有 `~/Documents/notes` 笔记保留，不自动迁移 |
 
 Umbriel 使用 Wayland、TOML、wlroots 0.20 和 SceneFX，上游包自带 XWayland 供 Steam、Wine 等使用，无需额外安装。保留 XWayland 原生分辨率设置，其余未覆盖的焦点、窗口规则和外观沿用上游配置。合成器不是 Vulkan 渲染，安装 Vulkan 工具不会改变这一点。OnlyOffice、Blender、Steam、mpv 不强制切换主题，Codex 仅在启动时探测。DDC 亮度控制需显示器开启 DDC/CI，UEFI 需开启 Above 4G Decoding 与 Re-Size BAR。
 
 `opacity = 0.8` 统一 Ghostty、Zed、mpv、Luciole，以及 Shell 状态栏、Dock、通知、OSD 的背景不透明度；`alpha` 自动转为十六进制。Shell 面板采用 `soft`（外层 `0.8`，内卡片由上游调整）。mpv 视频、Luciole 菜单和对话框保持原样；Zed 内层保留零 alpha，避免叠色。Umbriel 拖动不透明度也为 `0.8`。
 
-模糊使用 Umbriel 上游窗口及图层规则和强度，Ghostty、Zed 与 Shell 状态栏、Dock 启用原生模糊；不额外叠加整窗透明度。模糊强度不等于不透明度，Greeter 壁纸模糊不作数值同步。Obsidian 的 Style Settings 仅配置主题内部面板透明，不保证透出桌面或产生系统毛玻璃；未同步 macOS 专用半透明开关。Obsidian、Chrome 未确认有适用的 Linux 原生背景数值设置，跳过该数值设置；不添加自定义 CSS snippet、不安装窗口透明化插件、不打补丁。
+模糊使用 Umbriel 上游窗口及图层规则和强度，Ghostty、Zed 与 Shell 状态栏、Dock 启用原生模糊；不额外叠加整窗透明度。模糊强度不等于不透明度，Greeter 壁纸模糊不作数值同步。Anytype、Chrome 未确认有适用的 Linux 原生背景数值设置，跳过该数值设置；不添加自定义 CSS snippet、不安装窗口透明化插件、不打补丁。
 
 14 个官方插件由 `notalia/plugins.nix` 固定源码版本和校验值，Home Manager 安装运行依赖，Shell 从原生 `path` 源 `nix-official` 加载。关闭 Shell Git 源与自动更新，避免在线导出阻塞界面；更新插件需单独更新该文件，不随 `nix flake update` 自动变化，也不修改插件源码。Companion 的 API 限制见下表。
 
@@ -133,13 +141,32 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 - Epic Games Launcher 使用社区 `epic-games-launcher-flake` 的 NixOS 模块，封装 Epic 官方 Linux Preview `.deb`；专有软件，限 `x86_64-linux`，更新锁定输入以获取上游新构建。Windows 游戏由启动器下载并配置 GE-Proton。
 - Podman 与 containerd 是独立运行时，不共享容器状态；BuildKit、Cloud Hypervisor 仅安装工具。containerd 尚未声明 CNI 网络配置，gVisor 需显式选择 `runsc` runtime。
 
+## Agent 工具
+
+| 工具 | 安装与配置 |
+| --- | --- |
+| Pi | nixpkgs + Home Manager 原生模块，`system` 主题跟随终端；运行 `pi` 后通过 `/login` 登录并选择模型 |
+| Herdr | `apps/herdr.nix` 使用 `terminal` 主题，保留会话恢复、屏幕历史及 Kitty 图片协议；直接链接安装包内 Pi／Claude Code／Codex 官方扩展或钩子 |
+| Delta（Zed 团队） | [官方 `delta-nix` flake](https://github.com/zed-industries/delta-nix)，与主系统共用 nixpkgs，提供 `delta` CLI 和桌面入口；专有应用，不是 Git diff 工具 `pkgs.delta` |
+| Gas City | 当前锁定的 nixpkgs 无包；已找到社区 `numtide/llm-agents.nix` 的 1.5.1 包，尚未接入或验证；Darwin 使用 Homebrew |
+| Vibex | 暂无现成 Nix 包，继续跳过，见软件取舍 |
+
+Pi／Herdr 在 Ghostty 中沿用 `opacity = 0.8` 和模糊配置；它们没有独立的窗口不透明度字段，Linux 实际模糊效果取决于合成器。Pi 设置可变，Nix 只固定主题，模型与凭据保留用户选择。无需再手工安装 Herdr 集成。
+
+Herdr 退出客户端（`Ctrl+B` 后按 `Q`）时后台进程继续运行；服务器重启后恢复布局及上报了有效引用的 Agent 对话。`resume_agents_on_restore = true` 和 `pane_history = true` 已启用；对话恢复优先于屏幕历史重放，不能恢复任意进程的内存状态。原有 Codex 手动恢复记录保留为历史问题，本次补齐 SessionStart 钩子，实际恢复仍需在 Linux 激活后验证。
+
+Delta 的设置由账号同步并保存到加密缓存，不复制 Zed 的 JSON 字段。主题目标参考 Zed 的 `GitHub Dark Dimmed`／`IR Black`，但尚未找到对应主题导入、透明／模糊或 Herdr 集成接口，暂不设置。它会按需下载语法高亮扩展，但官方明确尚不运行语言服务器；诊断、补全和跳转不可照搬，也未找到保存时格式化接口。完整编辑可使用 `Open in Zed`。参见 [Delta 设置](https://delta.dev/docs/configuration/settings)、[语言支持](https://delta.dev/docs/agents/language-support)。
+
+更新 Delta 使用 `nix flake update delta` 后重建；不使用应用自更新。此次仅同步本机 `~/nixos` 配置，未部署远程笔记本或执行 `switch`。2026-11-19 在 macOS 上完成格式检查、全系统 Flake 求值及系统 derivation 求值，无模块警告或失败断言；核对 Pi 1.5.2、Herdr 0.9.5、Delta 0.28.3 及生成的用户路径。Linux 构建、桌面效果和会话恢复仍待目标机器验证。
+
 ## 软件取舍
 
 以下保留此前的选型理由，包可用性属于当时的检查结果，可随依赖更新重新评估。当前选择覆盖大量字体、14 个插件、两款编辑器及两种容器运行时；配置可精简，但并非最小安装，未使用功能的取舍应单独决定。
 
 | 方案 | 未采用或撤回原因 | 当前选择 |
 | --- | --- | --- |
-| Vibex | 当时没有可用的 nixpkgs 包，不自行打包 | Herdr；早期 Sheprd 已移除 |
+| Vibex | 2026-11-19 复核仍无现成 Nix 包，不自行打包 | Herdr；早期 Sheprd 已移除 |
+| Gas City | nixpkgs 无包；社区 [llm-agents.nix](https://github.com/numtide/llm-agents.nix/blob/main/packages/gascity/package.nix) 已提供 1.5.1，待验证；tmux 后端存在 Nix 包装器进程识别报告 [#7551](https://github.com/gastownhall/gascity/issues/7551)，不能据此推断 Herdr 后端同样受影响 | Darwin 已通过 Homebrew 声明；NixOS 尚未接入社区包 |
 | Meta oomd / MetaOOM | 没有可用的 Nix 包 | systemd-oomd + zram-generator |
 | Hickory DNS | 虽有包，但接入代理 TUN/DNS 需要额外适配，完整递归当时仍属实验性 | NetworkManager + systemd-resolved，代理 DNS 由 JustRay TUN 处理 |
 | Cassotis IME | 锁定的 nixpkgs 没有包，不自行封装 | Fcitx5 + Rime + 雾凇拼音 |
@@ -162,7 +189,7 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 | GUI 覆盖 | Noctalia 的旧 `settings.toml` 可以关闭状态栏或覆盖插件配置；重建不会自动清除，先备份再处理冲突字段 |
 
 - JustRay：订阅报 `tcp: unsupported header type: multi` 时，改用 sing-box JSON / Clash YAML，或尝试在链接末尾加 `?flag=sing-box`。
-- Herdr 已启用 Kitty 图片协议，但 Agent 在 pane 内发图仍受上游终端识别限制；Codex 重启后需要手动 `codex resume`，Claude Code 不受影响。
+- Herdr 已启用 Kitty 图片协议，但 Agent 在 pane 内发图仍受上游终端识别限制；此前 Codex 重启后需要手动 `codex resume`，本次已补齐原生恢复钩子，待 Linux 实机复验；Claude Code 此前不受影响。
 - 《艾尔登法环》：Steam 大屏幕下姓名框无法打开，普通模式中文候选无法提交，原因待定位。
 
 ## 待提供的硬件信息
@@ -183,7 +210,7 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 | Umbriel、Greeter、Shell、Ghostty、Zed、游戏 | 本机待指定 AMD 独显；远程已声明 NVIDIA 渲染优先，需应用后验证实际设备 |
 | mpv、视频壁纸 | 本机自动选择硬解，待绑定 AMD 独显；远程已指定 NVDEC |
 | Screen Recorder | 显式使用 `video_encoder = "gpu"`；插件没有具体 GPU 选择字段，实际编码设备需录制时验证 |
-| Chrome、Obsidian 等 Chromium/Electron 应用 | GPU 渲染不等于视频硬解；Chrome 已声明硬件编码特性，解码路径与设备需通过 `chrome://gpu`、`chrome://media-internals` 核实；NVIDIA VA-API 不保证适用于 Chromium |
+| Chrome、Anytype 等 Chromium/Electron 应用 | GPU 渲染不等于视频硬解；Chrome 已声明硬件编码特性，解码路径与设备需通过 `chrome://gpu`、`chrome://media-internals` 核实；NVIDIA VA-API 不保证适用于 Chromium |
 | Blender | 本机包启用 ROCm，Cycles 仍需在应用内选择 HIP 与 RX 9070 XT；远程需选择可用的 CUDA/OptiX 与 NVIDIA 设备，不能仅靠图形渲染环境变量指定计算设备 |
 | Luciole 缩略图、插件缩略图与 FFmpeg | 当前相关调用没有统一的硬解设备字段；安装 FFmpeg 不会让所有调用自动使用 GPU，不修改上游代码来强制替换 |
 | Flatpak、容器和应用自带运行时 | 设备权限、驱动和加速选项由各自运行环境决定，宿主机变量不能保证全部覆盖 |

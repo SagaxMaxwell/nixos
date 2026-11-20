@@ -22,8 +22,10 @@
     );
 
     packages = with pkgs; [
+      anytype
       (blender.override { rocmSupport = true; })
       mission-center
+      onlyoffice-desktopeditors
       tabularis
     ];
   };
@@ -36,54 +38,6 @@
         background-color = "#${alpha}000000";
       };
       scripts = [ pkgs.mpvScripts.mpris ];
-    };
-
-    obsidian = {
-      enable = true;
-      cli.enable = true;
-
-      vaults.notes = {
-        target = "Documents/notes";
-        settings.app.restrictedMode = false;
-      };
-
-      defaultSettings.communityPlugins = with pkgs.obsidianPlugins; [
-        obsidian-linter
-        {
-          pkg = obsidian-style-settings;
-          settings = {
-            "Appearance-light@@card-layout-open-light" = true;
-            "Appearance-dark@@card-layout-open-dark" = true;
-            "Appearance-light@@mod-left-split-background-select-light" =
-              "mod-left-split-background-transparent-light";
-            "Appearance-light@@mod-root-split-background-select-light" =
-              "mod-root-split-background-transparent-light";
-            "Appearance-light@@mod-right-split-background-select-light" =
-              "mod-right-split-background-transparent-light";
-            "Appearance-dark@@mod-left-split-background-select-dark" =
-              "mod-left-split-background-transparent-dark";
-            "Appearance-dark@@mod-root-split-background-select-dark" =
-              "mod-root-split-background-transparent-dark";
-            "Appearance-dark@@mod-right-split-background-select-dark" =
-              "mod-right-split-background-transparent-dark";
-          };
-        }
-        {
-          pkg = update-time;
-          settings = {
-            createdPropertyName = "date created";
-            updatedPropertyName = "date updated";
-          };
-        }
-        templater-obsidian
-        dataview
-        notebook-navigator
-        jupyter-viewer
-        advanced-canvas
-        tldraw
-      ];
-
-      defaultSettings.themes = [ pkgs.obsidianThemes.border ];
     };
 
     google-chrome = {

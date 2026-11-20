@@ -48,7 +48,6 @@ in
           location = "https://nightly.gnome.org/gnome-nightly.flatpakrepo";
         }
       ];
-      packages = [ "org.onlyoffice.desktopeditors" ];
       uninstallUnused = true;
       update.auto = {
         enable = true;

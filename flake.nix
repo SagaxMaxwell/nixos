@@ -22,6 +22,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    delta = {
+      url = "github:zed-industries/delta-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     umbriel = {
       url = "github:noctalia-dev/umbriel";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -46,11 +51,6 @@
 
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    obsidian-extensions = {
-      url = "git+https://github.com/karaolidis/nix-obsidian-extensions?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -107,7 +107,6 @@
             nixpkgs.overlays = [
               inputs.umbriel.overlays.default
               inputs.nix-cachyos-kernel.overlays.pinned
-              inputs.obsidian-extensions.overlays.default
             ];
 
             home-manager = {
@@ -115,7 +114,7 @@
               useUserPackages = true;
               backupFileExtension = "hm-backup";
               overwriteBackup = true;
-              extraSpecialArgs = { inherit opacity alpha; };
+              extraSpecialArgs = { inherit inputs opacity alpha; };
               users.maxwell.imports = [
                 inputs.nix-index-database.homeModules.default
                 ./home.nix

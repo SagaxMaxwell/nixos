@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "delta": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795149710,
+        "narHash": "sha256-H7+CAWFHj+24XPeujHM3q2taPps57WMTsZznuiKECgs=",
+        "owner": "zed-industries",
+        "repo": "delta-nix",
+        "rev": "48b2e25483c4c11017ffe1bdd2cde3584cf6334f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zed-industries",
+        "repo": "delta-nix",
+        "type": "github"
+      }
+    },
     "epic-games-launcher": {
       "inputs": {
         "nixpkgs": [
@@ -240,30 +260,9 @@
         "type": "github"
       }
     },
-    "obsidian-extensions": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "treefmt-nix": "treefmt-nix"
-      },
-      "locked": {
-        "lastModified": 1795009354,
-        "narHash": "sha256-Npua6/1tKNIdvNMVLUkVLDFheim07Q8YP/V7+2OLU6k=",
-        "ref": "refs/heads/main",
-        "rev": "a0d50ac69296080fb56b36417b46ca2892bfaafd",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/karaolidis/nix-obsidian-extensions"
-      },
-      "original": {
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/karaolidis/nix-obsidian-extensions"
-      }
-    },
     "root": {
       "inputs": {
+        "delta": "delta",
         "epic-games-launcher": "epic-games-launcher",
         "home-manager": "home-manager",
         "justray": "justray",
@@ -272,29 +271,7 @@
         "nix-flatpak": "nix-flatpak",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",
-        "obsidian-extensions": "obsidian-extensions",
         "umbriel": "umbriel"
-      }
-    },
-    "treefmt-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "obsidian-extensions",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1785360170,
-        "narHash": "sha256-XE1lKgQ3eIO3E7zWryqcRsax+mYXod/5RHBn4YaR9YE=",
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "rev": "d1187f8bc71fb8aab02395869ec3f5c1920f75c0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "type": "github"
       }
     },
     "umbriel": {

@@ -1,15 +1,19 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 
 {
-  home.packages = with pkgs; [
-    nixd
-    nixfmt
-    gh
-    oxfmt
-    ruff
-    ty
-    rustup
-  ];
+  imports = [ ./herdr.nix ];
+
+  home.packages =
+    (with pkgs; [
+      nixd
+      nixfmt
+      gh
+      oxfmt
+      ruff
+      ty
+      rustup
+    ])
+    ++ [ inputs.delta.packages.${pkgs.stdenv.hostPlatform.system}.delta ];
 
   programs = {
     bun.enable = true;
@@ -20,23 +24,15 @@
       settings.theme = "auto";
     };
 
-    codex.enable = true;
-
-    herdr = {
+    codex = {
       enable = true;
       mutableSettings = true;
-      settings = {
-        theme.auto_switch = true;
-        session.resume_agents_on_restore = true;
-        remote.manage_ssh_config = true;
-        terminal.default_shell = "nu";
-        terminal.kitty_graphics = true;
-        worktrees.directory = "~/.herdr/worktrees";
-        ui.toast.delivery = "herdr";
-        ui.toast.delay_seconds = 0;
-        ui.sound.enabled = true;
-        experimental.pane_history = true;
-      };
+    };
+
+    pi-coding-agent = {
+      enable = true;
+      mutableSettings = true;
+      settings.theme = "system";
     };
 
     difftastic = {

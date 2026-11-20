@@ -48,14 +48,17 @@
           lock = {
             enabled = true;
             timeout = 900;
+            action = "lock";
           };
           screen-off = {
             enabled = true;
             timeout = 1200;
+            action = "screen_off";
           };
           lock-and-suspend = {
             enabled = true;
             timeout = 1500;
+            action = "lock_and_suspend";
           };
         };
 
@@ -112,25 +115,53 @@
 
         desktop_widgets = {
           enabled = true;
-          widget_order = [ "desktop-clock" ];
-          widget."desktop-clock" = {
-            type = "clock";
-            output = "Philips 32M2N8900X";
-            cx = 1920.0;
-            cy = 140.0;
-            settings.format = "{:%H:%M}";
+          widget_order = [
+            "desktop-weather"
+            "desktop-clock"
+            "desktop-sysmon"
+          ];
+          widget = {
+            "desktop-weather" = {
+              type = "weather";
+              cx = 220.0;
+              cy = 140.0;
+              box_width = 360.0;
+              box_height = 140.0;
+            };
+            "desktop-clock" = {
+              type = "clock";
+              cx = 3620.0;
+              cy = 2060.0;
+              box_width = 360.0;
+              box_height = 120.0;
+              settings.format = "{:%H:%M}";
+            };
+            "desktop-sysmon" = {
+              type = "sysmon";
+              cx = 220.0;
+              cy = 2030.0;
+              box_width = 360.0;
+              box_height = 180.0;
+              settings.stat2 = "ram_pct";
+            };
           };
         };
 
         lockscreen_widgets = {
           enabled = true;
           widget_order = [ "lockscreen-clock" ];
-          widget."lockscreen-clock" = {
-            type = "clock";
-            output = "Philips 32M2N8900X";
-            cx = 1920.0;
-            cy = 160.0;
-            settings.format = "{:%H:%M}";
+          widget = {
+            "lockscreen-clock" = {
+              type = "clock";
+              cx = 1920.0;
+              cy = 1080.0;
+              box_width = 360.0;
+              box_height = 120.0;
+              settings = {
+                format = "{:%H:%M}";
+                center_text = true;
+              };
+            };
           };
         };
       };
