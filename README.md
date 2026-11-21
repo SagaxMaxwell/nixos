@@ -20,7 +20,7 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 | `system/hardware.nix` | AMD 显卡、Btrfs 压缩、zram、OOM 和硬件工具 |
 | `system/fonts.nix` | 字体安装、渲染与应用字体设置 |
 | `system/services.nix` | Flatpak、portal、网络、音频、JustRay、SSH 和权限服务 |
-| `system/monitoring.nix` | Home Assistant、SMART Sniffer 集成与磁盘采集代理 |
+| `system/monitoring.nix` | Scrutiny 磁盘健康监测与本机数据库 |
 | `system/gaming.nix` | Steam、Epic Games Launcher、GameMode、Gamescope、MangoHud 和 Wine |
 | `system/virtualisation.nix` | Podman、containerd、gVisor 和虚拟化工具 |
 | `notalia/default.nix` | 团队模块入口及共用桌面集成 |
@@ -137,7 +137,8 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 - NetworkManager 使用 iwd，DNS 使用 systemd-resolved，TCP 使用 BBR + FQ。
 - JustRay 接口启动或重新应用时，NetworkManager 钩子将 DNS 指向 TUN 的 `172.19.0.2`，设置路由域 `~.` 并清理缓存；接口移除后自动恢复普通网络 DNS。
 - Btrfs 使用 `compress=zstd:1`，每周自动 scrub 校验，同一设备的子卷不重复校验；磁盘 swap 禁用，zram 使用一半内存和 zstd，配合 systemd-oomd。
-- 磁盘健康监测使用 [SMART Sniffer](https://github.com/DAB-LABS/smart-sniffer)，替代此前的 Scrutiny 与 InfluxDB。`system/monitoring.nix` 部署 Home Assistant，仅加载健康面板所需的界面、历史记录和集成依赖，不启用整套 `default_config`；固定 1.0.0 官方代理及集成的来源和校验值，无本地补丁、无需 HACS；升级需更新该文件，不随 `nix flake update` 自动升级。代理调用 smartctl，每 5 分钟采集一次，首次读取后跳过待机磁盘；关闭 mDNS，通过 systemd 网络限制仅允许本机访问代理 API。应用配置后打开 <http://127.0.0.1:8123> 创建账号，在“设置 → 设备与服务 → 添加集成”选择 SMART Sniffer，填写主机 `127.0.0.1`、端口 `9099`，令牌留空；管理员可在侧栏查看控制中心和 Home Assistant 内的异常通知，手机推送需另行配置。代理状态位于 `/var/lib/smartha-agent`，Home Assistant 数据位于 `/var/lib/hass`；不再单独启用 smartd。
+- 磁盘健康监测方案：**Home Assistant + SMART Sniffer**、**Scrutiny（当前选择）**。`system/monitoring.nix` 使用 Scrutiny 原生 NixOS 模块，自动启用 smartd、每日采集器和 InfluxDB，无自定义下载包或本地补丁；版本随 nixpkgs 锁定输入更新。应用配置后访问 <http://127.0.0.1:8080> 查看 SMART/NVMe 健康数据与历史趋势，网页和数据库均仅监听本机；首次采集可运行 `sudo systemctl start scrutiny-collector.service`。邮件或推送告警尚未配置。
+- 备选 Home Assistant + SMART Sniffer 提供健康面板和 Home Assistant 内通知，需部署平台及代理；此前固定 1.0.0，每 5 分钟采集，首次读取后跳过待机磁盘，集成通过 Nix 安装而无需 HACS。现已移除该方案的声明，原网页 `8123`、代理 `9099` 和账号接入步骤不再适用；若曾启用，`/var/lib/hass` 与 `/var/lib/smartha-agent` 的历史数据不自动删除。
 - Zed 启用类型与参数内联提示（`inlay_hints.enabled`），具体支持取决于语言服务器。
 - mpv 界面与缩略图组合：`thumbfast + material-osc`、[ModernGlass + thumbz](https://github.com/akFace/mpv.config/tree/c4f8bd5c27833ab3061320ba947df75f166f988c/src/modern_glass)、`uosc + thumbfast`。当前选择 **uosc + thumbfast**，使用 nixpkgs 包，关闭自带控制条，保留 MPRIS 桌面媒体控制。ModernGlass + thumbz 支持实时缩略图、故事板预渲染和缓存；进度条缓存用于当前文件，菜单封面另有持久缓存。thumbz 与 uosc 的消息接口不同，不能直接替换 thumbfast，采用时需一并更换界面。
 - Git 启用 `rerere`，记录并复用相同冲突的解决方式，复用后仍需检查并手动暂存。
@@ -167,7 +168,7 @@ Delta 的设置由账号同步并保存到加密缓存，不复制 Zed 的 JSON 
 
 ## 软件取舍
 
-以下保留此前的选型理由，包可用性属于当时的检查结果，可随依赖更新重新评估。当前选择覆盖大量字体、14 个插件、两款编辑器、两种容器运行时，以及用于 SMART Sniffer 的 Home Assistant；并非最小安装，Home Assistant 的资源开销也高于独立磁盘采集器。未使用功能的取舍应单独决定。
+以下保留此前的选型理由，包可用性属于当时的检查结果，可随依赖更新重新评估。当前选择覆盖大量字体、14 个插件、两款编辑器、两种容器运行时，以及 Scrutiny 和 InfluxDB；并非最小安装，完整健康面板及数据库的资源开销也高于独立磁盘采集器。未使用功能的取舍应单独决定。
 
 | 方案 | 未采用或撤回原因 | 当前选择 |
 | --- | --- | --- |
