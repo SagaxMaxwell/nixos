@@ -64,13 +64,6 @@ let
       hash = "sha256-BVd6/BuJZpw2Qr8OK+dkpZGWeE4ODqfkRPcDwpUPpps=";
     };
 
-    zhuque-fangsong = mkFontArchive {
-      pname = "zhuque-fangsong";
-      version = "0.212";
-      url = "https://github.com/TrionesType/zhuque/releases/download/v0.212/ZhuqueFangsong-v0.212.zip";
-      hash = "sha256-u4tmGnZD0ilqctnRBTCgCUlBnE5Sf7YXg/c8K6GowGI=";
-    };
-
     alimama-fangyuan = mkFont {
       pname = "alimama-fangyuan";
       version = "1.004-beta";
@@ -142,6 +135,23 @@ let
       ];
     };
 
+    chiron-hei = mkFont {
+      pname = "chiron-hei";
+      version = "2.609";
+      sources = [
+        {
+          name = "ChironHeiHKVF.otf";
+          url = "https://raw.githubusercontent.com/chiron-fonts/chiron-hei-hk/v2.609/VAR_OTF/ChironHeiHKVF.otf";
+          hash = "sha256-audsxR4DOouoPRO4JhGGcGtgGamezdhRlQC13aVqtT4=";
+        }
+        {
+          name = "ChironHeiHKItVF.otf";
+          url = "https://raw.githubusercontent.com/chiron-fonts/chiron-hei-hk/v2.609/VAR_OTF/ChironHeiHKItVF.otf";
+          hash = "sha256-dnXqPvJ5UN3nsmRZwu8C/W8p1nDCWXm0xJBUOXg0qDc=";
+        }
+      ];
+    };
+
     chiron-sung = mkFont {
       pname = "chiron-sung";
       version = "1.024";
@@ -175,7 +185,9 @@ let
   sans = [
     "Roboto Flex"
     "Google Sans Flex"
+    "Inter"
     "Source Han Sans SC VF"
+    "Chiron Hei HK VF"
   ];
   serif = [
     "Amstelvar Roman"
@@ -184,10 +196,10 @@ let
     "Chiron Sung HK VF"
   ];
   mono = [
+    "Monaspace Neon Var"
     "Cascadia Code NF"
     "Maple Mono NF"
     "Maple Mono NF CN"
-    "Monaspace Neon Var"
     "Recursive"
     "Sarasa Mono SC"
     "Sarasa Term SC"
@@ -210,11 +222,11 @@ let
     ];
     fantasy = [
       "Nabla"
+      "Honk"
       "Alimama FangYuanTi VF"
       "Smiley Sans"
     ];
     math = [ "STIX Two Math" ];
-    fangsong = [ "Zhuque Fangsong (technical preview)" ];
   };
 in
 {
@@ -228,10 +240,12 @@ in
         (google-fonts.override {
           fonts = [
             "Roboto Serif"
+            "Inter"
             "Recursive"
             "Shantell Sans"
             "Playwrite US Modern"
             "Nabla"
+            "Honk"
             "STIX Two Math"
           ];
         })
@@ -291,9 +305,20 @@ in
             </match>
 
             <match target="font">
+              <test name="family"><string>Monaspace Neon Var</string></test>
+              <edit name="fontfeatures" mode="append"><string>calt=1</string></edit>
+            </match>
+
+            <match target="font">
               <test target="pattern" name="family"><string>ui-rounded</string></test>
               <test name="family"><string>Google Sans Flex</string></test>
               <edit name="fontvariations" mode="append"><string>ROND=100</string></edit>
+            </match>
+
+            <match target="font">
+              <test target="pattern" name="family"><string>ui-rounded</string></test>
+              <test name="family"><string>Alimama FangYuanTi VF</string></test>
+              <edit name="fontvariations" mode="append"><string>BEVL=100</string></edit>
             </match>
           </fontconfig>
         '')

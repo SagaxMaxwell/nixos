@@ -105,7 +105,7 @@ Nix 使用 Lix，每周清理超过 30 天的旧代和未引用的 store 路径�
 | 图片壁纸轮换 | 每 15 分钟随机切换，包含子目录；使用 Shell 原生 `wallpaper.automation`，视频壁纸轮播由插件单独管理 |
 | 文件管理 | Luciole 使用官方 Nix 包，作为默认目录和文件选择器；启用图片、视频、文本、PDF 预览，运行时包含 Glycin、FFmpeg、ffmpegthumbnailer 与 Poppler |
 | 应用主题 | Ghostty、Zed 对齐 `~/darwin` 设置，使用 Nix 包；日夜主题 GitHub Dark Dimmed / IR Black，Zed 自动安装主题扩展；Helix 使用 `base16_terminal` |
-| 应用字体 | Ghostty、Zed 界面及编辑区采用应用默认；Zed 内置终端 Cascadia Code NF → Maple Mono NF → Maple Mono NF CN |
+| 应用字体 | Ghostty、Zed 内置终端使用 Monaspace Neon Var → Cascadia Code NF → Maple Mono NF → Maple Mono NF CN → Recursive → Sarasa Mono SC → Sarasa Term SC；界面与编辑区采用应用默认 |
 | Anytype | 使用 nixpkgs 的 `anytype` 桌面包；本地优先，账户与同步方式在应用内选择；既有 `~/Documents/notes` 笔记保留，不自动迁移 |
 
 Umbriel 使用 Wayland、TOML、wlroots 0.20 和 SceneFX，上游包自带 XWayland 供 Steam、Wine 等使用，无需额外安装。保留 XWayland 原生分辨率设置，其余未覆盖的焦点、窗口规则和外观沿用上游配置。合成器不是 Vulkan 渲染，安装 Vulkan 工具不会改变这一点。OnlyOffice、Blender、Steam、mpv 不强制切换主题，Codex 仅在启动时探测。DDC 亮度控制需显示器开启 DDC/CI，UEFI 需开启 Above 4G Decoding 与 Re-Size BAR。
@@ -157,7 +157,7 @@ Herdr 退出客户端（`Ctrl+B` 后按 `Q`）时后台进程继续运行；服�
 
 Delta 的设置由账号同步并保存到加密缓存，不复制 Zed 的 JSON 字段。主题目标参考 Zed 的 `GitHub Dark Dimmed`／`IR Black`，但尚未找到对应主题导入、透明／模糊或 Herdr 集成接口，暂不设置。它会按需下载语法高亮扩展，但官方明确尚不运行语言服务器；诊断、补全和跳转不可照搬，也未找到保存时格式化接口。完整编辑可使用 `Open in Zed`。参见 [Delta 设置](https://delta.dev/docs/configuration/settings)、[语言支持](https://delta.dev/docs/agents/language-support)。
 
-更新 Delta 使用 `nix flake update delta` 后重建；不使用应用自更新。此次仅同步本机 `~/nixos` 配置，未部署远程笔记本或执行 `switch`。2026-11-19 在 macOS 上完成格式检查、全系统 Flake 求值及系统 derivation 求值，无模块警告或失败断言；核对 Pi 1.5.2、Herdr 0.9.5、Delta 0.28.3 及生成的用户路径。Linux 构建、桌面效果和会话恢复仍待目标机器验证。
+更新 Delta 使用 `nix flake update delta` 后重建；不使用应用自更新。配置同步只复制声明文件，不执行远程构建或 `switch`。2026-11-19 在 macOS 上完成格式检查、全系统 Flake 求值及系统 derivation 求值，无模块警告或失败断言；核对 Pi 1.5.2、Herdr 0.9.5、Delta 0.28.3 及生成的用户路径。Linux 构建、桌面效果和会话恢复仍待目标机器验证。
 
 ## 软件取舍
 
@@ -165,6 +165,7 @@ Delta 的设置由账号同步并保存到加密缓存，不复制 Zed 的 JSON 
 
 | 方案 | 未采用或撤回原因 | 当前选择 |
 | --- | --- | --- |
+| 方正可变悠黑 | 尚未取得适用授权及可用于 Nix 的字体文件，暂不声明安装 | 中文无衬线回退顺序为思源黑体 VF → Chiron Hei HK VF；英文优先 Inter |
 | Vibex | 2026-11-19 复核仍无现成 Nix 包，不自行打包 | Herdr；早期 Sheprd 已移除 |
 | Gas City | nixpkgs 无包；社区 [llm-agents.nix](https://github.com/numtide/llm-agents.nix/blob/main/packages/gascity/package.nix) 已提供 1.5.1，待验证；tmux 后端存在 Nix 包装器进程识别报告 [#7551](https://github.com/gastownhall/gascity/issues/7551)，不能据此推断 Herdr 后端同样受影响 | Darwin 已通过 Homebrew 声明；NixOS 尚未接入社区包 |
 | Meta oomd / MetaOOM | 没有可用的 Nix 包 | systemd-oomd + zram-generator |
