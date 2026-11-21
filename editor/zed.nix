@@ -68,6 +68,7 @@ in
       };
 
       diagnostics.inline.enabled = true;
+      inlay_hints.enabled = true;
       autosave = "on_window_change";
       format_on_save = "on";
 

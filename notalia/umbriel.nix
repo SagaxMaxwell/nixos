@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs,
   opacity,
   inputs,
   ...
@@ -17,8 +16,7 @@
 
       # Extend the upstream starting configuration.
       settings =
-        lib.recursiveUpdate
-          (builtins.fromTOML (builtins.readFile "${inputs.umbriel}/examples/config.toml"))
+        lib.recursiveUpdate (builtins.fromTOML (builtins.readFile "${inputs.umbriel}/examples/config.toml"))
           {
             keybinds."Mod+Return".action = "spawn ${lib.getExe config.programs.ghostty.package}";
 

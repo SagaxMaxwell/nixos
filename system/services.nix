@@ -34,6 +34,16 @@ in
   services = {
     flatpak = {
       enable = true;
+      packages = [
+        rec {
+          appId = "jp.ne.ibis.ibisOffice";
+          sha256 = "84bd15198df36f5d3e4c5bb826e2c1a2a1d63c03906e8bfd2b0efdce9a5fddb1";
+          bundle = "${pkgs.fetchurl {
+            url = "https://github.com/ibisjp/ibis-office/releases/download/v0.8.9/ibisOffice-0.8.9-Linux-x86_64.flatpak";
+            inherit sha256;
+          }}";
+        }
+      ];
       remotes = [
         {
           name = "flathub";

@@ -2,7 +2,7 @@
 
 Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Noctalia。
 
-本仓库对应 AMD 台式机。远程 `~/Downloads/nixos` 是 Intel + NVIDIA 笔记本，保留硬件配置、NVIDIA 优先策略、PRIME、Ayuz 和 Intel 媒体驱动；supergfxd 保持禁用，不能用 AMD 硬件文件覆盖。
+本仓库对应 AMD 台式机。远程 `~/Downloads/nixos` 是 Intel + NVIDIA 笔记本，保留硬件配置、PRIME、Ayuz 和 Intel 媒体驱动；supergfxd 保持禁用。此前黑屏排查中，远程 Greeter 与 Umbriel 改为 Intel 渲染路径，应用保留 NVIDIA offload 配置；NVIDIA 初始化阻塞的根因仍未解决，同步时须保留实际远程设置，不能用 AMD 硬件文件覆盖。
 
 ## 结构
 
@@ -20,6 +20,7 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 | `system/hardware.nix` | AMD 显卡、Btrfs 压缩、zram、OOM 和硬件工具 |
 | `system/fonts.nix` | 字体安装、渲染与应用字体设置 |
 | `system/services.nix` | Flatpak、portal、网络、音频、JustRay、SSH 和权限服务 |
+| `system/monitoring.nix` | Home Assistant、SMART Sniffer 集成与磁盘采集代理 |
 | `system/gaming.nix` | Steam、Epic Games Launcher、GameMode、Gamescope、MangoHud 和 Wine |
 | `system/virtualisation.nix` | Podman、containerd、gVisor 和虚拟化工具 |
 | `notalia/default.nix` | 团队模块入口及共用桌面集成 |
@@ -40,9 +41,9 @@ Ryzen 7 9800X3D + RX 9070 XT；NixOS unstable、CachyOS 内核、Umbriel + Nocta
 
 Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，可以覆盖声明配置；移除 Nix 设置不会自动清除已有 GUI 设置。Luciole、Zed、Herdr、Tabularis、Claude Code、Codex 和 Pi 也保留可变配置，具体合并方式由各自模块决定，删除声明字段后旧值可能仍保留。
 
-软件优先使用 nixpkgs，由 NixOS 或 Home Manager 配置；Luciole 使用其官方 flake 模块，JustRay 等使用 `flake.nix` 锁定的上游输入。OnlyOffice 使用 nixpkgs 包，原生解决跳过 NixOS 字体链接的问题。Flatpak 仍由 nix-flatpak v0.8.0 管理，保留 Flathub Stable、Flathub Beta、GNOME Nightly 和每周更新，目前不声明应用。Flatpak 数据位于 `/var/lib/flatpak`，不随 Nix 代回滚；可用 `flatpak uninstall --unused` 清理未使用的运行时。Homebrew 仅用于独立的 Darwin 配置。
+软件优先使用 nixpkgs，由 NixOS 或 Home Manager 配置；Luciole 使用其官方 flake 模块，JustRay 等使用 `flake.nix` 锁定的上游输入。ibisOffice 替代 OnlyOffice，通过 nix-flatpak v0.8.0 的原生 `bundle` 字段安装官方 0.8.9 x86_64 Flatpak，固定下载地址和 SHA-256，无本地补丁；DOCX、XLSX、PPTX 默认由它打开。保留 Flathub Stable、Flathub Beta、GNOME Nightly 和每周更新；ibisOffice 尚未上架 Flathub，升级需修改 `system/services.nix` 中的版本地址和校验值，不随 `nix flake update` 或每周 Flatpak 更新自动升级。Flatpak 数据位于 `/var/lib/flatpak`，不随 Nix 代回滚；可用 `flatpak uninstall --unused` 清理未使用的运行时。Homebrew 仅用于独立的 Darwin 配置。
 
-切换后先构建并验证 Nix 版 OnlyOffice，再用 `flatpak uninstall --system org.onlyoffice.desktopeditors` 移除旧应用；保留应用数据，不加 `--delete-data`。
+历史：nixpkgs 的 OnlyOffice 包原生解决了跳过 NixOS 字体链接的问题；现已从安装列表移除。应用配置后，若仍有早期手动安装的 Flatpak 版，可用 `flatpak uninstall --system org.onlyoffice.desktopeditors` 移除；保留应用数据，不加 `--delete-data`。
 
 ## 补丁与参数覆盖
 
@@ -62,6 +63,7 @@ Noctalia 的 GUI 设置保存在 `~/.local/state/noctalia/settings.toml`，可�
 | --- | --- |
 | Zed | 移除上游链接参数覆盖，调整 WebRTC 动态链接、GLib 头文件路径和许可证生成工具版本 |
 | gVisor | 将 `/sbin/ldconfig` 替换为 Nix store 中的路径 |
+| smartmontools | nixpkgs 的补丁调整 Darwin 链接框架，不改变 Linux 分支；本仓库无额外补丁 |
 | Delta 官方 flake | 修正发布二进制的 ELF 加载器／RPATH，使用 Nix 的 libxkbcommon 并包装运行环境、禁用应用自更新；上游 Linux 打包适配，本仓库无额外补丁 |
 | Herdr（Linux） | nixpkgs 固定 notify-send 路径，并调整内嵌 libghostty 的 compiler-rt／ubsan 构建选项 |
 | Pi | nixpkgs 从同版本 npm 发布补充模型目录并整理 workspace 依赖；上游离线构建与安装处理 |
@@ -96,8 +98,8 @@ Nix 使用 Lix，每周清理超过 30 天的旧代和未引用的 store 路径�
 | 自启动 | Ghostty、Chrome 使用 Umbriel `general.autostart`，引用 Home Manager 程序路径并保留 Chrome 参数；更改后重新登录 |
 | 平铺 | `scrolling`，默认列宽 `0.7`，档位 `[0.5, 0.7, 0.9]`；横纵间距 `8px`、边框 `0px`，四侧 struts 均为 `-8`，抵消外侧间距；不足一屏时居中，仍尊重面板占位 |
 | 状态栏 | 顶部智能隐藏、不占位，开启接触阴影，控制中心入口最右；空工作区或概览中显示，有窗口时按需隐藏，触及边缘可显示；`auto_hide_delay_ms` 是普通自动隐藏模式的隐藏延迟 |
-| Dock | 右侧自动隐藏、不占位，悬停 `500ms` 后出现 |
-| Shell 与登录 | Shell 随壁纸取色（`theme.source = "wallpaper"`），主题模式与 Shell 主题模式均为 `auto`；热角、夜灯沿用默认值；Greeter 默认 Umbriel 会话 |
+| Dock | 右侧智能隐藏、不占位，显示延迟沿用上游默认值 |
+| Shell 与登录 | Shell 随壁纸取色（`theme.source = "wallpaper"`），主题模式与 Shell 主题模式均为 `auto`；热角沿用默认值，夜灯启用，日间 `6500K`、夜间 `6000K`；Greeter 默认 Umbriel 会话 |
 | 闲置动作 | 启用闲置 15 分钟锁屏、20 分钟熄屏、25 分钟锁屏并睡眠（Suspend）；时间从闲置开始计算，不累加，合盖策略独立 |
 | 小组件 | 锁屏中央时钟、下方密码框；桌面左上天气、右下时钟、左下系统监控（CPU 与内存使用率）。普通组件背景默认 `0.8`；本机组件不指定屏幕，自动选择可用屏幕，密码框由 Shell 自动生成（默认 `0.88`）。布局在 `notalia/shell.nix`，坐标仍按 3840×2160、缩放 1 设置，不会自动适配所有分辨率；图形编辑器保存的布局可覆盖声明配置 |
 | 锁屏组件待排查 | 远程 Noctalia 5.5.0 锁定并挂起后，唤醒时钟可能消失；未发现相关配置或权限异常，热加载可暂时恢复但不稳定。已提交 [Noctalia #5444](https://github.com/noctalia-dev/noctalia/issues/5444)，尚未修复 |
@@ -108,9 +110,9 @@ Nix 使用 Lix，每周清理超过 30 天的旧代和未引用的 store 路径�
 | 应用字体 | Ghostty、Zed 内置终端使用 Monaspace Neon Var → Cascadia Code NF → Maple Mono NF → Maple Mono NF CN → Recursive → Sarasa Mono SC → Sarasa Term SC；界面与编辑区采用应用默认 |
 | Anytype | 使用 nixpkgs 的 `anytype` 桌面包；本地优先，账户与同步方式在应用内选择；既有 `~/Documents/notes` 笔记保留，不自动迁移 |
 
-Umbriel 使用 Wayland、TOML、wlroots 0.20 和 SceneFX，上游包自带 XWayland 供 Steam、Wine 等使用，无需额外安装。保留 XWayland 原生分辨率设置，其余未覆盖的焦点、窗口规则和外观沿用上游配置。合成器不是 Vulkan 渲染，安装 Vulkan 工具不会改变这一点。OnlyOffice、Blender、Steam、mpv 不强制切换主题，Codex 仅在启动时探测。DDC 亮度控制需显示器开启 DDC/CI，UEFI 需开启 Above 4G Decoding 与 Re-Size BAR。
+Umbriel 使用 Wayland、TOML、wlroots 0.20 和 SceneFX，上游包自带 XWayland 供 Steam、Wine 等使用，无需额外安装。保留 XWayland 原生分辨率设置，其余未覆盖的焦点、窗口规则和外观沿用上游配置。合成器不是 Vulkan 渲染，安装 Vulkan 工具不会改变这一点。ibisOffice、Blender、Steam、mpv 不强制切换主题，Codex 仅在启动时探测。DDC 亮度控制需显示器开启 DDC/CI，UEFI 需开启 Above 4G Decoding 与 Re-Size BAR。
 
-`opacity = 0.8` 统一 Ghostty、Zed、mpv、Luciole，以及 Shell 状态栏、Dock、通知、OSD 的背景不透明度；`alpha` 自动转为十六进制。Shell 面板采用 `soft`（外层 `0.8`，内卡片由上游调整）。mpv 视频、Luciole 菜单和对话框保持原样；Zed 内层保留零 alpha，避免叠色。Umbriel 拖动不透明度也为 `0.8`。
+`opacity = 0.8` 统一 Ghostty、Zed、mpv、Luciole，以及 Shell 状态栏、Dock、通知、OSD 的背景不透明度；`alpha` 自动转为十六进制。Shell 面板采用 `glass`，具体层次透明度由上游控制，不再使用此前的 `soft`。mpv 视频、Luciole 菜单和对话框保持原样；Zed 内层保留零 alpha，避免叠色。Umbriel 拖动不透明度也为 `0.8`。
 
 模糊使用 Umbriel 上游窗口及图层规则和强度，Ghostty、Zed 与 Shell 状态栏、Dock 启用原生模糊；不额外叠加整窗透明度。模糊强度不等于不透明度，Greeter 壁纸模糊不作数值同步。Anytype、Chrome 未确认有适用的 Linux 原生背景数值设置，跳过该数值设置；不添加自定义 CSS snippet、不安装窗口透明化插件、不打补丁。
 
@@ -134,7 +136,11 @@ systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
 - Chrome 声明实验性硬件编码特性；内存节省模式由浏览器设置管理，实际视频解码器可在 `chrome://media-internals` 查看。
 - NetworkManager 使用 iwd，DNS 使用 systemd-resolved，TCP 使用 BBR + FQ。
 - JustRay 接口启动或重新应用时，NetworkManager 钩子将 DNS 指向 TUN 的 `172.19.0.2`，设置路由域 `~.` 并清理缓存；接口移除后自动恢复普通网络 DNS。
-- Btrfs 使用 `compress=zstd:1`，磁盘 swap 禁用，zram 使用一半内存和 zstd，配合 systemd-oomd。
+- Btrfs 使用 `compress=zstd:1`，每周自动 scrub 校验，同一设备的子卷不重复校验；磁盘 swap 禁用，zram 使用一半内存和 zstd，配合 systemd-oomd。
+- 磁盘健康监测使用 [SMART Sniffer](https://github.com/DAB-LABS/smart-sniffer)，替代此前的 Scrutiny 与 InfluxDB。`system/monitoring.nix` 部署 Home Assistant，仅加载健康面板所需的界面、历史记录和集成依赖，不启用整套 `default_config`；固定 1.0.0 官方代理及集成的来源和校验值，无本地补丁、无需 HACS；升级需更新该文件，不随 `nix flake update` 自动升级。代理调用 smartctl，每 5 分钟采集一次，首次读取后跳过待机磁盘；关闭 mDNS，通过 systemd 网络限制仅允许本机访问代理 API。应用配置后打开 <http://127.0.0.1:8123> 创建账号，在“设置 → 设备与服务 → 添加集成”选择 SMART Sniffer，填写主机 `127.0.0.1`、端口 `9099`，令牌留空；管理员可在侧栏查看控制中心和 Home Assistant 内的异常通知，手机推送需另行配置。代理状态位于 `/var/lib/smartha-agent`，Home Assistant 数据位于 `/var/lib/hass`；不再单独启用 smartd。
+- Zed 启用类型与参数内联提示（`inlay_hints.enabled`），具体支持取决于语言服务器。
+- mpv 界面与缩略图组合：`thumbfast + material-osc`、[ModernGlass + thumbz](https://github.com/akFace/mpv.config/tree/c4f8bd5c27833ab3061320ba947df75f166f988c/src/modern_glass)、`uosc + thumbfast`。当前选择 **uosc + thumbfast**，使用 nixpkgs 包，关闭自带控制条，保留 MPRIS 桌面媒体控制。ModernGlass + thumbz 支持实时缩略图、故事板预渲染和缓存；进度条缓存用于当前文件，菜单封面另有持久缓存。thumbz 与 uosc 的消息接口不同，不能直接替换 thumbfast，采用时需一并更换界面。
+- Git 启用 `rerere`，记录并复用相同冲突的解决方式，复用后仍需检查并手动暂存。
 - SSH：`ssh maxwell@<主机-IP>`，支持 SFTP、SCP 和远程开发；WireGuard 提供工具与 NetworkManager 导入方式，连接参数待配置。
 - Blender 使用启用 ROCm 的 nixpkgs 构建，Cycles 的 HIP 设备需在应用内选择。
 - Steam 启动选项为 `gamemoderun %command%`；性能叠加使用 `gamemoderun mangohud %command%`。
@@ -157,15 +163,15 @@ Herdr 退出客户端（`Ctrl+B` 后按 `Q`）时后台进程继续运行；服�
 
 Delta 的设置由账号同步并保存到加密缓存，不复制 Zed 的 JSON 字段。主题目标参考 Zed 的 `GitHub Dark Dimmed`／`IR Black`，但尚未找到对应主题导入、透明／模糊或 Herdr 集成接口，暂不设置。它会按需下载语法高亮扩展，但官方明确尚不运行语言服务器；诊断、补全和跳转不可照搬，也未找到保存时格式化接口。完整编辑可使用 `Open in Zed`。参见 [Delta 设置](https://delta.dev/docs/configuration/settings)、[语言支持](https://delta.dev/docs/agents/language-support)。
 
-更新 Delta 使用 `nix flake update delta` 后重建；不使用应用自更新。配置同步只复制声明文件，不执行远程构建或 `switch`。2026-11-19 在 macOS 上完成格式检查、全系统 Flake 求值及系统 derivation 求值，无模块警告或失败断言；核对 Pi 1.5.2、Herdr 0.9.5、Delta 0.28.3 及生成的用户路径。Linux 构建、桌面效果和会话恢复仍待目标机器验证。
+更新 Delta 使用 `nix flake update delta` 后重建；不使用应用自更新。配置同步只复制声明文件，不执行远程构建或 `switch`。2026-11-19 已核对 Pi 1.5.2、Herdr 0.9.5、Delta 0.28.3 及生成的用户路径；2026-11-21 再次在 macOS 上检查全部 Nix 文件格式、Flake 与系统 derivation 求值及模块断言。Linux 构建、桌面效果和会话恢复仍待目标机器验证。
 
 ## 软件取舍
 
-以下保留此前的选型理由，包可用性属于当时的检查结果，可随依赖更新重新评估。当前选择覆盖大量字体、14 个插件、两款编辑器及两种容器运行时；配置可精简，但并非最小安装，未使用功能的取舍应单独决定。
+以下保留此前的选型理由，包可用性属于当时的检查结果，可随依赖更新重新评估。当前选择覆盖大量字体、14 个插件、两款编辑器、两种容器运行时，以及用于 SMART Sniffer 的 Home Assistant；并非最小安装，Home Assistant 的资源开销也高于独立磁盘采集器。未使用功能的取舍应单独决定。
 
 | 方案 | 未采用或撤回原因 | 当前选择 |
 | --- | --- | --- |
-| 方正可变悠黑 | 尚未取得适用授权及可用于 Nix 的字体文件，暂不声明安装 | 中文无衬线回退顺序为思源黑体 VF → Chiron Hei HK VF；英文优先 Inter |
+| 方正可变悠黑 | 尚未取得适用授权及可用于 Nix 的字体文件，暂不声明安装 | 中文无衬线回退顺序为思源黑体 VF → Chiron Hei HK VF；西文为 Roboto Flex → Google Sans Flex → Inter |
 | Vibex | 2026-11-19 复核仍无现成 Nix 包，不自行打包 | Herdr；早期 Sheprd 已移除 |
 | Gas City | nixpkgs 无包；社区 [llm-agents.nix](https://github.com/numtide/llm-agents.nix/blob/main/packages/gascity/package.nix) 已提供 1.5.1，待验证；tmux 后端存在 Nix 包装器进程识别报告 [#7551](https://github.com/gastownhall/gascity/issues/7551)，不能据此推断 Herdr 后端同样受影响 | Darwin 已通过 Homebrew 声明；NixOS 尚未接入社区包 |
 | Meta oomd / MetaOOM | 没有可用的 Nix 包 | systemd-oomd + zram-generator |
@@ -187,6 +193,7 @@ Delta 的设置由账号同步并保存到加密缓存，不复制 Zed 的 JSON 
 | --- | --- |
 | Umbriel Companion | 本机随插件源使用 1.4.0（API 54），当前 Shell 仅支持到 API 53，升级前无法加载；按用户选择不固定旧版。远程单独保留 1.3.0，同步时保留差异 |
 | JustRay 构建 | 锁定提交 `23dd90f` 的依赖校验值不匹配；两端共用已验证的 `vendorHash` 修正，更新到上游修正版后可移除 |
+| 远程 Ayuz | 上游依赖求值仍提示 `system` 应改为 `stdenv.hostPlatform.system`；系统求值通过，本仓库不加补丁，待上游更新 |
 | GUI 覆盖 | Noctalia 的旧 `settings.toml` 可以关闭状态栏或覆盖插件配置；重建不会自动清除，先备份再处理冲突字段 |
 
 - JustRay：订阅报 `tcp: unsupported header type: multi` 时，改用 sing-box JSON / Clash YAML，或尝试在链接末尾加 `?flag=sing-box`。
@@ -200,7 +207,7 @@ Delta 的设置由账号同步并保存到加密缓存，不复制 Zed 的 JSON 
 | 项目 | 待提供的信息 | 后续调整 |
 | --- | --- | --- |
 | RX 9070 XT | `lspci -Dnn` 中的显卡 PCI 地址，以及 `ls -l /dev/dri/by-path/` 输出 | 指定独显用于桌面、应用渲染、视频硬解与录屏编码；目前尚未指定具体设备 |
-| 显示器 | `umbriel outputs` 输出，确认输出名、分辨率和刷新率；HDR 另需确认 EDID 支持 | 确定输出模式和 HDR 设置；目前未强制指定 |
+| 显示器 | `umbriel outputs` 输出，核实匹配名称、分辨率和刷新率，以及 EDID/HDR 支持 | 已对 `Philips 32M2N8900X` 声明 `3840x2160@240`、全屏 VRR、HDR、EDID 色彩配置及 sRGB SDR 传递函数和色域；仍需实机确认生效，不同步到远程内屏 |
 
 ## 显卡使用范围
 
@@ -208,7 +215,7 @@ Delta 的设置由账号同步并保存到加密缓存，不复制 Zed 的 JSON 
 
 | 范围 | 当前配置与限制 |
 | --- | --- |
-| Umbriel、Greeter、Shell、Ghostty、Zed、游戏 | 本机待指定 AMD 独显；远程已声明 NVIDIA 渲染优先，需应用后验证实际设备 |
+| Umbriel、Greeter、Shell、Ghostty、Zed、游戏 | 本机待指定 AMD 独显；远程 Greeter 与 Umbriel 使用 Intel 渲染路径以恢复登录，应用保留 NVIDIA offload 配置，实际 GPU 及稳定性仍需验证 |
 | mpv、视频壁纸 | 本机自动选择硬解，待绑定 AMD 独显；远程已指定 NVDEC |
 | Screen Recorder | 显式使用 `video_encoder = "gpu"`；插件没有具体 GPU 选择字段，实际编码设备需录制时验证 |
 | Chrome、Anytype 等 Chromium/Electron 应用 | GPU 渲染不等于视频硬解；Chrome 已声明硬件编码特性，解码路径与设备需通过 `chrome://gpu`、`chrome://media-internals` 核实；NVIDIA VA-API 不保证适用于 Chromium |

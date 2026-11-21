@@ -45,6 +45,7 @@
 
     git = {
       enable = true;
+      settings.rerere.enabled = true;
       settings.user = {
         name = "maxwellsagax";
         email = "sagax.maxwell@gmail.com";

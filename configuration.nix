@@ -11,6 +11,7 @@ in
     ./system/input.nix
     ./system/gaming.nix
     ./system/hardware.nix
+    ./system/monitoring.nix
     ./system/services.nix
     ./system/virtualisation.nix
   ];

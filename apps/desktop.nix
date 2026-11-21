@@ -25,7 +25,6 @@
       anytype
       (blender.override { rocmSupport = true; })
       mission-center
-      onlyoffice-desktopeditors
       tabularis
     ];
   };
@@ -35,9 +34,14 @@
       enable = true;
       config = {
         hwdec = "auto";
+        osc = false;
         background-color = "#${alpha}000000";
       };
-      scripts = [ pkgs.mpvScripts.mpris ];
+      scripts = with pkgs.mpvScripts; [
+        mpris
+        uosc
+        thumbfast
+      ];
     };
 
     google-chrome = {
@@ -47,17 +51,23 @@
   };
 
   xdg = {
-    mimeApps.defaultApplications = lib.genAttrs [
-      "video/mp4"
-      "video/x-matroska"
-      "video/webm"
-      "video/quicktime"
-      "video/x-msvideo"
-      "video/mpeg"
-      "video/ogg"
-      "video/mp2t"
-      "video/x-flv"
-      "video/x-ms-wmv"
-    ] (_: [ "mpv.desktop" ]);
+    mimeApps.defaultApplications =
+      lib.genAttrs [
+        "video/mp4"
+        "video/x-matroska"
+        "video/webm"
+        "video/quicktime"
+        "video/x-msvideo"
+        "video/mpeg"
+        "video/ogg"
+        "video/mp2t"
+        "video/x-flv"
+        "video/x-ms-wmv"
+      ] (_: [ "mpv.desktop" ])
+      // lib.genAttrs [
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      ] (_: [ "jp.ne.ibis.ibisOffice.desktop" ]);
   };
 }

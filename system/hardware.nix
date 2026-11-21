@@ -7,6 +7,11 @@
     options = [ "compress=zstd:1" ];
   });
 
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "weekly";
+  };
+
   hardware = {
     amdgpu = {
       initrd.enable = true;
