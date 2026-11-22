@@ -35,7 +35,7 @@
 
 | 范围 | 当前配置 |
 | --- | --- |
-| Nix | Lix、flakes、nix-command；每周 GC（保留 30 天）和 store 优化；官方、lantian、nix-community 缓存统一在 `flake.nix` 声明 |
+| Nix | Lix、flakes、nix-command、XDG 基础目录；每周 GC（保留 30 天）和 store 优化；官方、lantian、nix-community 缓存统一在 `flake.nix` 声明 |
 | 启动 | systemd-boot，最多保留 10 代；CachyOS 最新内核；临时目录开机清理 |
 | 文件系统 | Btrfs `compress=zstd:1`；每周自动 scrub；swap 禁用，zram 使用一半内存和 zstd；systemd-oomd 管理用户 slice |
 | 网络 | NetworkManager + iwd；systemd-resolved；BBR + FQ；OpenSSH、chrony、PipeWire 和 portal 已启用 |
@@ -116,9 +116,9 @@ GPU 加速分为驱动安装、硬解开关和设备选择三件事。当前本�
 | Pi | nixpkgs + Home Manager；主题跟随系统；模型和凭据保留用户选择 |
 | Herdr | `apps/herdr.nix`；terminal 主题、会话恢复、屏幕历史、Kitty 图片协议及 Pi／Claude Code／Codex 集成 |
 | Delta | Zed 团队的 `delta-nix` flake，提供 Delta CLI 和桌面入口；不是 `pkgs.delta` Git diff 工具 |
-| Git | 启用 `rerere`；Difftastic 作为 difftool |
+| Git | 启用 `rerere`、远程引用自动清理、`zdiff3` 冲突上下文和首次推送自动设置 upstream；Difftastic 作为 difftool |
 | 语言工具 | nixd、nixfmt、oxfmt、ruff、ty、rustup、Bun、uv、gh、difftastic |
-| 终端 | Nushell、Bash、Starship、bat、eza、fd、ripgrep、tealdeer、atuin、bottom、Yazi、zoxide、direnv；bottom 使用终端调色板 |
+| 终端 | Nushell、Bash、Starship、bat、eza、fd、ripgrep、tealdeer、atuin、bottom、Yazi、zoxide、direnv；eza 启用 Nushell 集成，direnv 启用 Git 集成和 nix-direnv，bottom 使用终端调色板 |
 
 Pi、Herdr 在 Ghostty 中继承 `opacity = 0.8` 和模糊；Herdr 退出客户端（`Ctrl+B` 后按 `Q`）时后台进程继续运行。`resume_agents_on_restore = true` 和 `pane_history = true` 已启用，但不能恢复任意进程的内存状态；Linux 实机仍需验证完整会话恢复。
 

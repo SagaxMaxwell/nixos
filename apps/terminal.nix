@@ -18,13 +18,17 @@
 
     direnv = {
       enable = true;
+      enableGitIntegration = true;
       nix-direnv.enable = true;
     };
 
     starship.enable = true;
 
     bat.enable = true;
-    eza.enable = true;
+    eza = {
+      enable = true;
+      enableNushellIntegration = true;
+    };
     fd.enable = true;
     ripgrep.enable = true;
     tealdeer.enable = true;

@@ -45,10 +45,15 @@
 
     git = {
       enable = true;
-      settings.rerere.enabled = true;
-      settings.user = {
-        name = "maxwellsagax";
-        email = "sagax.maxwell@gmail.com";
+      settings = {
+        rerere.enabled = true;
+        fetch.prune = true;
+        merge.conflictStyle = "zdiff3";
+        push.autoSetupRemote = true;
+        user = {
+          name = "maxwellsagax";
+          email = "sagax.maxwell@gmail.com";
+        };
       };
     };
 

@@ -28,6 +28,7 @@ in
         "nix-command"
         "flakes"
       ];
+      use-xdg-base-directories = true;
       substituters = lib.mkAfter nixConfig.extra-substituters;
       trusted-public-keys = lib.mkAfter nixConfig.extra-trusted-public-keys;
     };
