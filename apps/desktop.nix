@@ -23,8 +23,10 @@
 
     packages = with pkgs; [
       anytype
+      anime4k
       (blender.override { rocmSupport = true; })
       mission-center
+      syncplay
       tabularis
     ];
   };
@@ -35,10 +37,16 @@
       config = {
         hwdec = "auto";
         osc = false;
+        vo = "gpu-next";
+        gpu-api = "auto";
         background-color = "#${alpha}000000";
       };
       scripts = with pkgs.mpvScripts; [
+        autosubsync-mpv
         mpris
+        skipsilence
+        smartskip
+        sponsorblock-minimal
         uosc
         thumbfast
       ];

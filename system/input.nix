@@ -18,7 +18,6 @@ in
     type = "fcitx5";
     fcitx5 = {
       waylandFrontend = true;
-      settings.addons.classicui.globalSection.UseDarkTheme = true;
       addons = [
         (pkgs.fcitx5-rime.override { inherit rimeDataPkgs; })
       ];
