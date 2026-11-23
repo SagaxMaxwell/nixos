@@ -6,7 +6,7 @@ in
 {
   programs.helix = {
     enable = true;
-    extraPackages = [ pkgs.wl-clipboard ];
+    extraPackages = [ pkgs.wl-clipboard-rs ];
 
     settings = {
       theme = "base16_terminal";

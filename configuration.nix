@@ -29,6 +29,10 @@ in
         "flakes"
       ];
       use-xdg-base-directories = true;
+      http3 = true;
+      http2 = true;
+      http-connections = 50;
+      max-substitution-jobs = 32;
       substituters = lib.mkAfter nixConfig.extra-substituters;
       trusted-public-keys = lib.mkAfter nixConfig.extra-trusted-public-keys;
     };

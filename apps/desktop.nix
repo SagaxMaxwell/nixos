@@ -25,7 +25,9 @@
       anytype
       anime4k
       (blender.override { rocmSupport = true; })
+      loupe
       mission-center
+      papers
       syncplay
       tabularis
     ];
@@ -72,6 +74,19 @@
         "video/x-flv"
         "video/x-ms-wmv"
       ] (_: [ "mpv.desktop" ])
+      // lib.genAttrs [
+        "image/avif"
+        "image/bmp"
+        "image/gif"
+        "image/heic"
+        "image/heif"
+        "image/jpeg"
+        "image/jxl"
+        "image/png"
+        "image/svg+xml"
+        "image/tiff"
+        "image/webp"
+      ] (_: [ "org.gnome.Loupe.desktop" ])
       // lib.genAttrs [
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

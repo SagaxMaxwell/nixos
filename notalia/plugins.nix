@@ -63,7 +63,7 @@ in
 
     home.packages = with pkgs; [
       bitwarden-cli
-      evtest
+      libinput
       gpu-screen-recorder
       mpvpaper
       python3

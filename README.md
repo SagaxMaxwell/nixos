@@ -1,202 +1,182 @@
 # NixOS 配置
 
-这套配置面向 Ryzen 7 9800X3D + RX 9070 XT 台式机，运行 NixOS unstable、CachyOS 内核、Umbriel 和 Noctalia。远程 `~/Downloads/nixos` 是 Intel + NVIDIA 笔记本，硬件配置、PRIME、Ayuz、Intel 媒体驱动和 NVIDIA 应用 offload 保持独立；远程 `supergfxd` 已禁用，Greeter 与 Umbriel 使用 Intel 渲染路径以避免登录阻塞。同步时不能用本机的 AMD 硬件文件覆盖远程配置。
+这套配置面向 Ryzen 7 9800X3D + RX 9070 XT 台式机，运行 NixOS unstable、CachyOS 内核、Umbriel 和 Noctalia。远程 ~/Downloads/nixos 是 Intel + NVIDIA 笔记本，硬件文件、显示输出和显卡策略独立维护，不能用本机 AMD 配置覆盖。
 
-## 文件与配置边界
+## 结构
 
-| 路径 | 内容 |
+| 路径 | 用途 |
 | --- | --- |
-| `flake.nix` | 输入、Home Manager、nix-flatpak、共享透明度和检查项 |
-| `configuration.nix` | NixOS 入口、用户、启动、Nix 设置和模块导入 |
-| `hardware-configuration.nix` | 当前主机的磁盘、文件系统、CPU 和硬件生成配置 |
-| `home.nix` | `maxwell` 的 Home Manager 入口、应用模块和 XDG 设置 |
-| `system/` | 字体、硬件、输入法、服务、监控、游戏和虚拟化 |
-| `apps/` | 终端、开发工具、桌面应用、媒体和 Agent 工具 |
-| `editor/` | Helix、Zed、格式化器和语言服务 |
-| `notalia/` | Umbriel、Noctalia Shell、Luciole、Greeter 和官方插件 |
-| `README.md` | 当前选择、限制、维护方式和部署命令 |
+| flake.nix | 输入、缓存、Home Manager、nix-flatpak 和检查项 |
+| configuration.nix | NixOS 入口、用户、启动和 Nix 设置 |
+| hardware-configuration.nix | 当前主机生成的磁盘和硬件配置 |
+| home.nix | maxwell 的 Home Manager 入口 |
+| system/ | 字体、硬件、输入法、服务、监控、游戏和虚拟化 |
+| apps/ | 桌面、终端、开发和 Agent 应用 |
+| editor/ | Helix、Zed、格式化器和语言服务 |
+| notalia/ | Umbriel、Noctalia、Luciole、Greeter 和插件 |
 
-`configuration.nix` 管理系统层，`home.nix` 管理用户层；Home Manager 已接入 NixOS，一次 `nixos-rebuild switch` 同时应用两层。系统服务、内核、驱动、udev、PAM 和 `/etc` 留在 NixOS 层，应用配置优先使用 Home Manager 的 `programs.<name>`，其次使用 `home.packages`。注释使用简短英文，注释上方留空行，不写同行注释。
+系统服务和硬件放在 NixOS 层，应用配置优先使用 Home Manager 模块，其次使用 home.packages。两个 stateVersion 只表示数据兼容基线。Home Manager 冲突文件保存为 *.hm-backup；应用已有的可变用户配置不会因删除声明字段而自动清理。
 
-两个 `stateVersion` 是数据兼容基线，不随依赖更新。Home Manager 冲突文件备份为 `*.hm-backup`；Noctalia、Luciole、Zed、Herdr、Tabularis、Claude Code、Codex 和 Pi 仍保留可变用户配置，删除声明字段不会自动清理旧值。
+注释使用简短英文，注释上方留空行，不写同行注释。
 
 ## 软件来源
 
-软件按以下顺序选择，避免重复封装和源码补丁：
+1. 优先使用 nixpkgs 或上游 flake 的原生包和模块。
+2. nixpkgs 没有包但有官方 Flatpak 时使用 nix-flatpak。
+3. Homebrew 只用于 Darwin 独立配置。
+4. 没有现成包的项目只记录取舍，不自行打包或修改源码。
 
-1. 优先使用 nixpkgs 或上游 flake 的原生模块和包。
-2. nixpkgs 没有包、但有官方 Flatpak 时使用 nix-flatpak。
-3. 只有 Darwin 独立配置才使用 Homebrew。
-4. 没有现成包的项目只记录在取舍表，不自行打包或打补丁。
-
-`nix-flatpak` 由 nixpkgs/flake 配置安装，Flatpak 运行时和应用不独立手工安装。当前配置保留 Flathub Stable、Beta、GNOME Nightly 和每周更新；ibisOffice 使用官方 0.8.9 x86_64 bundle，固定 URL 和 SHA-256，不随 `nix flake update` 自动升级。DOCX、XLSX、PPTX 默认由 ibisOffice 打开。OnlyOffice 已移除；早期 Flatpak 可用 `flatpak uninstall --system org.onlyoffice.desktopeditors` 删除，但保留应用数据。Flatpak 数据位于 `/var/lib/flatpak`，不随 Nix 代回滚，可用 `flatpak uninstall --unused` 清理运行时。
+nix-flatpak 由 Nix 配置安装。当前 Flatpak 应用是 ibisOffice 和 Flectar Mail，运行时来自 Flathub Stable、Beta 或 GNOME Nightly；bundle 版本和 SHA-256 固定，不随 nix flake update 自动变化。DOCX、XLSX、PPTX 默认交给 ibisOffice。BetterOffice 目前只有 SDK，没有桌面应用，因此不安装。旧 OnlyOffice 数据不会自动删除，需要时可用 flatpak uninstall --system org.onlyoffice.desktopeditors 清理应用，flatpak uninstall --unused 清理未使用运行时。
 
 ## 系统
 
 | 范围 | 当前配置 |
 | --- | --- |
-| Nix | Lix、flakes、nix-command、XDG 基础目录；每周 GC（保留 30 天）和 store 优化；官方、lantian、nix-community 缓存统一在 `flake.nix` 声明 |
-| 启动 | systemd-boot，最多保留 10 代；CachyOS 最新内核；临时目录开机清理 |
-| 文件系统 | Btrfs `compress=zstd:1`；每周自动 scrub；swap 禁用，zram 使用一半内存和 zstd；systemd-oomd 管理用户 slice |
-| 网络 | NetworkManager + iwd；systemd-resolved；BBR + FQ；OpenSSH、chrony、PipeWire 和 portal 已启用 |
-| 代理 | JustRay 系统模块和用户服务共用同一包；TUN 接口由 NetworkManager 管理，启动或重新应用时将 DNS 指向 `172.19.0.2`、路由域设为 `~.` 并清理缓存 |
-| 输入法 | Fcitx5 + Rime + `rime-ice`；Classic UI 不固定深色，跟随桌面主题；用户词库保留，配置变化时清理旧编译缓存 |
-| 字体 | `system/fonts.nix` 集中管理字体、回退顺序、Fontconfig 渲染参数和应用字体；不重复安装 Noto CJK 或位图 Emoji |
-| 健康监控 | Scrutiny + InfluxDB，原生 NixOS 模块；网页和数据库仅监听 `127.0.0.1`，默认网页 `8080`、InfluxDB `8086` |
-| 硬件工具 | AMDGPU initrd/OpenCL、OpenRGB、DDCutil、VA-API、Mesa、NVTop、PCI 和 Vulkan 工具 |
-| 虚拟化 | Podman、containerd、BuildKit、Cloud Hypervisor、gVisor；容器运行时状态彼此独立，CNI 尚未额外声明 |
+| Nix | Lix、flakes、nix-command、XDG 基础目录、每周 GC（保留 30 天）和 store 优化 |
+| 启动 | systemd-boot，最多保留 10 代；CachyOS 最新内核；开机清理临时目录 |
+| 文件系统 | Btrfs compress=zstd:1、每周 scrub、zram（内存一半，zstd）、systemd-oomd |
+| 网络 | NetworkManager + iwd、systemd-resolved、BBR/FQ、OpenSSH、chrony、PipeWire 和 portal |
+| 代理 | JustRay 系统与用户服务共用同一包；NetworkManager dispatcher 为 TUN 设置 172.19.0.2 和 ~. DNS 路由域 |
+| 输入法 | Fcitx5 + Rime Ice；用户词库保留，部署变化时清理旧编译缓存 |
+| 字体 | system/fonts.nix 集中管理字体、回退、Fontconfig 渲染和应用字体；关闭默认字体集合，避免重复安装 Noto CJK 与位图 Emoji |
+| 健康监控 | Scrutiny + InfluxDB，仅监听 127.0.0.1（网页 8080、InfluxDB 8086） |
+| 硬件工具 | AMDGPU initrd/OpenCL、OpenRGB、DDCutil、VA-API、Mesa、nvtop、PCI 和 Vulkan 工具 |
+| 虚拟化 | Podman、containerd、BuildKit、Cloud Hypervisor 和 gVisor |
 
-磁盘监控的备选方案是 Home Assistant + SMART Sniffer；它需要额外平台和代理，当前没有部署。历史 `/var/lib/hass` 和 `/var/lib/smartha-agent` 不会自动删除。
+## Umbriel 与 Noctalia
 
-## Umbriel 与 Noctalia 桌面
-
-Umbriel 使用 Wayland、TOML、wlroots 0.20 和 SceneFX，上游包自带 XWayland。布局和窗口外观只覆盖个人选择，其余沿用上游默认，避免复制默认配置。
+Umbriel 使用 Wayland 和上游起始配置，只覆盖明确的窗口布局、输出和外观选择。Noctalia 使用壁纸取色、自动主题、玻璃面板、天气、夜灯、壁纸轮换和桌面/锁屏组件。
 
 | 项目 | 设置 |
 | --- | --- |
-| 快捷键 | `Super+Enter` 启动 Ghostty；`Super` 打开启动器；`Ctrl+Space` 切换 `us` 与 Rime |
-| 布局 | `scrolling`；默认宽度 `0.7`；宽度 `[0.5, 0.7, 0.9]`；窗口间距 `8px`；边框 `0px`；四侧 struts `-8`；不足一屏时居中 |
-| 状态栏 | 顶部、智能隐藏、不占位、接触阴影；控制中心入口在最右侧 |
+| 快捷键 | Super+Enter 启动 Ghostty；Super 启动器；Ctrl+Space 切换 US 与 Rime |
+| 布局 | scrolling；默认宽度 0.7；预设 [0.5, 0.7, 0.9]；窗口间距 8px；边框 0px；四侧外边距抵消为 -8 |
+| 状态栏 | 顶部、智能隐藏、不占位、接触阴影；控制中心在最右侧 |
 | Dock | 右侧、智能隐藏、不占位 |
-| 主题 | 壁纸取色；主题和 Shell 主题均为 `auto`；纯黑暗色开启；面板使用 `glass` |
-| 天气 | IP 自动定位；代理或 VPN 可能改变结果 |
-| 夜灯 | 开启；日间 `6500K`，夜间 `6000K` |
-| 闲置 | 15 分钟锁屏，20 分钟熄屏，25 分钟锁屏并挂起 |
-| 壁纸 | 启动过渡动画；图片每 15 分钟随机轮换，递归读取子目录 |
-| 小组件 | 桌面左上天气、右下时间、左下系统监控；锁屏中央时钟；普通组件背景默认 `0.8`，密码框沿用默认 `0.88` |
-| Luciole | 官方包和模块；默认文件/目录选择器；启用图片、视频、文本、PDF 预览及 Glycin、FFmpeg、ffmpegthumbnailer、Poppler |
+| 主题与透明度 | 壁纸取色；主题模式自动；纯黑暗色；面板玻璃效果；背景透明度 0.8 |
+| 闲置 | 15 分钟锁屏，20 分钟熄屏，25 分钟锁定并挂起 |
+| 壁纸 | 启动过渡动画；图片每 15 分钟随机轮换并递归读取目录 |
+| 小组件 | 桌面天气、时间、系统监控；锁屏中央时钟 |
+| Luciole | 文件/目录选择器；启用图片、视频、文本和 PDF 预览 |
 
-桌面组件坐标按本机 3840×2160、缩放 1 设置，图形编辑器保存的布局可能覆盖声明。远程 Noctalia 5.5.0 在“锁定并挂起”后唤醒时可能丢失锁屏时钟；热加载可以暂时恢复。已排除配置和权限问题，并提交 [Noctalia #5444](https://github.com/noctalia-dev/noctalia/issues/5444)。
+官方插件从固定提交的 notalia/plugins.nix 导入，关闭 Git 源和自动更新。已启用 example、screen_recorder、bongocat、translator、timer、wallhaven、mpvpaper、kaomoji、notes、bitwarden、world_clock、wallpaper_depth、umbriel-companion 和 lyrics。插件安装后仍需按插件要求添加组件、登录或提供模型。
 
-状态栏、Dock、通知和 OSD 的背景不透明度为 `0.8`，Ghostty、Zed、mpv、Luciole 也使用该值；Shell 和窗口模糊使用应用或合成器原生设置，不通过补丁强制统一。Anytype、Chrome 没有确认适用的 Linux 原生透明度字段，因此不添加 CSS 或透明化插件。
+远程 Noctalia 在“锁定并挂起”唤醒后可能丢失锁屏时钟；热加载可恢复，问题已提交 [Noctalia #5444](https://github.com/noctalia-dev/noctalia/issues/5444)。插件安装后仍需按插件要求添加状态栏/桌面组件、登录或提供模型：Translator 使用启动器 /tr，Bitwarden 需要登录，深度壁纸需要模型，Video Wallpaper 支持 MOV、MP4、MKV、WebM 和 GIF。插件 Slideshow 与 Shell 图片轮换相互独立。
 
-官方插件源由 `notalia/plugins.nix` 固定提交和校验值，关闭 Git 源和自动更新，避免在线导出阻塞 Shell。当前加载的插件为：
+## 应用与 GPU
 
-`example`、`screen_recorder`、`bongocat`、`translator`、`timer`、`wallhaven`、`mpvpaper`、`kaomoji`、`notes`、`bitwarden`、`world_clock`、`wallpaper_depth`、`umbriel-companion`、`lyrics`。
-
-插件安装不代表功能已配置：状态栏按钮需在状态栏设置中添加，Timer 需在桌面组件编辑器中添加，Translator 使用启动器 `/tr`，Bitwarden 需要登录，深度壁纸需要模型。Video Wallpaper 需在视频面板选择显示器并点击视频，支持 MOV、MP4、MKV、WebM、GIF；`socat` 用于同步视频和静态帧。插件提供的 Slideshow 与 Shell 图片轮换相互独立。
-
-## 应用、字体与 GPU
-
-| 应用或范围 | 当前配置 |
+| 应用 | 配置 |
 | --- | --- |
-| Ghostty / Zed | 日间 `GitHub Dark Dimmed`，夜间 `IR Black`；终端字体顺序为 Monaspace Neon Var → Cascadia Code NF → Maple Mono NF → Maple Mono NF CN → Recursive → Sarasa Mono SC → Sarasa Term SC |
-| Helix | `base16_terminal`，跟随终端调色板 |
-| Anytype | nixpkgs 桌面包；本地数据优先，账户和同步在应用内选择 |
-| Chrome | 实验性硬件编码特性；主题由浏览器管理；解码器在 `chrome://media-internals`，GPU 路径在 `chrome://gpu` 核实 |
-| Blender | `rocmSupport = true`；Cycles 仍需在应用内选择 HIP 设备 |
-| Steam | GameMode、Gamescope、MangoHud、Wine；启动选项可用 `gamemoderun %command%` |
-| Epic Games Launcher | 社区 flake 的 NixOS 模块；官方 Linux Preview `.deb`，仅 `x86_64-linux` |
+| Ghostty / Zed | 日间 GitHub Dark Dimmed，夜间 IR Black；终端字体为 Monaspace Neon Var、Cascadia Code NF、Maple Mono NF/CN、Recursive、Sarasa Mono/Term SC |
+| Helix | base16_terminal，跟随终端调色板；使用 wl-clipboard-rs |
+| Anytype | nixpkgs 桌面包；账户和同步在应用内设置 |
+| Loupe | nixpkgs 包；常见图片格式默认由 Loupe 打开 |
+| Chrome | 开启实验性硬件编码；GPU 路径需在 chrome://gpu 检查 |
+| Blender | rocmSupport = true；Cycles 设备在应用内选择 HIP |
+| Steam | GameMode、Gamescope、MangoHud、Proton GE |
+| Epic Games Launcher | 社区 flake 模块；官方 Linux Preview，仅 x86_64-linux |
 
-GPU 加速分为驱动安装、硬解开关和设备选择三件事。当前本机尚未提供 RX 9070 XT 的 PCI 地址，因此不能宣称所有桌面和视频任务已绑定独显；远程 Greeter/Umbriel 保持 Intel 渲染，应用保留 NVIDIA offload，mpv 和视频壁纸使用 NVDEC。Screen Recorder 只声明 `video_encoder = "gpu"`，具体编码设备需实测。Flatpak、容器和应用自带运行时可能有独立设备权限。
+本机尚未提供 RX 9070 XT 的 PCI 地址，不能声明所有任务已绑定独显；远程 Greeter/Umbriel 保持 Intel 渲染，应用可使用 NVIDIA offload。mpv 和视频壁纸使用自动硬件解码，实际设备由运行环境选择。Flatpak、容器和应用自带运行时可能有独立设备权限。
+
+## 终端与开发工具
+
+| 类别 | 当前包或模块 |
+| --- | --- |
+| Shell | Nushell、Bash、Starship、devenv 2.4.0（Nushell 集成） |
+| 文件与文本 | lsr、mcat、ast-grep、fd、ripgrep、Yazi；fd 和 ripgrep 作为 Yazi 搜索依赖保留 |
+| 网络与 Nix | resterm、sendme、zstd、WireGuard CLI、nix-output-monitor、nix-tree、mvs |
+| 日常工具 | tealdeer、atuin、bottom、zoxide、Ringboard（`services.ringboard.wayland`） |
+| 开发 | nixd、nixfmt、oxfmt、ruff、ty、rustup、Bun、uv、gh、Difftastic、Delta |
+
+已移除 bat、eza、xh、direnv、nix-direnv 和 comma。纯文本搜索可使用系统 grep；结构化搜索使用 ast-grep。Difftastic 作为 Git difftool 保留。resterm 是当前使用的终端 REST 客户端，不能与同名的 reMarkable 投屏工具混淆。Yazi 的 fd/ripgrep 运行依赖仍保留。
 
 ## mpv
 
-当前 mpv 配置为 `hwdec = "auto"`、`vo = "gpu-next"`、`gpu-api = "auto"`，关闭内置 OSC，启用 MPRIS、`uosc + thumbfast`，并安装以下 nixpkgs 包。视频壁纸使用同一 mpv 配置，但插件传入的参数可能覆盖输出设备。
+mpv 使用 hwdec = "auto"、vo = "gpu-next"、gpu-api = "auto"，关闭内置 OSC，启用 MPRIS、uosc + thumbfast。
 
-| 类型 | 包 | 是否安装（当前选择） | 包状态 |
-| --- | --- | --- | --- |
-| 跳过赞助商片段 | `mpvScripts.sponsorblock-minimal` | 是 | 维护 |
-| 片头、回顾、片尾 | `mpvScripts.smartskip` | 是 | 维护 |
-| 静音跳过与加速 | `mpvScripts.skipsilence` | 是 | 维护 |
-| 字幕同步 | `mpvScripts.autosubsync-mpv` | 是 | 维护 |
-| 同步观影 | `pkgs.syncplay` | 是 | 维护 |
-| 超分着色器 | `pkgs.anime4k` | 是 | 维护 |
-| 播放器界面 | `mpvScripts.uosc` + `mpvScripts.thumbfast` | 是 | 维护 |
-| 语音转写、字幕翻译、下载、历史、手势、流媒体预加载、剪辑 | — | 否 | 无包或停止维护 |
-| `intro-fingerprint`、`TheIntroDB/mpv-script` | — | 否 | 停止或无包 |
-| ModernGlass + `thumbz`、`material-osc`、`mpv-prescalers` | — | 否 | 无包 |
+| 类型 | 当前选择 | 状态 |
+| --- | --- | --- |
+| 赞助商片段 | sponsorblock-minimal | 维护 |
+| 片头/回顾/片尾 | smartskip | 维护 |
+| 静音跳过与加速 | skipsilence | 维护 |
+| 字幕同步 | autosubsync-mpv | 维护 |
+| 同步观影 | syncplay | 维护 |
+| 超分着色器 | anime4k | 维护 |
+| 播放器界面与缩略图 | uosc + thumbfast | 维护 |
+| 片头识别 | intro-fingerprint、TheIntroDB/mpv-script | 停止维护或无包 |
+| ModernGlass + thumbz、material-osc、mpv-prescalers | — | 无包 |
 
-`thumbz` 的消息接口与 `uosc` 不兼容，不能单独替换 `thumbfast`。Anime4K 只提供着色器资源，不会自动改变解码或画质。已安装 nixpkgs 包没有本仓库添加的源码补丁。
+语音转写、翻译、下载、历史、手势、流媒体预加载和剪辑脚本没有可用 nixpkgs 包或已停止维护，因此不安装。Anime4K 只提供着色器资源，不会自动改变解码或画质。thumbz 与 uosc 的接口不兼容，不能直接替换 thumbfast；采用 ModernGlass 时需要一并更换播放器界面。
 
-## Agent 与开发工具
-
-| 工具 | 配置 |
-| --- | --- |
-| Pi | nixpkgs + Home Manager；主题跟随系统；模型和凭据保留用户选择 |
-| Herdr | `apps/herdr.nix`；terminal 主题、会话恢复、屏幕历史、Kitty 图片协议及 Pi／Claude Code／Codex 集成 |
-| Delta | Zed 团队的 `delta-nix` flake，提供 Delta CLI 和桌面入口；不是 `pkgs.delta` Git diff 工具 |
-| Git | 启用 `rerere`、远程引用自动清理、`zdiff3` 冲突上下文和首次推送自动设置 upstream；Difftastic 作为 difftool |
-| 语言工具 | nixd、nixfmt、oxfmt、ruff、ty、rustup、Bun、uv、gh、difftastic |
-| 终端 | Nushell、Bash、Starship、bat、eza、fd、ripgrep、tealdeer、atuin、bottom、Yazi、zoxide、direnv；eza 启用 Nushell 集成，direnv 启用 Git 集成和 nix-direnv，bottom 使用终端调色板 |
-
-Pi、Herdr 在 Ghostty 中继承 `opacity = 0.8` 和模糊；Herdr 退出客户端（`Ctrl+B` 后按 `Q`）时后台进程继续运行。`resume_agents_on_restore = true` 和 `pane_history = true` 已启用，但不能恢复任意进程的内存状态；Linux 实机仍需验证完整会话恢复。
-
-Delta 设置由账号同步并保存到加密缓存，不复制 Zed JSON。当前未找到主题导入、透明/模糊或保存时格式化接口；官方尚未运行语言服务器，完整编辑可使用 `Open in Zed`。更新使用 `nix flake update delta`，不使用应用自更新。
-
-## 网络、端口与外部服务
+## 网络与端口
 
 | 服务 | 监听或用途 |
 | --- | --- |
-| Scrutiny | `127.0.0.1:8080` |
-| InfluxDB | `127.0.0.1:8086` |
-| JustRay | TUN 和代理 DNS `172.19.0.2`，端口由订阅和 sing-box 决定 |
-| SSH | systemd 服务，默认 22；仅按需开放防火墙 |
-| WireGuard | 仅安装工具和 NetworkManager 导入支持，未声明连接参数 |
-| Flatpak 应用 | 各应用自带运行时，宿主机端口未额外开放 |
+| Scrutiny | 127.0.0.1:8080 |
+| InfluxDB | 127.0.0.1:8086 |
+| SSH | 默认端口 22，是否开放由防火墙决定 |
+| JustRay | TUN；DNS 172.19.0.2；代理端口由订阅配置决定 |
+| WireGuard | 仅安装 CLI 和 NetworkManager 导入支持，未声明连接 |
 
-JustRay 报 `tcp: unsupported header type: multi` 时，改用 sing-box JSON/Clash YAML，或尝试在链接末尾加 `?flag=sing-box`。首次连接仍需运行 `justray`，按 `a` 导入订阅、`m` 切换 TUN、`Enter` 连接。
+## 取舍与未安装项目
 
-## 补丁、覆盖与维护边界
-
-本仓库没有 `patches`、`fetchpatch` 或 `applyPatches`。以下是参数覆盖或应用配置：
-
-| 位置 | 类型 | 用途 |
+| 项目 | 未采用或撤回原因 | 当前选择 |
 | --- | --- | --- |
-| `flake.nix` `mkShell.override` | 开发环境参数 | devShell 使用 mold 链接器 |
-| `apps/desktop.nix` `blender.override` | 包参数 | 启用 ROCm |
-| `system/input.nix` `fcitx5-rime.override` | 包参数 | 注入 `rime-ice` 数据 |
-| `system/input.nix` `defaultCustom.patch` | 应用配置 | 选择 Rime Ice schema |
-| `system/services.nix` `overrideAttrs` | 依赖校验值修正 | 修复 JustRay 锁定提交的 `vendorHash`，不改源码 |
+| LEKTRA | nixpkgs 与已知社区 flake 均无可用包 | Papers |
+| OpenGrep | 没有 nixpkgs 包，不自行打包 | ast-grep |
+| OmniDiff | 没有 nixpkgs 包，不自行打包 | Difftastic |
+| all-smi | 没有 nixpkgs 包，不自行打包 | nvtop |
+| Glanvu | 暂无 nixpkgs 包 | Loupe |
+| BetterOffice | 目前只有 SDK，没有桌面应用 | 暂不安装 |
+| Home Assistant + SMART Sniffer | 可提供健康面板和通知，但需要额外平台与代理 | Scrutiny + InfluxDB（当前选择） |
+| FluxDown | nixpkgs 与已知社区包均无可用版本，不自行打包 | 暂不安装 |
+| 字体 | 方正可变悠黑的授权和可固定 Nix 来源尚未确认 | 思源黑体 VF → Chiron Hei HK VF；西文使用 Roboto Flex → Google Sans Flex → Inter |
+| Hickory DNS | 虽有包，但接入 JustRay TUN/DNS 需要额外适配，完整递归功能仍不作为当前默认 | NetworkManager + systemd-resolved |
+| Meta oomd / MetaOOM | 没有可用 Nix 包 | systemd-oomd + zram-generator |
+| Cassotis、Rime 万象及独立语法模型 | 没有稳定 nixpkgs 来源；固定快照、模型和校验值需要额外维护 | Fcitx5 + Rime Ice |
+| Spacedrive 2.x | nixpkgs 没有所需版本；独立封装的目录浏览和索引兼容性不足 | Luciole；终端保留 Yazi |
+| mimalloc 全局替换 | 无法覆盖应用内分配器，混用可能导致崩溃 | 系统 libc 和应用默认分配器 |
+| LLVM libc | 不能替换桌面、Steam 及依赖所需的 glibc | glibc |
+| 替换 journald | journald 已与系统完整集成 | systemd-journald，并限制容量和保留时间 |
+| mdevd | 不能替换桌面和硬件服务依赖的 udev | systemd-udevd |
+| 替换 systemd | NixOS、登录会话和系统/用户服务都依赖 systemd | systemd |
+| Gas City | nixpkgs 无包；社区版本尚未验证，NixOS 暂不接入 | Darwin 使用 Homebrew，Agent 桌面使用 Herdr |
+| Vibex | 无现成 Nix 包，不自行打包 | 暂不安装 |
 
-依赖自身可能含 nixpkgs 维护的构建适配：Zed 的链接和 GLib 路径、gVisor 的 `ldconfig` 路径、smartmontools 的 Darwin 框架、Delta 的 ELF/RPATH 包装和自动更新关闭、Herdr 的 notify-send/libghostty 构建选项、Pi 的 npm workspace 整理，以及 Helix Perl 依赖的 `bsearch` 修正。这些都不是本仓库的源码补丁。
+## 补丁与覆盖
 
-## 软件取舍
+仓库没有 patches、fetchpatch 或 applyPatches。现有覆盖仅用于参数或依赖：
 
-| 项目 | 当前选择或原因 |
+| 位置 | 用途 |
 | --- | --- |
-| 中文无衬线字体 | 思源黑体 VF → Chiron Hei HK VF；西文 Roboto Flex → Google Sans Flex → Inter；方正可变悠黑因授权和来源未确定而跳过 |
-| 输入法 | Fcitx5 + Rime Ice；Cassotis、万象和独立语法模型没有稳定 nixpkgs 来源，不自行封装 |
-| 文件管理 | Luciole；Spacedrive 2.x 版本和索引兼容性不足，终端保留 Yazi |
-| 合成器 | Umbriel + Noctalia；不同时维护 niri、Hyprland 和其他个人分支 |
-| 剪贴板 | Noctalia 内置功能；不重复安装 Ringboard |
-| 内存分配器/ libc | 系统默认 glibc；不做全局 mimalloc 或 LLVM libc 替换 |
-| 日志与设备管理 | systemd-journald、systemd-udevd；不替换为其他实现 |
-| Gas City | nixpkgs 无包，社区 `llm-agents.nix` 有待验证版本；Darwin 使用 Homebrew，NixOS 暂不接入 |
-| Vibex | 无现成 Nix 包，继续跳过；Herdr 为当前 Agent 桌面选择 |
+| flake.nix mkShell.override | devShell 使用 mold 链接器 |
+| apps/desktop.nix blender.override | 启用 ROCm |
+| system/input.nix fcitx5-rime.override | 注入 Rime Ice 数据 |
+| system/input.nix defaultCustom | 选择 Rime Ice schema |
+| system/fonts.nix | 固定上游字体文件；不是源码补丁 |
+
+nixpkgs 自身可能包含构建适配，例如 Zed 的 GLib 路径、gVisor 的 ldconfig、Delta 的 ELF/RPATH 包装、Herdr 的构建选项和 Helix 依赖修正；这些不属于本仓库的源码补丁。
 
 ## 已知限制
 
-- Umbriel Companion：本机插件源为 1.4.0（API 54），当前 Shell 只支持 API 53；远程单独保留 1.3.0。
-- JustRay：锁定提交 `23dd90f` 的依赖校验值不匹配，两端共用已验证的 `vendorHash` 覆盖；上游修正后应移除。
-- 远程 Ayuz：上游仍提示 `system` 应改为 `stdenv.hostPlatform.system`，求值通过，本仓库不加补丁。
-- Noctalia：旧 `~/.local/state/noctalia/settings.toml` 可能覆盖声明配置；重建不会清理旧 GUI 值。
-- Herdr：Kitty 图片协议和 Agent 恢复仍需 Linux 实机验证；Codex 过去需要手动 `codex resume`。
-- Steam《艾尔登法环》：大屏幕姓名框和普通模式中文候选仍待定位。
-
-## 待提供的硬件信息
-
-| 信息 | 用途 |
-| --- | --- |
-| 本机 RX 9070 XT 的 `lspci -Dnn` PCI 地址及 `/dev/dri/by-path/` | 将桌面、应用渲染、视频硬解和录屏编码绑定到独显 |
-| 本机 `umbriel outputs` | 核实 `Philips 32M2N8900X` 的分辨率、240 Hz、VRR、HDR、EDID 和实际生效状态 |
-
-本机已声明 `Philips 32M2N8900X` 的 `3840x2160@240`、全屏 VRR、HDR、EDID、sRGB SDR transfer/gamut；这部分不复制到远程内屏。显示器模式仍需通过 OSD 或实机确认。
+- Umbriel Companion 的本机插件源与部分 Shell API 版本可能不一致。
+- Noctalia 旧用户状态可能覆盖声明配置；重建不会清理旧 GUI 值。
+- JustRay 遇到 tcp: unsupported header type: multi 时改用 sing-box JSON/Clash YAML；首次连接需运行 justray，按 a 导入订阅、m 切换 TUN、回车连接。
+- Herdr 的 Kitty 图片协议和 Agent 会话恢复仍需 Linux 实机验证；Pi、Claude Code、Codex 凭据保留用户选择。
+- 远程 Ayuz 的上游提示不影响本仓库求值；Steam《艾尔登法环》的中文候选和大屏姓名框仍待定位。
+- 应用、Flatpak、容器和视频壁纸的硬件设备选择仍需在实际机器上验证。
+- 本机显示器 Philips 32M2N8900X 的 HDR、VRR、EDID 与 3840x2160@240 配置不复制到远程主机。
 
 ## 部署与检查
 
-在仓库目录执行；普通 Git flake 需要先 `git add` 新文件，工作树检查可用 `path:.`。只有激活阶段提权。
+```sh
+nixos-rebuild switch --flake .#nixos --elevate run0
+nix flake update
+nix flake check --all-systems --no-build
+nixos-rebuild build --flake .#nixos
+nixos-rebuild switch --rollback --no-reexec --elevate run0
+```
 
-| 用途 | 命令 |
-| --- | --- |
-| 应用 | `nixos-rebuild switch --flake .#nixos --elevate run0` |
-| 更新输入 | `nix flake update` |
-| 完整检查 | `nix flake check` |
-| 仅求值 | `nix flake check --no-build --show-trace` |
-| 构建不切换 | `nixos-rebuild build --flake .#nixos` |
-| 回滚 | `nixos-rebuild switch --rollback --no-reexec --elevate run0` |
-| macOS 检查 | `nix flake check --all-systems --no-build` |
-| 含未跟踪文件检查 | `nix flake check path:. --all-systems --no-build` |
-| Rime 重新部署 | `systemctl --user restart app-org.fcitx.Fcitx5@autostart.service` |
+完整检查会验证 Noctalia 和 Umbriel 配置；普通 Git flake 需要先 git add 新文件，工作树检查可使用 path:.。只有激活阶段需要提权。更换机器时重新运行 nixos-generate-config 并核对磁盘 UUID。
 
-`--no-build` 不构建检查项，但 IFD 仍可能下载或构建。Umbriel 验证器和 Noctalia 配置生成需要 Linux 完整检查；没有缓存时内核可能本地编译。更换机器时重新运行 `nixos-generate-config` 并核对磁盘 UUID；Btrfs 压缩在 `system/hardware.nix` 独立声明，回滚不会修改仓库。
+Rime 配置更新后可用 systemctl --user restart app-org.fcitx.Fcitx5@autostart.service 重载输入法。

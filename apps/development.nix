@@ -32,7 +32,29 @@
     pi-coding-agent = {
       enable = true;
       mutableSettings = true;
-      settings.theme = "system";
+      settings = {
+        theme = "system";
+        defaultProvider = "openrouter";
+        defaultModel = "openrouter/free";
+        shellPath = "${pkgs.bash}/bin/bash";
+        externalEditor = "${pkgs.helix}/bin/hx";
+        defaultTools = [ "+codemode" ];
+        npmCommand = [ "${pkgs.bun}/bin/bun" ];
+        packages = [
+          "npm:billion-context"
+          "npm:pi-total-recall"
+          "npm:pi-lens"
+          "npm:@tintinweb/pi-subagents"
+          "npm:pi-web-access"
+          "npm:pi-doc-review"
+          "npm:pi-permission-modes"
+          "npm:pi-agent-budget"
+          "npm:@juicesharp/rpiv-todo"
+          "npm:pi-md-render"
+        ];
+        terminal.showTerminalProgress = true;
+        quietStartup = "header";
+      };
     };
 
     difftastic = {

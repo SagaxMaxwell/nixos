@@ -16,6 +16,7 @@
         gamemode
         mangohud
       ];
+      extraCompatPackages = [ pkgs.proton-ge-bin ];
       gamescopeSession.enable = true;
     };
   };
@@ -23,6 +24,5 @@
   users.users.maxwell.extraGroups = [ "gamemode" ];
   home-manager.users.maxwell = {
     programs.mangohud.enable = true;
-    home.packages = [ pkgs.wineWow64Packages.stagingFull ];
   };
 }

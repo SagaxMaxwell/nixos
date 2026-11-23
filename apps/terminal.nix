@@ -1,11 +1,27 @@
-{ pkgs, opacity, ... }:
+{
+  inputs,
+  pkgs,
+  opacity,
+  ...
+}:
 
 {
   home.packages = with pkgs; [
     nix-output-monitor
     nix-tree
-    xh
+    ast-grep
+    fd
+    lsr
+    mcat
+    resterm
+    ringboard-wayland
+    ripgrep
+    sendme
+    zstd
+    impression
+    ventoy
     wireguard-tools
+    inputs.multiverse.packages.${pkgs.stdenv.hostPlatform.system}.mvs
   ];
 
   programs = {
@@ -16,21 +32,13 @@
       loadSessionVariables = true;
     };
 
-    direnv = {
+    devenv = {
       enable = true;
-      enableGitIntegration = true;
-      nix-direnv.enable = true;
+      enableNushellIntegration = true;
     };
 
     starship.enable = true;
 
-    bat.enable = true;
-    eza = {
-      enable = true;
-      enableNushellIntegration = true;
-    };
-    fd.enable = true;
-    ripgrep.enable = true;
     tealdeer.enable = true;
     atuin.enable = true;
 
@@ -74,6 +82,5 @@
       };
     };
 
-    nix-index-database.comma.enable = true;
   };
 }

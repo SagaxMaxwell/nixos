@@ -1,24 +1,17 @@
 { inputs, pkgs, ... }:
 
-let
-
-  # Correct the upstream dependency hash.
-  justray = inputs.justray.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs {
-    vendorHash = "sha256-IGRz+7u0vpk4DPjXoFwXkffSiwZb/EnnkTCrXNO2S4M=";
-  };
-in
 {
   imports = [ inputs.justray.nixosModules.default ];
   programs.justray = {
     enable = true;
-    package = justray;
+    package = inputs.justray.packages.${pkgs.stdenv.hostPlatform.system}.default;
   };
 
   home-manager.users.maxwell = {
     imports = [ inputs.justray.homeManagerModules.default ];
     services.justray = {
       enable = true;
-      package = justray;
+      package = inputs.justray.packages.${pkgs.stdenv.hostPlatform.system}.default;
     };
   };
 
@@ -32,6 +25,8 @@ in
   };
 
   services = {
+    ringboard.wayland.enable = true;
+
     flatpak = {
       enable = true;
       packages = [
@@ -40,6 +35,14 @@ in
           sha256 = "84bd15198df36f5d3e4c5bb826e2c1a2a1d63c03906e8bfd2b0efdce9a5fddb1";
           bundle = "${pkgs.fetchurl {
             url = "https://github.com/ibisjp/ibis-office/releases/download/v0.8.9/ibisOffice-0.8.9-Linux-x86_64.flatpak";
+            inherit sha256;
+          }}";
+        }
+        rec {
+          appId = "com.flectar.mail";
+          sha256 = "b439456b9f53684ca55464a2fb0d58b8aede5ddf1e0eb4f81e6e25ebab3a6f95";
+          bundle = "${pkgs.fetchurl {
+            url = "https://github.com/flectar/mail/releases/download/v0.1.0-alpha.7/flectar-mail-0.1.0-alpha.7-linux-x64.flatpak";
             inherit sha256;
           }}";
         }

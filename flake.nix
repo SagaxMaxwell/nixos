@@ -49,10 +49,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-index-database = {
-      url = "github:nix-community/nix-index-database";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    multiverse.url = "github:fzakaria/nixpkgs-multiverse";
   };
 
   outputs =
@@ -116,7 +113,6 @@
               overwriteBackup = true;
               extraSpecialArgs = { inherit inputs opacity alpha; };
               users.maxwell.imports = [
-                inputs.nix-index-database.homeModules.default
                 ./home.nix
               ];
             };
