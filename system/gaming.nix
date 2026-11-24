@@ -23,8 +23,8 @@
   users.users.maxwell.extraGroups = [ "gamemode" ];
   home-manager.users.maxwell = {
     home.packages = [
-      pkgs.nero-umu
-      pkgs.protonplus
+      pkgs.faugus-launcher
+      pkgs.protonup-rs
     ];
     programs.mangohud.enable = true;
   };

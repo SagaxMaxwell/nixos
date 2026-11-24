@@ -73,7 +73,7 @@ Umbriel 使用 Wayland 和上游起始配置，只覆盖明确的窗口布局、
 | Loupe | nixpkgs 包；常见图片格式默认由 Loupe 打开 |
 | Chrome | 开启实验性硬件编码；GPU 路径需在 chrome://gpu 检查 |
 | Blender | rocmSupport = true；Cycles 设备在应用内选择 HIP |
-| Steam | GameMode、Gamescope、MangoHud；Nero-umu 运行外部 Proton，ProtonPlus 管理 Runner |
+| Steam | GameMode、Gamescope、MangoHud；Faugus Launcher 通过 UMU 运行外部 Proton，ProtonUp-rs 管理 Runner |
 | Epic Games Launcher | 社区 flake 模块；官方 Linux Preview，仅 x86_64-linux |
 
 本机尚未提供 RX 9070 XT 的 PCI 地址，不能声明所有任务已绑定独显；远程 Greeter/Umbriel 保持 Intel 渲染，应用可使用 NVIDIA offload。mpv 和视频壁纸使用自动硬件解码，实际设备由运行环境选择。Flatpak、容器和应用自带运行时可能有独立设备权限。

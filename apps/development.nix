@@ -47,8 +47,6 @@
           "npm:@tintinweb/pi-subagents"
           "npm:pi-web-access"
           "npm:pi-doc-review"
-          "npm:pi-permission-modes"
-          "npm:pi-agent-budget"
           "npm:@juicesharp/rpiv-todo"
           "npm:pi-md-render"
         ];
