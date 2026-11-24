@@ -16,13 +16,16 @@
         gamemode
         mangohud
       ];
-      extraCompatPackages = [ pkgs.proton-ge-bin ];
       gamescopeSession.enable = true;
     };
   };
 
   users.users.maxwell.extraGroups = [ "gamemode" ];
   home-manager.users.maxwell = {
+    home.packages = [
+      pkgs.nero-umu
+      pkgs.protonplus
+    ];
     programs.mangohud.enable = true;
   };
 }
