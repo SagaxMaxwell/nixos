@@ -35,7 +35,10 @@
 
   # Use zram only.
   swapDevices = lib.mkForce [ ];
-  boot.kernelParams = [ "zswap.enabled=0" ];
+  boot.kernelParams = [
+    "zswap.enabled=0"
+    "systemd.swap=0"
+  ];
   services.zram-generator = {
     enable = true;
     settings.zram0 = {
