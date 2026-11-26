@@ -1,7 +1,8 @@
-{ lib, pkgs, ... }:
+{ inputs, lib, pkgs, ... }:
 
 let
   exe = lib.getExe;
+  tix = inputs.nixpkgs-tix.legacyPackages.${pkgs.stdenv.hostPlatform.system}.tix;
 in
 {
   programs.helix = {
@@ -67,7 +68,7 @@ in
         {
           name = "nix";
           auto-format = true;
-          language-servers = [ "nixd" ];
+          language-servers = [ "tix" ];
           formatter.command = exe pkgs.nixfmt;
         }
         {
@@ -84,7 +85,10 @@ in
       ];
 
       language-server = {
-        nixd.command = exe pkgs.nixd;
+        tix = {
+          command = exe tix;
+          args = [ "lsp" ];
+        };
         ty.command = exe pkgs.ty;
         ruff.command = exe pkgs.ruff;
         rust-analyzer.command = exe pkgs.rust-analyzer;

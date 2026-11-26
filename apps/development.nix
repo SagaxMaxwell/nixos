@@ -13,7 +13,9 @@
       ty
       rustup
     ])
-    ++ [ inputs.delta.packages.${pkgs.stdenv.hostPlatform.system}.delta ];
+    ++ [ inputs.delta.packages.${pkgs.stdenv.hostPlatform.system}.delta ]
+    ++ [ inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gascity ]
+    ++ [ inputs.nixpkgs-tix.legacyPackages.${pkgs.stdenv.hostPlatform.system}.tix ];
 
   programs = {
     bun.enable = true;

@@ -92,7 +92,7 @@ Umbriel 使用 Wayland 和上游起始配置，只覆盖明确的窗口布局、
 | 文件与文本 | `lsr`、`broot`、`mcat`、`ast-grep`、`fd`、`ripgrep`、Yazi；`fd` 和 `ripgrep` 作为 Yazi 搜索依赖保留 |
 | 网络与 Nix | `resterm`、`sendme`、`zstd`、`wireguard-tools`、`nix-output-monitor`、`nix-tree`、`mvs` |
 | 日常工具 | `tealdeer`、`atuin`、`bottom`、`zoxide`、`ringboard-wayland`、Impression、Ventoy |
-| 开发 | `nixd`、`nixfmt`、`oxfmt`、`oxlint`、`ruff`、`ty`、`rust-analyzer`、`tombi`、`rustup`、Bun、`uv`、`gh`、Difftastic、Delta |
+| 开发 | `tix`（Helix，来自 `nixpkgs-tix`）、`nixd`（Zed）、`nixfmt`、`oxfmt`、`oxlint`、`ruff`、`ty`、`rust-analyzer`、`tombi`、`rustup`、Bun、`uv`、`gh`、Difftastic、Delta |
 
 已移除 `bat`、`eza`、`xh`、`direnv`、`nix-direnv` 和 `comma`。纯文本搜索可使用系统 `grep`；结构化搜索使用 `ast-grep`。Difftastic 作为 Git difftool 保留。`resterm` 是当前使用的终端 REST 客户端，不能与同名的 reMarkable 投屏工具混淆。Yazi 的 `fd`/`ripgrep` 运行依赖仍保留。
 
@@ -137,6 +137,7 @@ mpv 使用 `hwdec = "auto"`、`vo = "gpu-next"`、`gpu-api = "auto"`，关闭内
 | 工具 | 配置与使用 |
 | --- | --- |
 | Herdr | `apps/herdr.nix` 接入 Claude Code、Codex、Pi 的 SessionStart 钩子和扩展；在 Herdr 窗格运行 `pi` |
+| Gas City | `apps/development.nix` 通过社区 flake `numtide/llm-agents.nix` 安装 `gascity`，命令为 `gc` |
 | Pi | 使用 Bun 安装声明在 `settings.packages` 中的 npm 插件；默认提供商为 OpenRouter，模型为 `openrouter/free`，凭据保留用户选择 |
 | Claude Code / Codex | 由 Home Manager 启用，主题和凭据保留用户配置；通过 Herdr 钩子同步会话状态 |
 | Delta | 上游 `delta-nix` flake 提供 Delta CLI 和桌面入口；与 Git 的 Difftastic difftool 分开使用 |
@@ -163,7 +164,6 @@ mpv 使用 `hwdec = "auto"`、`vo = "gpu-next"`、`gpu-api = "auto"`，关闭内
 | 替换 journald | journald 已与系统完整集成 | systemd-journald，并限制容量和保留时间 |
 | mdevd | 不能替换桌面和硬件服务依赖的 udev | systemd-udevd |
 | 替换 systemd | NixOS、登录会话和系统/用户服务都依赖 systemd | systemd |
-| Gas City | nixpkgs 无包；社区版本尚未验证，NixOS 暂不接入 | Darwin 使用 Homebrew，Agent 桌面使用 Herdr |
 | Vibex | 无现成 Nix 包，不自行打包 | 暂不安装 |
 
 ## 补丁与兼容处理
