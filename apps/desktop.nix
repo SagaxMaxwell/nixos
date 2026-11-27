@@ -21,15 +21,15 @@
       }
     );
 
-    packages = with pkgs; [
-      anytype
-      anime4k
-      (blender.override { rocmSupport = true; })
-      loupe
-      mission-center
-      papers
-      syncplay
-      tabularis
+    packages = [
+      pkgs.anytype
+      pkgs.anime4k
+      (pkgs.blender.override { rocmSupport = true; })
+      pkgs.loupe
+      pkgs.mission-center
+      pkgs.papers
+      pkgs.syncplay
+      pkgs.tabularis
     ];
   };
 
@@ -43,14 +43,14 @@
         gpu-api = "auto";
         background-color = "#${alpha}000000";
       };
-      scripts = with pkgs.mpvScripts; [
-        autosubsync-mpv
-        mpris
-        skipsilence
-        smartskip
-        sponsorblock-minimal
-        uosc
-        thumbfast
+      scripts = [
+        pkgs.mpvScripts.autosubsync-mpv
+        pkgs.mpvScripts.mpris
+        pkgs.mpvScripts.skipsilence
+        pkgs.mpvScripts.smartskip
+        pkgs.mpvScripts.sponsorblock-minimal
+        pkgs.mpvScripts.uosc
+        pkgs.mpvScripts.thumbfast
       ];
     };
 

@@ -5,23 +5,26 @@
   ...
 }:
 
+let
+  inherit (pkgs.stdenv.hostPlatform) system;
+in
 {
-  home.packages = with pkgs; [
-    nix-output-monitor
-    nix-tree
-    broot
-    ast-grep
-    fd
-    lsr
-    mcat
-    resterm
-    ripgrep
-    sendme
-    zstd
-    impression
-    ventoy
-    wireguard-tools
-    inputs.multiverse.packages.${pkgs.stdenv.hostPlatform.system}.mvs
+  home.packages = [
+    pkgs.nix-output-monitor
+    pkgs.nix-tree
+    pkgs.broot
+    pkgs.ast-grep
+    pkgs.fd
+    pkgs.lsr
+    pkgs.mcat
+    pkgs.resterm
+    pkgs.ripgrep
+    pkgs.sendme
+    pkgs.zstd
+    pkgs.impression
+    pkgs.ventoy
+    pkgs.wireguard-tools
+    inputs.multiverse.packages.${system}.mvs
   ];
 
   programs = {
@@ -81,6 +84,5 @@
         background-blur = true;
       };
     };
-
   };
 }

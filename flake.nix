@@ -74,11 +74,11 @@
       devShells.${system}.default =
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          mkShell = pkgs.mkShell.override {
+            stdenv = pkgs.stdenvAdapters.useMoldLinker pkgs.stdenv;
+          };
         in
-        (pkgs.mkShell.override {
-          stdenv = pkgs.stdenvAdapters.useMoldLinker pkgs.stdenv;
-        })
-          { };
+        mkShell { };
 
       checks.${system} =
         let

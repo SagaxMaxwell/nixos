@@ -12,9 +12,9 @@
 
     steam = {
       enable = true;
-      extraPackages = with pkgs; [
-        gamemode
-        mangohud
+      extraPackages = [
+        pkgs.gamemode
+        pkgs.mangohud
       ];
       gamescopeSession.enable = true;
     };

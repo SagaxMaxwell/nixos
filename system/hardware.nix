@@ -22,15 +22,15 @@
 
   services.udev.packages = [ pkgs.openrgb ];
 
-  home-manager.users.maxwell.home.packages = with pkgs; [
-    ddcutil
-    libva-utils
-    mesa-demos
-    nvtopPackages.amd
-    openrgb
-    pciutils
-    vulkan-tools
-    vulkan-validation-layers
+  home-manager.users.maxwell.home.packages = [
+    pkgs.ddcutil
+    pkgs.libva-utils
+    pkgs.mesa-demos
+    pkgs.nvtopPackages.amd
+    pkgs.openrgb
+    pkgs.pciutils
+    pkgs.vulkan-tools
+    pkgs.vulkan-validation-layers
   ];
 
   # Use zram only.

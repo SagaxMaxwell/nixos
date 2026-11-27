@@ -24,7 +24,7 @@ in
     programs.noctalia.settings.plugin_settings."noctalia/screen_recorder".video_encoder = "gpu";
 
     programs.noctalia.settings.plugins = {
-      enabled = map (name: "noctalia/${name}") names;
+      enabled = builtins.map (name: "noctalia/${name}") names;
       auto_update = "official";
       source = [
         {
@@ -42,14 +42,14 @@ in
       ];
     };
 
-    home.packages = with pkgs; [
-      bitwarden-cli
-      libinput
-      gpu-screen-recorder
-      mpvpaper
-      python3
-      slurp
-      socat
+    home.packages = [
+      pkgs.bitwarden-cli
+      pkgs.libinput
+      pkgs.gpu-screen-recorder
+      pkgs.mpvpaper
+      pkgs.python3
+      pkgs.slurp
+      pkgs.socat
     ];
   };
 }

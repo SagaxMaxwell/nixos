@@ -6,7 +6,8 @@
 }:
 
 let
-  package = inputs.luciole.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  inherit (pkgs.stdenv.hostPlatform) system;
+  package = inputs.luciole.packages.${system}.default;
 in
 {
   imports = [ inputs.luciole.nixosModules.default ];

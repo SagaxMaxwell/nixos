@@ -13,7 +13,7 @@ let
     pkgs.stdenvNoCC.mkDerivation {
       inherit pname version;
       src = pkgs.linkFarm "${pname}-sources" (
-        map (source: {
+        builtins.map (source: {
           inherit (source) name;
           path = pkgs.fetchurl source;
         }) sources
@@ -233,31 +233,29 @@ in
   fonts = {
     enableDefaultPackages = false;
 
-    packages =
-      with pkgs;
-      [
-        roboto-flex
-        (google-fonts.override {
-          fonts = [
-            "Roboto Serif"
-            "Inter"
-            "Recursive"
-            "Shantell Sans"
-            "Playwrite US Modern"
-            "Nabla"
-            "Honk"
-            "STIX Two Math"
-          ];
-        })
-        monaspace.variable
-        (cascadia-code.override { useVariableFont = true; })
-        source-han-sans-vf-ttf
-        source-han-serif-vf-ttf
-        sarasa-gothic
-        lxgw-wenkai
-        smiley-sans
-      ]
-      ++ builtins.attrValues extraFonts;
+    packages = [
+      pkgs.roboto-flex
+      (pkgs.google-fonts.override {
+        fonts = [
+          "Roboto Serif"
+          "Inter"
+          "Recursive"
+          "Shantell Sans"
+          "Playwrite US Modern"
+          "Nabla"
+          "Honk"
+          "STIX Two Math"
+        ];
+      })
+      pkgs.monaspace.variable
+      (pkgs.cascadia-code.override { useVariableFont = true; })
+      pkgs.source-han-sans-vf-ttf
+      pkgs.source-han-serif-vf-ttf
+      pkgs.sarasa-gothic
+      pkgs.lxgw-wenkai
+      pkgs.smiley-sans
+    ]
+    ++ builtins.attrValues extraFonts;
 
     fontconfig = {
       antialias = true;

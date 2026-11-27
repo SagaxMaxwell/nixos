@@ -1,21 +1,28 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 
+let
+  inherit (pkgs.stdenv.hostPlatform) system;
+in
 {
   imports = [ ./herdr.nix ];
 
-  home.packages =
-    (with pkgs; [
-      nixd
-      tix
-      nixfmt
-      gh
-      oxfmt
-      ruff
-      ty
-      rustup
-    ])
-    ++ [ inputs.delta.packages.${pkgs.stdenv.hostPlatform.system}.delta ]
-    ++ [ inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gascity ];
+  home.packages = [
+    pkgs.nixd
+    pkgs.tix
+    pkgs.nixfmt
+    pkgs.gh
+    pkgs.oxfmt
+    pkgs.ruff
+    pkgs.ty
+    pkgs.rustup
+    inputs.delta.packages.${system}.delta
+    inputs.llm-agents.packages.${system}.gascity
+  ];
 
   programs = {
     bun.enable = true;
@@ -38,10 +45,10 @@
         theme = "system";
         defaultProvider = "openrouter";
         defaultModel = "openrouter/free";
-        shellPath = "${pkgs.bash}/bin/bash";
-        externalEditor = "${pkgs.helix}/bin/hx";
+        shellPath = lib.getExe' pkgs.bash "bash";
+        externalEditor = lib.getExe' pkgs.helix "hx";
         defaultTools = [ "+codemode" ];
-        npmCommand = [ "${pkgs.bun}/bin/bun" ];
+        npmCommand = [ (lib.getExe' pkgs.bun "bun") ];
         packages = [
           "npm:billion-context"
           "npm:pi-total-recall"
