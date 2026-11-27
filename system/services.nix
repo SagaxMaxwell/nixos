@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   imports = [ inputs.justray.nixosModules.default ];
@@ -84,6 +89,8 @@
       pulse.enable = true;
     };
   };
+
+  systemd.user.services.ringboard-listener.environment.RUST_LOG = lib.mkForce "warn";
 
   xdg.portal = {
     enable = true;

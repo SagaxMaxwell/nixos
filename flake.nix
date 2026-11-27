@@ -17,8 +17,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
-    nixpkgs-tix.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/master";
 
     home-manager = {

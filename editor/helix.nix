@@ -1,8 +1,7 @@
-{ inputs, lib, pkgs, ... }:
+{ lib, pkgs, ... }:
 
 let
   exe = lib.getExe;
-  tix = inputs.nixpkgs-tix.legacyPackages.${pkgs.stdenv.hostPlatform.system}.tix;
 in
 {
   programs.helix = {
@@ -86,7 +85,7 @@ in
 
       language-server = {
         tix = {
-          command = exe tix;
+          command = exe pkgs.tix;
           args = [ "lsp" ];
         };
         ty.command = exe pkgs.ty;

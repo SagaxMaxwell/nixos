@@ -15,7 +15,6 @@
     lsr
     mcat
     resterm
-    ringboard-wayland
     ripgrep
     sendme
     zstd

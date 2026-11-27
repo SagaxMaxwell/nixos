@@ -36,7 +36,7 @@ nix-flatpak 由 Nix 配置安装。当前 Flatpak 应用是 ibisOffice 和 Flect
 | --- | --- |
 | Nix | Lix、`flakes`、`nix-command`、`nix-ld`、XDG 基础目录、每周 GC（保留 30 天）和 store 优化 |
 | 启动 | `systemd-boot`，最多保留 10 代；CachyOS 最新内核；开机清理临时目录 |
-| 文件系统 | Btrfs `compress=zstd:1`、每周 scrub、zram（内存一半，zstd）、`systemd-oomd` |
+| 文件系统 | Btrfs `compress=zstd:1`、每周 scrub、仅使用 zram 交换（内存一半，zstd），磁盘 swap 已禁用，启用 `systemd-oomd` |
 | 网络 | NetworkManager + iwd、`systemd-resolved`、BBR/FQ、OpenSSH、chrony、PipeWire、portal 和 `wireguard-tools` |
 | 桌面服务 | GVFS、GNOME Keyring、fwupd、rtkit、nftables 和 run0；sudo 关闭 |
 | 代理 | JustRay 系统与用户服务共用同一包；NetworkManager dispatcher 为 TUN 设置 `172.19.0.2` 和 `~.` DNS 路由域 |
@@ -62,7 +62,7 @@ Umbriel 使用 Wayland 和上游起始配置，只覆盖明确的窗口布局、
 | 小组件 | 桌面天气、时间、系统监控；锁屏中央时钟 |
 | Luciole | 文件/目录选择器；启用图片、视频、文本和 PDF 预览 |
 
-官方插件从 Noctalia 官方 Git 源导入，自动跟随官方源更新。已启用 example、screen_recorder、bongocat、translator、timer、wallhaven、mpvpaper、kaomoji、notes、bitwarden、world_clock、wallpaper_depth、umbriel-companion 和 lyrics。插件安装后仍需按插件要求添加组件、登录或提供模型。
+官方插件从 Noctalia 官方 Git 源导入，自动跟随官方源更新。已启用 example、screen_recorder、bongocat、translator、timer、wallhaven、mpvpaper、kaomoji、notes、bitwarden、world_clock、wallpaper_depth、umbriel-companion 和 lyrics。
 
 远程 Noctalia 在“锁定并挂起”唤醒后可能丢失锁屏时钟；热加载可恢复，问题已提交 [Noctalia #5444](https://github.com/noctalia-dev/noctalia/issues/5444)。插件安装后仍需按插件要求添加状态栏/桌面组件、登录或提供模型：Translator 使用启动器 /tr，Bitwarden 需要登录，深度壁纸需要模型，Video Wallpaper 支持 MOV、MP4、MKV、WebM 和 GIF。插件 Slideshow 与 Shell 图片轮换相互独立。
 
@@ -92,7 +92,7 @@ Umbriel 使用 Wayland 和上游起始配置，只覆盖明确的窗口布局、
 | 文件与文本 | `lsr`、`broot`、`mcat`、`ast-grep`、`fd`、`ripgrep`、Yazi；`fd` 和 `ripgrep` 作为 Yazi 搜索依赖保留 |
 | 网络与 Nix | `resterm`、`sendme`、`zstd`、`wireguard-tools`、`nix-output-monitor`、`nix-tree`、`mvs` |
 | 日常工具 | `tealdeer`、`atuin`、`bottom`、`zoxide`、`ringboard-wayland`、Impression、Ventoy |
-| 开发 | `tix`（Helix，来自 `nixpkgs-tix`）、`nixd`（Zed）、`nixfmt`、`oxfmt`、`oxlint`、`ruff`、`ty`、`rust-analyzer`、`tombi`、`rustup`、Bun、`uv`、`gh`、Difftastic、Delta |
+| 开发 | `tix`（Helix）、`nixd`（Zed）、`nixfmt`、`oxfmt`、`oxlint`、`ruff`、`ty`、`rust-analyzer`、`tombi`、`rustup`、Bun、`uv`、`gh`、Difftastic、Delta |
 
 已移除 `bat`、`eza`、`xh`、`direnv`、`nix-direnv` 和 `comma`。纯文本搜索可使用系统 `grep`；结构化搜索使用 `ast-grep`。Difftastic 作为 Git difftool 保留。`resterm` 是当前使用的终端 REST 客户端，不能与同名的 reMarkable 投屏工具混淆。Yazi 的 `fd`/`ripgrep` 运行依赖仍保留。
 
@@ -128,7 +128,7 @@ mpv 使用 `hwdec = "auto"`、`vo = "gpu-next"`、`gpu-api = "auto"`，关闭内
 | --- | --- |
 | Scrutiny | 127.0.0.1:8080 |
 | InfluxDB | 127.0.0.1:8086 |
-| SSH | 默认端口 22，是否开放由防火墙决定 |
+| SSH | 默认端口 `22/tcp`，由 OpenSSH 模块在本机防火墙放行 |
 | JustRay | TUN；DNS 172.19.0.2；代理端口由订阅配置决定 |
 | WireGuard | 仅安装 CLI 和 NetworkManager 导入支持，未声明连接 |
 
@@ -196,10 +196,11 @@ nixpkgs 自身可能包含构建适配，例如 Zed 的 GLib 路径、gVisor 的
 nixos-rebuild switch --flake .#nixos --elevate run0
 nix flake update
 nix flake check --all-systems --no-build
+nix build --no-link .#checks.x86_64-linux.noctalia-config .#checks.x86_64-linux.umbriel-config
 nixos-rebuild build --flake .#nixos
 nixos-rebuild switch --rollback --no-reexec --elevate run0
 ```
 
-完整检查会验证 Noctalia 和 Umbriel 配置；普通 Git flake 需要先 git add 新文件，工作树检查可使用 path:.。只有激活阶段需要提权。更换机器时重新运行 nixos-generate-config 并核对磁盘 UUID。
+`nix flake check --no-build` 只做求值。显式构建两个检查项会生成 Noctalia TOML，并运行 Umbriel 的原生配置验证器。普通 Git flake 需要先 `git add` 新文件，工作树检查可使用 `path:.`。只有激活阶段需要提权。更换机器时重新运行 `nixos-generate-config` 并核对磁盘 UUID。
 
 Rime 配置更新后可用 `systemctl --user restart app-org.fcitx.Fcitx5@autostart.service` 重载输入法。

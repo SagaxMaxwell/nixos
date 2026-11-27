@@ -6,6 +6,7 @@
   home.packages =
     (with pkgs; [
       nixd
+      tix
       nixfmt
       gh
       oxfmt
@@ -14,8 +15,7 @@
       rustup
     ])
     ++ [ inputs.delta.packages.${pkgs.stdenv.hostPlatform.system}.delta ]
-    ++ [ inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gascity ]
-    ++ [ inputs.nixpkgs-tix.legacyPackages.${pkgs.stdenv.hostPlatform.system}.tix ];
+    ++ [ inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gascity ];
 
   programs = {
     bun.enable = true;
