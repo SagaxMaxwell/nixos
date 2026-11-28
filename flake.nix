@@ -54,6 +54,11 @@
     multiverse.url = "github:fzakaria/nixpkgs-multiverse";
 
     llm-agents.url = "github:numtide/llm-agents.nix";
+
+    mcp-servers-nix = {
+      url = "github:natsukium/mcp-servers-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

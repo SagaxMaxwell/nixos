@@ -7,6 +7,7 @@
 
 let
   inherit (pkgs.stdenv.hostPlatform) system;
+  chromeDevtoolsMcp = inputs.mcp-servers-nix.packages.${system}.chrome-devtools-mcp;
 in
 {
   imports = [ ./herdr.nix ];
@@ -22,6 +23,8 @@ in
     pkgs.rustup
     inputs.delta.packages.${system}.delta
     inputs.llm-agents.packages.${system}.gascity
+    inputs.llm-agents.packages.${system}.kitesurf
+    chromeDevtoolsMcp
   ];
 
   programs = {
@@ -36,6 +39,10 @@ in
     codex = {
       enable = true;
       mutableSettings = true;
+      settings.mcp_servers.kitesurf = {
+        command = lib.getExe chromeDevtoolsMcp;
+        args = [ "--wsEndpoint=wss://kitesurf.dev/devtools/browser" ];
+      };
     };
 
     pi-coding-agent = {

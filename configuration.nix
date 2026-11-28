@@ -76,6 +76,12 @@ in
   };
   users.defaultUserShell = pkgs.nushell;
   environment.shells = [ pkgs.nushell ];
+  environment.etc."opt/chrome/policies/managed/preferences.json".text = builtins.toJSON {
+    RestoreOnStartup = 1;
+    HighEfficiencyModeEnabled = true;
+    MemorySaverModeSavings = 1;
+    HardwareAccelerationModeEnabled = true;
+  };
   programs.nushell.enable = true;
   programs.nix-ld.enable = true;
 

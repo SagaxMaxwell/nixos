@@ -140,7 +140,11 @@ mpv 使用 `hwdec = "auto"`、`vo = "gpu-next"`、`gpu-api = "auto"`，关闭内
 | Gas City | `apps/development.nix` 通过社区 flake `numtide/llm-agents.nix` 安装 `gascity`，命令为 `gc` |
 | Pi | 使用 Bun 安装声明在 `settings.packages` 中的 npm 插件；默认提供商为 OpenRouter，模型为 `openrouter/free`，凭据保留用户选择 |
 | Claude Code / Codex | 由 Home Manager 启用，主题和凭据保留用户配置；通过 Herdr 钩子同步会话状态 |
+| Kitesurf | 终端客户端通过已有的 [llm-agents.nix](https://github.com/numtide/llm-agents.nix#kitesurf) 输入安装。运行 `kitesurf --playground --mode=ansi https://example.com` 可免登录试用 |
+| Chrome DevTools MCP | 桥接器来自 [mcp-servers-nix](https://github.com/natsukium/mcp-servers-nix/blob/main/pkgs/official/chrome-devtools/default.nix)。Codex 通过 `programs.codex.settings.mcp_servers.kitesurf` 连接 Cloudflare Playground。在 Codex 内用 `/mcp` 查看 |
 | Delta | 上游 `delta-nix` flake 提供 Delta CLI 和桌面入口；与 Git 的 Difftastic difftool 分开使用 |
+
+当前锁定的 nixpkgs 没有这两个包，Flathub 的 x86_64 应用目录也未收录，故使用上述社区 Nix 包。Pi 内置 MCP 客户端，但当前锁定的 Home Manager 模块没有 MCP 专用字段。若手动接入，可在 `.pi/mcp.json` 或 `~/.pi/agent/mcp.json` 中为 `chrome-devtools-mcp` 传入 `--wsEndpoint=wss://kitesurf.dev/devtools/browser`。
 
 ## 软件取舍
 

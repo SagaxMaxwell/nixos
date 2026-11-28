@@ -2,9 +2,40 @@
   lib,
   opacity,
   inputs,
+  pkgs,
   ...
 }:
 
+let
+  chromeAtLogin =
+    chrome:
+    pkgs.writeShellScript "chrome-at-login" ''
+      data_dir="''${CHROME_USER_DATA_DIR:-''${CHROME_CONFIG_HOME:-''${XDG_CONFIG_HOME:-$HOME/.config}}/google-chrome}"
+
+      # Extended preloading is a profile preference.
+      if [[ ! -L "$data_dir/SingletonLock" ]]; then
+        for prefs in "$data_dir"/{Default,Profile\ *}/Preferences; do
+          [[ -f "$prefs" && ! -L "$prefs" ]] || continue
+          (
+            tmp=$(${lib.getExe' pkgs.coreutils "mktemp"} "$prefs.XXXXXX") || exit
+            trap '${lib.getExe' pkgs.coreutils "rm"} -f "$tmp"' EXIT
+            if ${lib.getExe pkgs.jq} -ce '
+              select(type == "object")
+              | (.account_values.net // {} | has("network_prediction_options")) as $has_account_pref
+              | select(.net.network_prediction_options != 3 or
+                  ($has_account_pref and .account_values.net.network_prediction_options != 3))
+              | .net.network_prediction_options = 3
+              | if $has_account_pref then .account_values.net.network_prediction_options = 3 else . end
+            ' "$prefs" > "$tmp" && [[ ! -L "$data_dir/SingletonLock" ]]; then
+              ${lib.getExe' pkgs.coreutils "mv"} -f "$tmp" "$prefs"
+            fi
+          )
+        done
+      fi
+
+      exec ${chrome}
+    '';
+in
 {
   programs.umbriel.enable = true;
 
@@ -24,7 +55,7 @@
               xwayland_native_resolution = true;
               autostart = [
                 (lib.getExe config.programs.ghostty.package)
-                (lib.getExe config.programs.google-chrome.finalPackage)
+                (toString (chromeAtLogin (lib.getExe config.programs.google-chrome.finalPackage)))
               ];
             };
 
